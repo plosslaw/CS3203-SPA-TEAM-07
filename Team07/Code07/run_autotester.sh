@@ -1,0 +1,1 @@
+./build/src/autotester/autotester $1 $2 $3
