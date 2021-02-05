@@ -1,21 +1,10 @@
 #pragma once
 
-#include<stdio.h>
-#include <iostream>
-#include <string>
-#include <vector>
+#include <unordered_map>
+#include "PKBEntities.hpp"
 
-using namespace std;
-typedef short PROC;
-
-class TNode;
-
-class VarTable;  // no need to #include "VarTable.h" as all I need is pointer
-
-class PKB {
-public:
-	static VarTable* varTable; 
-	static int setProcToAST(PROC p, TNode* r);
-	static TNode* getRootAST (PROC p);
-
-};
+typedef struct {
+	std::unordered_map<var_ref, variable> variables;
+	std::unordered_map<stmt_ref, statement> statements;
+	TNode ast_root;
+} PKB;
