@@ -10,5 +10,5 @@ class PKBBuilder {
             ast_root = root;
         }
 
-        PKB build() {}
+        PKB build();
 };
