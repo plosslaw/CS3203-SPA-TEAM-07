@@ -1,5 +1,5 @@
 #include "PKBEntities.hpp"
-#include "PKB.h"
+#include "PKB.hpp"
 
 class PKBBuilder {
     private:

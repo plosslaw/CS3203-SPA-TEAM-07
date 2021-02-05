@@ -1,5 +1,5 @@
 #include "Types.hpp"
-#include "TNode.h"
+#include "TNode.hpp"
 #include <unordered_set>
 #include <optional>
 
