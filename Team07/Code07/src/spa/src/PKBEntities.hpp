@@ -1,9 +1,9 @@
-#include "Types.hpp"
-#include "TNode.hpp"
 #include <unordered_set>
 #include <optional>
+#include "Types.hpp"
+#include "TNode.hpp"
 
-typedef struct {
+typedef struct statement{
     stmt_ref reference;
     stmt_type type;
     TNode ast;
@@ -16,8 +16,8 @@ typedef struct {
     std::unordered_set<stmt_ref> indirect_parent;
     std::unordered_set<stmt_ref> indirect_follows;
 
-} statement;
+};
 
-typedef struct {
+typedef struct variable{
     var_ref reference;
-} variable;
+};
