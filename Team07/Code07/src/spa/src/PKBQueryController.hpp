@@ -14,7 +14,8 @@ class PKBQueryController {
         bool isParentStar(stmt_ref s1, stmt_ref s2);
         bool statementUses(stmt_ref s, var_ref v);
         bool statementModifies(stmt_ref s, var_ref v);
-        // satisfies pattern: define asgn_ref, pattern uses, pattern modifies
+        bool satisfiesPattern(assign_ref a, pattern p);
+        // pattern uses, pattern modifies
         std::vector<var_ref> getAllVariables();
         std::vector<statement> getAllStatements();
         std::vector<stmt_ref> getStatementsOfType();

@@ -15,9 +15,9 @@ typedef int stmt_ref;
 typedef int assign_ref;
 typedef std::string var_ref;
 
-typedef struct {
+typedef struct pattern{
     var_ref lvalue;
     std::string rvalue;
-} pattern;
+};
 
 
