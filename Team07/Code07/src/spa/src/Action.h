@@ -32,8 +32,7 @@ class Action {
     };
 
 public: 
-    Action(search_type searchType, std::vector<std::string> argList,
-        std::vector<arg_type> argTypeList);
+    Action(search_type searchType, std::vector<std::string> argList, std::vector<arg_type> argTypeList);
 
 private:
     search_type searchType;
