@@ -1,11 +1,18 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 class Action {
     enum search_type {
         PATTERN,
-        SUCH_THAT
+        SUCH_THAT_FOLLOWS,
+        SUCH_THAT_FOLLOWST,
+        SUCH_THAT_PARENT,
+        SUCH_THAT_PARENTT,
+        SUCH_THAT_USES,
+        SUCH_THAT_MODIFIES,
+        DECLARATION
     };
 
 /**
@@ -25,14 +32,12 @@ class Action {
     };
 
 public: 
-    Action(search_type searchType, std::string firstArg, std::string secondArg,
-        arg_type firstArgType, arg_type secondArgType);
+    Action(search_type searchType, std::vector<std::string> argList,
+        std::vector<arg_type> argTypeList);
 
 private:
     search_type searchType;
-    std::string firstArg;
-    std::string secondArg;
-    arg_type firstArgType;
-    arg_type secondArgType;
+    std::vector<std::string> argList;
+    std::vector<arg_type> argTypeList;
 
 };
