@@ -1,1 +1,1 @@
-Checks: -*, clang-analyzer-*, cppcoreguidelines-*
+Checks: -*, clang-analyzer-*, cppcoreguidelines-*, google-*
