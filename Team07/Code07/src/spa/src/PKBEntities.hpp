@@ -1,9 +1,8 @@
 #include <unordered_set>
-#include <optional>
-#include "Types.hpp"
 #include "TNode.hpp"
+#include "Types.hpp"
 
-typedef struct statement{
+typedef struct statement {
     stmt_ref reference;
     stmt_type type;
     TNode ast;
@@ -18,6 +17,10 @@ typedef struct statement{
 
 };
 
-typedef struct variable{
+typedef struct variable {
     var_ref reference;
+};
+
+typedef struct constant {
+    const_value value;
 };

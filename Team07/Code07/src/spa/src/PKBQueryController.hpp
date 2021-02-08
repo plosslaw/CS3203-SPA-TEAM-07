@@ -16,6 +16,7 @@ class PKBQueryController {
         bool statementModifies(stmt_ref s, var_ref v);
         bool satisfiesPattern(assign_ref a, pattern p);
         // pattern uses, pattern modifies
+        std::vector<constant> getAllConstants();
         std::vector<var_ref> getAllVariables();
         std::vector<statement> getAllStatements();
         std::vector<stmt_ref> getStatementsOfType();
