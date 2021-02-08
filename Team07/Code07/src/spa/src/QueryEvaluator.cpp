@@ -2,6 +2,3 @@
 
 using namespace std;
 
-void QEExecuteQuery(vector<Action>) {
-
-}
