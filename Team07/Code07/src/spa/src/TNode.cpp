@@ -2,14 +2,28 @@
 
 TNode::TNode()
 {
+  stmtNum = NULL_STMT_REF;
   value = "";
   type = "";
 }
 
 TNode::TNode(std::string val, std::string typ)
 {
+  stmtNum = NULL_STMT_REF;
   value = val;
   type = typ;
+}
+
+TNode::TNode(int num, std::string val, std::string typ)
+{
+  stmtNum = num;
+  value = val;
+  type = typ;
+}
+
+int TNode::getStmtNum()
+{
+  return stmtNum;
 }
 
 std::string TNode::getValue()
