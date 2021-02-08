@@ -2,12 +2,13 @@
 
 #include <vector>
 
-using namespace std;
-
 class Action {
     public: 
+
+    private:
+    
 
 };
 
 
-void executeQuery (vector<Action>);
+void QEExecuteQuery (std::vector<Action>);
