@@ -17,6 +17,7 @@ class PKBQueryController {
         bool satisfiesPattern(assign_ref a, pattern p);
         // pattern uses, pattern modifies
         std::vector<constant> getAllConstants();
+        std::vector<proc_ref> getAllProcedures();
         std::vector<var_ref> getAllVariables();
         std::vector<statement> getAllStatements();
         std::vector<stmt_ref> getStatementsOfType();

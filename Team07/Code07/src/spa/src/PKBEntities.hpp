@@ -24,3 +24,11 @@ typedef struct variable {
 typedef struct constant {
     const_value value;
 };
+
+typedef struct procedure {
+    proc_ref reference;
+
+    std::unordered_set<proc_ref> children;
+    std::unordered_set<var_ref> uses;
+    std::unordered_set<var_ref> modifies;
+};

@@ -14,6 +14,7 @@ enum stmt_type {
 typedef int stmt_ref;
 typedef int assign_ref;
 typedef int const_value;
+typedef std::string proc_ref;
 typedef std::string var_ref;
 
 typedef struct pattern{
