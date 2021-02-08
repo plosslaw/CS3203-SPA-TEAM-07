@@ -2,28 +2,28 @@
 
 TNode::TNode()
 {
-  stmtNum = NULL_STMT_REF;
+  statementNum = NULL_STMT_REF;
   value = "";
-  type = "";
+  type = STATEMENT;
 }
 
-TNode::TNode(std::string val, std::string typ)
+TNode::TNode(std::string val, statementType typ)
 {
-  stmtNum = NULL_STMT_REF;
+  statementNum = NULL_STMT_REF;
+  value = val;
+  type = STATEMENT;
+}
+
+TNode::TNode(int num, std::string val, statementType typ)
+{
+  statementNum = num;
   value = val;
   type = typ;
 }
 
-TNode::TNode(int num, std::string val, std::string typ)
+int TNode::getStatementNum()
 {
-  stmtNum = num;
-  value = val;
-  type = typ;
-}
-
-int TNode::getStmtNum()
-{
-  return stmtNum;
+  return statementNum;
 }
 
 std::string TNode::getValue()
@@ -31,7 +31,7 @@ std::string TNode::getValue()
   return value;
 }
 
-std::string TNode::getType()
+statementType TNode::getType()
 {
   return type;
 }

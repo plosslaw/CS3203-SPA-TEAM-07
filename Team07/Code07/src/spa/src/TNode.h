@@ -2,23 +2,39 @@
 #include <vector>
 #define NULL_STMT_REF -1
 
+enum statementType
+{
+  STATEMENT,
+  READ,
+  PRINT,
+  CALL,
+  WHILE,
+  IF,
+  ASSIGN,
+  CONSTANT,
+  VARIABLE,
+  PROCEDURE,
+  OPERATOR,
+  STATEMENTLIST,
+};
+
 class TNode
 {
   /* value:type */
 private:
-  int stmtNum;
+  int statementNum;
   std::string value; // proc/var names, const, then, else
-  std::string type;  // var, const, call, assign, if, while, operators, stmtLst
+  statementType type;
 
   std::vector<TNode> children;
 
 public:
   TNode();
-  TNode(std::string val, std::string typ);
-  TNode(int num, std::string val, std::string typ);
+  TNode(std::string val, statementType typ);
+  TNode(int num, std::string val, statementType typ);
 
-  int getStmtNum();
+  int getStatementNum();
   std::string getValue();
-  std::string getType();
+  statementType getType();
   std::vector<TNode> getChildren();
 };
