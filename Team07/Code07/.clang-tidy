@@ -1,1 +1,6 @@
-Checks: -*, clang-analyzer-*, cppcoreguidelines-*, google-*
+Checks: 
+    -*, 
+    clang-analyzer-*, 
+    cppcoreguidelines-*, 
+    google-*, 
+    -google-build-using-namespace
