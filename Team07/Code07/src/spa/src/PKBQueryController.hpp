@@ -1,24 +1,44 @@
 #include <vector>
 #include "PKB.hpp"
-#include "Types.hpp"
-#include "PKBEntities.hpp"
 
 class PKBQueryController {
     private:
         PKB pkb;
-        PKBQueryController() {}
+        PKBQueryController();
     public:
+        // Returns true if and only if Follows(s1,s2)
         bool isFollows(stmt_ref s1, stmt_ref s2);
+
+        // Returns true if and only if Follows*(s1,s2)
         bool isFollowsStar(stmt_ref s1, stmt_ref s2);
+
+        // Returns true if and only if Parent(s1,s2)
         bool isParent(stmt_ref s1, stmt_ref s2);
+
+        // Returns true if and only if Parent(s1,s2)
         bool isParentStar(stmt_ref s1, stmt_ref s2);
+
+        // Returns true if and only if Uses(s,v)
         bool statementUses(stmt_ref s, var_ref v);
+
+        // Returns true if and only if Modifies(s,v)
         bool statementModifies(stmt_ref s, var_ref v);
+
+        // Returns true if and only if assignment statement a matches pattern p
         bool satisfiesPattern(assign_ref a, pattern p);
-        // pattern uses, pattern modifies
+
+        // Returns list of all constants in the SIMPLE program
         std::vector<constant> getAllConstants();
+
+        // Returns list of all procedures in the SIMPLE program
         std::vector<proc_ref> getAllProcedures();
-        std::vector<var_ref> getAllVariables();
+
+        // Returns list of all statements in the SIMPLE program
         std::vector<statement> getAllStatements();
-        std::vector<stmt_ref> getStatementsOfType();
+
+        // Returns list of all variables in the SIMPLE program
+        std::vector<var_ref> getAllVariables();
+
+        // Returns list of all statements of type t in the SIMPLE program
+        std::vector<stmt_ref> getStatementsOfType(stmt_type t);
 };
