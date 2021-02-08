@@ -29,7 +29,10 @@ public:
         arg_type firstArgType, arg_type secondArgType);
 
 private:
+    search_type searchType;
     std::string firstArg;
     std::string secondArg;
+    arg_type firstArgType;
+    arg_type secondArgType;
 
 };
