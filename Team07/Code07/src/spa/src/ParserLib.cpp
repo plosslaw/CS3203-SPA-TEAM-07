@@ -49,10 +49,9 @@ string ParseException::prettyPrint() {
 // combinators ----------------------------------------------------------------
 
 string stringMatch(State &s, string str) {
-	int i = s.i;
 	for (int j = 0; j < str.size(); j++) {
-		if (s.source.at(i + j) != str.at(j)) {
-			throw ParseException(i, i+j, "stringParse", str);
+		if (s.source.at(s.i + j) != str.at(j)) {
+			throw ParseException(s.i, s.i+j, "stringParse", str);
 		}
 	}
 	s.i += str.size();
