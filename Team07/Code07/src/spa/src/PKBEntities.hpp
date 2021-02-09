@@ -1,5 +1,5 @@
 #include <unordered_set>
-#include "TNode.hpp"
+#include "TNode.h"
 #include "Types.hpp"
 
 typedef struct statement {

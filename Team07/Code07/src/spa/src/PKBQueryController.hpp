@@ -1,5 +1,5 @@
 #include <vector>
-#include "PKB.hpp"
+#include "PKB.h"
 
 class PKBQueryController {
     private:
