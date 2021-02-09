@@ -2,8 +2,7 @@
 #include <vector>
 #define NULL_STMT_REF -1
 
-enum statementType
-{
+enum statementType {
   STATEMENT,
   READ,
   PRINT,
@@ -18,8 +17,7 @@ enum statementType
   STATEMENTLIST,
 };
 
-class TNode
-{
+class TNode {
   /* value:type */
 private:
   int statementNum;
@@ -33,6 +31,7 @@ public:
   TNode(std::string val, statementType typ);
   TNode(int num, std::string val, statementType typ);
 
+  void addChild(TNode child);
   int getStatementNum();
   std::string getValue();
   statementType getType();

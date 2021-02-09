@@ -1,42 +1,29 @@
 #include "TNode.h"
 
-TNode::TNode()
-{
+TNode::TNode() {
   statementNum = NULL_STMT_REF;
   value = "";
   type = STATEMENT;
 }
 
-TNode::TNode(std::string val, statementType typ)
-{
+TNode::TNode(std::string val, statementType typ) {
   statementNum = NULL_STMT_REF;
   value = val;
   type = STATEMENT;
 }
 
-TNode::TNode(int num, std::string val, statementType typ)
-{
+TNode::TNode(int num, std::string val, statementType typ) {
   statementNum = num;
   value = val;
   type = typ;
 }
 
-int TNode::getStatementNum()
-{
-  return statementNum;
-}
+void TNode::addChild(TNode child) { children.push_back(child); }
 
-std::string TNode::getValue()
-{
-  return value;
-}
+int TNode::getStatementNum() { return statementNum; }
 
-statementType TNode::getType()
-{
-  return type;
-}
+std::string TNode::getValue() { return value; }
 
-std::vector<TNode> TNode::getChildren()
-{
-  return children;
-}
+statementType TNode::getType() { return type; }
+
+std::vector<TNode> TNode::getChildren() { return children; }
