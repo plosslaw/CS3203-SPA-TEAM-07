@@ -12,7 +12,8 @@ class Action {
         SUCH_THAT_PARENTT,
         SUCH_THAT_USES,
         SUCH_THAT_MODIFIES,
-        DECLARATION
+        DECLARATION,
+        SELECT
     };
 
 /**
