@@ -1,7 +1,6 @@
 #include "QNode.h"
 
-QNode::QNode()
-{
+QNode::QNode() {
   tag = CLAUSE;
   value = "";
   QNodeType nodeType;
@@ -9,17 +8,13 @@ QNode::QNode()
   type = nodeType;
 }
 
-QNode::QNode(Tag tagType, std::string val, QNodeType nodeType)
-{
+QNode::QNode(Tag tagType, std::string val, QNodeType nodeType) {
   tag = tagType;
   value = val;
   type = nodeType;
 }
 
-void QNode::addChild(QNode child)
-{
-  children.push_back(child);
-}
+void QNode::addChild(QNode child) { children.push_back(child); }
 
 Tag QNode::getTag() { return tag; }
 

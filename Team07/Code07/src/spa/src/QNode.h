@@ -1,8 +1,7 @@
 #include <string>
 #include <vector>
 
-enum EntityType
-{
+enum EntityType {
   STATEMENT,
   READ,
   PRINT,
@@ -15,8 +14,7 @@ enum EntityType
   PROCEDURE,
 };
 
-enum RelationType
-{
+enum RelationType {
   FOLLOWS,
   FOLLOWST,
   PARENT,
@@ -25,30 +23,21 @@ enum RelationType
   MODIFIES,
 };
 
-enum ClauseType
-{
-  DECLARATION,
-  SELECT_CL,
-  SUCHTHAT_CL,
-  PATTERN_CL
-};
+enum ClauseType { DECLARATION, SELECT_CL, SUCHTHAT_CL, PATTERN_CL };
 
-enum Tag
-{
+enum Tag {
   ENTITY,
   RELATION,
   CLAUSE,
 };
 
-union QNodeType
-{
+union QNodeType {
   EntityType entityType;
   RelationType relationType;
   ClauseType clauseType;
 };
 
-class QNode
-{
+class QNode {
   /* tag value:type */
 private:
   Tag tag;
