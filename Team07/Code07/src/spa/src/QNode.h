@@ -61,6 +61,7 @@ public:
   QNode();
   QNode(Tag tagType, std::string val, QNodeType nodeType);
 
+  void addChild(QNode child);
   Tag getTag();
   std::string getValue();
   QNodeType getType();

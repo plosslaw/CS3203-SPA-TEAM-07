@@ -16,6 +16,11 @@ QNode::QNode(Tag tagType, std::string val, QNodeType nodeType)
   type = nodeType;
 }
 
+void QNode::addChild(QNode child)
+{
+  children.push_back(child);
+}
+
 Tag QNode::getTag() { return tag; }
 
 std::string QNode::getValue() { return value; }
