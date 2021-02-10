@@ -1,3 +1,5 @@
+#pragma once
+
 #include "PKBEntities.hpp"
 #include "PKB.h"
 

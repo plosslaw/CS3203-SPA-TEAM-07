@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #define NULL_STMT_REF -1
 
