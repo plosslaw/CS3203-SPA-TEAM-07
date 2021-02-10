@@ -4,8 +4,10 @@
 class PKBQueryController {
     private:
         PKB pkb;
-        PKBQueryController();
     public:
+        PKBQueryController(PKB pkbToSet);
+
+        void setPKB(PKB pkbToSet);
         // Returns true if and only if Follows(s1,s2)
         bool isFollows(stmt_ref s1, stmt_ref s2);
 

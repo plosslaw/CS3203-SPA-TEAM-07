@@ -2,8 +2,12 @@
 #include "PKB.h"
 #include "PKBQueryController.hpp"
 
-PKBQueryController::PKBQueryController() {
+PKBQueryController::PKBQueryController(PKB pkbToSet) {
+    setPKB(pkbToSet);
+}
 
+void PKBQueryController::setPKB(PKB pkbToSet) {
+    pkb = pkbToSet;
 }
 
 bool PKBQueryController::isFollows(stmt_ref s1, stmt_ref s2) {
