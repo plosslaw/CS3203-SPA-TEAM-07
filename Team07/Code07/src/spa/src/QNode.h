@@ -49,6 +49,9 @@ private:
 public:
   QNode();
   QNode(Tag tagType, std::string val, QNodeType nodeType);
+  QNode(Tag tagType, std::string val, EntityType nodeType);
+  QNode(Tag tagType, std::string val, RelationType nodeType);
+  QNode(Tag tagType, std::string val, ClauseType nodeType);
 
   void addChild(QNode child);
   Tag getTag();
