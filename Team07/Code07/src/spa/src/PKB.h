@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <unordered_set>
 #include "PKBEntities.hpp"
 
 typedef struct {
@@ -14,7 +15,7 @@ typedef struct {
 	std::unordered_map<var_ref, variable> variables;
 
 	// List of constant for select constant queries
-	std::unordered_set<constant> constants;
+	std::unordered_set<const_value> constants;
 
 	// Root node of the program's AST tree
 	TNode ast_root;

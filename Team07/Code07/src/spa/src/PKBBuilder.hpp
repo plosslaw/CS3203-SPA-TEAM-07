@@ -8,9 +8,6 @@ class PKBBuilder {
         PKB pkb;
         TNode ast_root;
     public:
-        PKBBuilder(TNode root) {
-            ast_root = root;
-        }
-
+        PKBBuilder(TNode root);
         PKB build();
 };

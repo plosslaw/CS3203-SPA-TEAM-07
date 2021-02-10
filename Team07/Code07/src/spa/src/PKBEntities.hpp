@@ -1,8 +1,10 @@
+#pragma once
+
 #include <unordered_set>
 #include "TNode.h"
 #include "Types.hpp"
 
-typedef struct statement {
+typedef struct {
     // Reference to this statement (statement number)
     stmt_ref reference;
 
@@ -30,19 +32,16 @@ typedef struct statement {
     // Set of statements s' such that Follows*(this statement, s')
     std::unordered_set<stmt_ref> indirect_follows;
 
-};
+} statement;
 
-typedef struct variable {
+typedef struct {
     // Reference to this variable (variable name)
     var_ref reference;
-};
+} variable;
 
-typedef struct constant {
-    // Value of the constant
-    const_value value;
-};
+typedef const_value constant;
 
-typedef struct procedure {
+typedef struct {
     // Reference to this procedure (procedure name)
     proc_ref reference;
 
@@ -54,4 +53,4 @@ typedef struct procedure {
 
     // List of variables modified by this procedure (not populated for this iteration)
     std::unordered_set<var_ref> modifies;
-};
+} procedure;
