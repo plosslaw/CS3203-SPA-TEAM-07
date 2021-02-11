@@ -7,7 +7,7 @@
 #include "ActionsExecutor.h"
 #include "ActionsGenerator.h"
 #include "PKB.h"
-#include "PKBQueryController.h"
+#include "PKBQueryController.hpp"
 #include "ResponseRenderer.h"
 #include "TNode.h"
 
@@ -18,8 +18,8 @@ public:
 
 private:
     std::vector<Action> QEGenerateActions(TNode* PQL_AST_Root);
-    vector<string> QEExecuteActions (std::vector<Action> queryActions);
-    std::vector<std::string> QERenderResults(vector<string> queryResults);
+    std::vector<std::string> QEExecuteActions (std::vector<Action> queryActions);
+    std::vector<std::string> QERenderResults(std::vector<std::string> queryResults);
 
 };
 
