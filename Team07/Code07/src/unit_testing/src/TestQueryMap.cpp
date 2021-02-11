@@ -1,30 +1,100 @@
 #include "QueryMap.h"
-
 #include "catch.hpp"
-using namespace std;
 #include <iostream>
+#include <vector>
 
-TEST_CASE("QueryMap Test 1") {
-  QueryMap query;
+TEST_CASE("PayLoad with single variable") {
+  PayLoad stmt(SINGLE, STATEMENT, "s");
+  PayLoad re(SINGLE, READ, "re");
+  PayLoad pn(SINGLE, PRINT, "pn");
+  PayLoad call(SINGLE, CALL, "c");
+  PayLoad w(SINGLE, WHILE, "w");
+  PayLoad ifs(SINGLE, IF, "ifs");
+  PayLoad a(SINGLE, ASSIGN, "a");
+  PayLoad c(SINGLE, CONSTANT, "c");
+  PayLoad var(SINGLE, VARIABLE, "v");
+  PayLoad proc(SINGLE, PROCEDURE, "p");
+  PayLoad syn(SINGLE, SYNONYM, "s");
 
-  query.addItem(SELECT, PayLoad(SINGLE, SYNONYM, "s"));
-  query.addItem(DECLARATION, PayLoad(SINGLE, STATEMENT, "s"));
-  query.addItem(DECLARATION, PayLoad(SINGLE, VARIABLE, "v"));
-  query.addItem(SUCHTHAT, PayLoad(PAIR, MODIFIES, "s,v"));
-  query.addItem(PATTERN, PayLoad(PAIR, SYN_ASSIGN, "_,_"));
+  SECTION("PayLoad tag") {
+    REQUIRE(stmt.getTag() == SINGLE);
+    REQUIRE(re.getTag() == SINGLE);
+    REQUIRE(pn.getTag() == SINGLE);
+    REQUIRE(call.getTag() == SINGLE);
+    REQUIRE(w.getTag() == SINGLE);
+    REQUIRE(ifs.getTag() == SINGLE);
+    REQUIRE(a.getTag() == SINGLE);
+    REQUIRE(c.getTag() == SINGLE);
+    REQUIRE(var.getTag() == SINGLE);
+    REQUIRE(proc.getTag() == SINGLE);
+    REQUIRE(syn.getTag() == SINGLE);
+  }
 
-  REQUIRE(query.getList(SELECT)[0].getValue() == "s");
-  REQUIRE(query.getList(SELECT)[0].getType().single == SYNONYM);
+  SECTION("PayLoad type") {
+    REQUIRE(stmt.getType().single == STATEMENT);
+    REQUIRE(re.getType().single == READ);
+    REQUIRE(pn.getType().single == PRINT);
+    REQUIRE(call.getType().single == CALL);
+    REQUIRE(w.getType().single == WHILE);
+    REQUIRE(ifs.getType().single == IF);
+    REQUIRE(a.getType().single == ASSIGN);
+    REQUIRE(c.getType().single == CONSTANT);
+    REQUIRE(var.getType().single == VARIABLE);
+    REQUIRE(proc.getType().single == PROCEDURE);
+    REQUIRE(syn.getType().single == SYNONYM);
+  }
 
-  REQUIRE(query.getList(DECLARATION)[0].getValue() == "s");
-  REQUIRE(query.getList(DECLARATION)[0].getType().single == STATEMENT);
+  SECTION("PayLoad value") {
+    REQUIRE(stmt.getValue() == "s");
+    REQUIRE(re.getValue() == "re");
+    REQUIRE(pn.getValue() == "pn");
+    REQUIRE(call.getValue() == "c");
+    REQUIRE(w.getValue() == "w");
+    REQUIRE(ifs.getValue() == "ifs");
+    REQUIRE(a.getValue() == "a");
+    REQUIRE(c.getValue() == "c");
+    REQUIRE(var.getValue() == "v");
+    REQUIRE(proc.getValue() == "p");
+    REQUIRE(syn.getValue() == "s");
+  }
+}
 
-  REQUIRE(query.getList(DECLARATION)[1].getValue() == "v");
-  REQUIRE(query.getList(DECLARATION)[1].getType().single == VARIABLE);
+TEST_CASE("PayLoad with pair variable") {
+  PayLoad follows(PAIR, FOLLOWS, "s1,s2");
+  PayLoad followst(PAIR, FOLLOWST, "s1,s2");
+  PayLoad parent(PAIR, PARENT, "s1,s2");
+  PayLoad parentt(PAIR, PARENTT, "s1,s2");
+  PayLoad uses(PAIR, USES, "s1,v");
+  PayLoad modifies(PAIR, MODIFIES, "s1,v");
+  PayLoad synonym_assign(PAIR, SYN_ASSIGN, "_,_");
 
-  REQUIRE(query.getList(SUCHTHAT)[0].getValue() == "s,v");
-  REQUIRE(query.getList(SUCHTHAT)[0].getType().pair == MODIFIES);
+  SECTION("PayLoad tag") {
+    REQUIRE(follows.getTag() == PAIR);
+    REQUIRE(followst.getTag() == PAIR);
+    REQUIRE(parent.getTag() == PAIR);
+    REQUIRE(parentt.getTag() == PAIR);
+    REQUIRE(uses.getTag() == PAIR);
+    REQUIRE(modifies.getTag() == PAIR);
+    REQUIRE(synonym_assign.getTag() == PAIR);
+  }
 
-  REQUIRE(query.getList(PATTERN)[0].getValue() == "_,_");
-  REQUIRE(query.getList(PATTERN)[0].getType().pair == SYN_ASSIGN);
+  SECTION("PayLoad type") {
+    REQUIRE(follows.getType().pair == FOLLOWS);
+    REQUIRE(followst.getType().pair == FOLLOWST);
+    REQUIRE(parent.getType().pair == PARENT);
+    REQUIRE(parentt.getType().pair == PARENTT);
+    REQUIRE(uses.getType().pair == USES);
+    REQUIRE(modifies.getType().pair == MODIFIES);
+    REQUIRE(synonym_assign.getType().pair == SYN_ASSIGN);
+  }
+
+  SECTION("PayLoad value") {
+    REQUIRE(follows.getValue() == "s1,s2");
+    REQUIRE(followst.getValue() == "s1,s2");
+    REQUIRE(parent.getValue() == "s1,s2");
+    REQUIRE(parentt.getValue() == "s1,s2");
+    REQUIRE(uses.getValue() == "s1,v");
+    REQUIRE(modifies.getValue() == "s1,v");
+    REQUIRE(synonym_assign.getValue() == "_,_");
+  }
 }
