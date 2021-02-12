@@ -18,11 +18,12 @@ int Parse (string file) {
 	cout << str <<"\n\n\n\n";
 
 	// TESTING PARSE hello world :
-	State s("hello world asd");
+	string str1 = "hello worlasd";
+	State s(&str1);
 	try{
 		helloWorld(s);
 	} catch (ParseException &e) {
-		cout << e.what() << "\n";
+		cout << e.prettyPrint() << "\n";
 	}
 	cout << s.toString() << "\n";
 	// ------
@@ -36,6 +37,6 @@ void helloWorld(State &s) {
 		whitespace(s);
 		stringMatch(s, "world");
 	} catch (ParseException &e) {
-		throw ParseException(so.i, s.i, "helloWorld", "", &e);
+		throw ParseException(so.i, s.i, "helloWorld", "", s.source, &e);
 	}
 }

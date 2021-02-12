@@ -1,12 +1,14 @@
+#include <limits>
 #include <string>
 #include <vector>
 #include <cctype>
 #include "ParserLib.h"
+#include <iostream>
 
 using namespace std;
 // class definitions ----------------------------------------------------------
 
-State::State(string str) {
+State::State(string *str) {
 	i = 0;
 	source = str;
 }
@@ -18,40 +20,103 @@ string State::toString() {
 	return "{ i: " + to_string(i) + " }";
 }
 
-void ParseException::init(int f, int a, string s, string ar, ParseException *c) {
+ParseException::ParseException(int f, int a, string s, string ar, string *source) {
+	from = f;
+	at = a;
+	subparser = s;
+	args = ar;
+	childException = nullptr;
+	str = source;
+}
+
+ParseException::ParseException(int f, int a, string s, string ar, string *source, ParseException *c) {
 	from = f;
 	at = a;
 	subparser = s;
 	args = ar;
 	childException = c;
-	errmsg = subparser + "(" + args + ") : from " + to_string(from) + " at " + to_string(at);
+	str = source;
 }
 
-ParseException::ParseException(int f, int a, string s, string ar) {
-	init(f,a,s,ar,nullptr);
+string ParseException::errorMessage() {
+	return subparser + "(" + args + ") : ";
+}
+const char* ParseException::what() const throw()
+{
+	static string str("ParseException : " + subparser);
+	return str.c_str();
 }
 
-ParseException::ParseException(int f, int a, string s, string ar, ParseException *c) {
-	init(f,a,s,ar,c);
-}
 string ParseException::prettyPrint() {
-  // for each f and a
-  // identify line number
-  // identify column number
-  
-  // print whole lines of line from f and a
-  // underline from (line,column) f to a
+	vector<int> fs;
+	vector<string> es;
+	froms(fs, es);
+	vector<int> fromLine(fs.size());
+	vector<int> fromCol(fs.size());
 
-  // concat what(), recursively for each childException
-  return "";
+	vector<int> linelengths;
+	vector<string> linestr;
+	vector<char> linebuilder;
+	
+	int curLineLength = 0;
+	int curLine = 0;
+	int atLine = 0;
+	int atCol = 0;
+
+	string strv = *str;
+	for(int i = 0 ; i < strv.length(); i++) {
+		char c = strv.at(i);
+		curLineLength++;
+		if(c == '\n') {
+			linelengths.push_back(curLineLength);
+			string linestrvalue(linebuilder.begin(), linebuilder.end());
+			linestr.push_back(linestrvalue);
+			linebuilder.clear();
+			curLine++;
+		} else {
+			linebuilder.push_back(c);
+		}
+		if(i == at) {
+			atLine = curLine;
+		}
+		for(int j = 0; j < fs.size(); j++) {
+			if(i == fs[j]) {
+				fromLine[j] = curLine;
+			}
+		}
+	}
+	linelengths.push_back(curLineLength);
+	string linestrvalue(linebuilder.begin(), linebuilder.end());
+	linestr.push_back(linestrvalue);
+	
+	atCol = linelengths.at(atLine) - at;
+	for(int j = 0; j < fs.size(); j++) {
+		int prevline = fromLine[j] - 1;
+		if(prevline == -1) {
+			fromCol[j] = fs[j];
+		} else {
+			fromCol[j] = linelengths[prevline] - fs[j];
+		}
+	}
+	// calculate from line cols and line strings
+
+	string outputstr = "";
+	outputstr += "ParseException\n\n";
+	outputstr += "  " + to_string(atLine + 1) + "|  " + linestr[atLine] + "\n\n";
+	for(int i = 0; i < fromLine.size(); i++) {
+		outputstr += "  " + es[i] + "\n";
+		outputstr += "    from line " + to_string(fromLine[i] + 1) + " col " + to_string(fromCol[i] + 1) + "\n";
+	}
+	// generate pretty output
+  return outputstr;
 }
 
 // combinators ----------------------------------------------------------------
 
 string stringMatch(State &s, string str) {
 	for (int j = 0; j < str.size(); j++) {
-		if (s.source.at(s.i + j) != str.at(j)) {
-			throw ParseException(s.i, s.i+j, "stringParse", str);
+		if ((*s.source).at(s.i + j) != str.at(j)) {
+			throw ParseException(s.i, s.i+j, "stringParse", str, s.source);
 		}
 	}
 	s.i += str.size();
@@ -59,11 +124,11 @@ string stringMatch(State &s, string str) {
 }
 
 char charPredicate(State &s, bool (*pred)(char), string errorName) {
-	char c = s.source.at(s.i);
+	char c = (*s.source).at(s.i);
 	if (pred(c)) {
 		s.i += 1;
 	} else {
-		throw ParseException(s.i, s.i, "charPredicate", errorName);
+		throw ParseException(s.i, s.i, "charPredicate", errorName, s.source);
 	}
 	return c;
 }
