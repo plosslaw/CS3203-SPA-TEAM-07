@@ -88,8 +88,12 @@ string ParseException::prettyPrint() {
 	linelengths.push_back(curLineLength);
 	string linestrvalue(linebuilder.begin(), linebuilder.end());
 	linestr.push_back(linestrvalue);
-	
-	atCol = linelengths.at(atLine) - at;
+	int prevline = atLine - 1;
+	if (prevline == -1) {
+		atCol = at;
+	} else {
+		atCol = linelengths[prevline] - at;
+	}
 	for(int j = 0; j < fs.size(); j++) {
 		int prevline = fromLine[j] - 1;
 		if(prevline == -1) {
@@ -102,7 +106,10 @@ string ParseException::prettyPrint() {
 
 	string outputstr = "";
 	outputstr += "ParseException\n\n";
-	outputstr += "  " + to_string(atLine + 1) + "|  " + linestr[atLine] + "\n\n";
+	string preoutput = "  " + to_string(atLine + 1) + "|  " ;
+	outputstr += preoutput + linestr[atLine] + "\n";
+	string whitespaceprefix = string(preoutput.length() + atCol, ' ');
+	outputstr += whitespaceprefix + "^\n";
 	for(int i = 0; i < fromLine.size(); i++) {
 		outputstr += "  " + es[i] + "\n";
 		outputstr += "    from line " + to_string(fromLine[i] + 1) + " col " + to_string(fromCol[i] + 1) + "\n";
@@ -116,7 +123,9 @@ string ParseException::prettyPrint() {
 string stringMatch(State &s, string str) {
 	for (int j = 0; j < str.size(); j++) {
 		if ((*s.source).at(s.i + j) != str.at(j)) {
-			throw ParseException(s.i, s.i+j, "stringParse", str, s.source);
+			int init = s.i;
+			s.i += j;
+			throw ParseException(init, s.i, "stringParse", str, s.source);
 		}
 	}
 	s.i += str.size();
