@@ -36,8 +36,15 @@ private:
 public:
   PayLoad(Tag loadTag, Single loadType, std::string loadVal);
   PayLoad(Tag loadTag, Pair loadType, std::string loadVal);
+  Tag getTag();
   LoadType getType();
   std::string getValue();
+  friend bool operator==(const PayLoad &l, const PayLoad &r) {
+    return (std::tie(l.tag, l.type.single, l.value) ==
+            std::tie(r.tag, r.type.single, r.value)) ||
+           (std::tie(l.tag, l.type.pair, l.value) ==
+            std::tie(r.tag, r.type.pair, r.value));
+  }
 };
 
 class QueryMap {
