@@ -1,5 +1,6 @@
 #include "Action.h"
 
+#include "PKBQueryController.hpp";
 using namespace std;
 
 Action::Action(search_type searchType, vector<string> argList, vector<arg_type> argTypeList)  {
