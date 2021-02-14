@@ -16,7 +16,7 @@ State::State(string *str) {
 State::State(State &s) {
 	i = s.i;
 	source = s.source;
-	curStmtNum = s.getCurStmtNum();
+	curStmtNum = s.curStmtNum;
 	excps.clear();
 	for (int j = 0; j < s.excps.size(); j++) {
 		excps.push_back(s.excps[i]);
@@ -25,16 +25,13 @@ State::State(State &s) {
 int State::advCurStmtNum() {
 	return curStmtNum++;
 }
-int State::getCurStmtNum() {
-	return curStmtNum;
-}
 string State::toString() {
 	return "{ i: " + to_string(i) + " }";
 }
 void State::assign(State &s) {
 	i = s.i;
 	source = s.source;
-	curStmtNum = s.getCurStmtNum();
+	curStmtNum = s.curStmtNum;
 	excps.clear();
 	for (int j = 0; j < s.excps.size(); j++) {
 		excps.push_back(s.excps[i]);

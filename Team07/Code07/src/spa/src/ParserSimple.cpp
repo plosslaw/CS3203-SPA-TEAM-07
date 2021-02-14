@@ -61,6 +61,7 @@ TNode read(State &s) {
 
 TNode assign(State &s) {
   int init = s.i;
+  int initNum = s.curStmtNum;
   try {
     TNode t1 = variable(s);
     whitespace(s);
@@ -68,12 +69,13 @@ TNode assign(State &s) {
     whitespace(s);
     TNode t2 = expr(s);
     stringMatch(s, ";");
-    TNode t("", ASSIGN);
+    TNode t(s.advCurStmtNum(), "", ASSIGN);
     t.addChild(t1);
     t.addChild(t2);
     return t;
   } catch(ParseException &e) {
     s.excps.push_back(e);
+    s.curStmtNum = initNum;
     throw ParseException(init, s.i, "assign", "");
   }
 }
