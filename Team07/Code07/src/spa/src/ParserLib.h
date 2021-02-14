@@ -19,6 +19,9 @@ class ParseException: public std::exception {
 };
 
 class State {
+	private:
+		/** current statement num index */
+		int curStmtNum;
 	public:
     /** current index in source to consume by parser */
 		int i;
@@ -29,6 +32,8 @@ class State {
 		State(std::string *str);
 		State(State &s);
 		std::string toString();
+		int advCurStmtNum();
+		int getCurStmtNum();
 		void assign(State &s);
 };
 

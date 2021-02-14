@@ -10,15 +10,23 @@ using namespace std;
 State::State(string *str) {
 	i = 0;
 	source = str;
+	curStmtNum = 1;
 	excps.clear();
 }
 State::State(State &s) {
 	i = s.i;
 	source = s.source;
+	curStmtNum = s.getCurStmtNum();
 	excps.clear();
 	for (int j = 0; j < s.excps.size(); j++) {
 		excps.push_back(s.excps[i]);
 	}
+}
+int State::advCurStmtNum() {
+	return curStmtNum++;
+}
+int State::getCurStmtNum() {
+	return curStmtNum;
 }
 string State::toString() {
 	return "{ i: " + to_string(i) + " }";
@@ -26,6 +34,7 @@ string State::toString() {
 void State::assign(State &s) {
 	i = s.i;
 	source = s.source;
+	curStmtNum = s.getCurStmtNum();
 	excps.clear();
 	for (int j = 0; j < s.excps.size(); j++) {
 		excps.push_back(s.excps[i]);
@@ -138,7 +147,8 @@ void consExcp(State &s, int from, int at, string subparser, string arg) {
 
 string stringMatch(State &s, string str) {
 	for (int j = 0; j < str.size(); j++) {
-		if ((*s.source).at(s.i + j) != str.at(j)) {
+		int ii = s.i + j;
+		if (ii >= (*s.source).size() || (*s.source).at(ii) != str.at(j)) {
 			int init = s.i;
 			s.i += j;
 			throw ParseException(init, s.i, "stringMatch", str);
@@ -161,7 +171,7 @@ char charPredicate(State &s, bool (*pred)(char), string errorName) {
 string stringPredicate(State &s, bool (*pred)(char), string errorName) {
 	vector<char> cs;
 	State so(s);
-	while(true) {
+	while(s.i < (*s.source).size()) {
 		try {
 			cs.push_back(charPredicate(s, pred, errorName));
 			so.assign(s);

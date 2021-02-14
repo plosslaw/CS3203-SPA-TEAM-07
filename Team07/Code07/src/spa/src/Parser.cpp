@@ -10,7 +10,6 @@ using namespace std;
 
 
 // core functions -------------------------------------------------------------
-void helloOrHihi(State &s);
 
 int Parse (string file) {
 	ifstream t(file);
@@ -19,11 +18,11 @@ int Parse (string file) {
 	//cout << str <<"\n\n\n\n";
 	
 	// TESTING PARSE hello world :
-	string str1 = "hello worlasd";
+	string str1 = "1 * 2 / 3";
 	State s(&str1);
 	
 	try{
-		name(s);
+		term(s);
 	} catch (ParseException &e) {
 		s.excps.push_back(e);
 		cout << prettyPrintException(s) << "\n";
@@ -33,16 +32,7 @@ int Parse (string file) {
 	return 0;
 }
 
-void hi(State &s) {
-	State so(s);
-	try {
-		stringMatch(s, "hi");
-	} catch(ParseException &e) {
-		s.excps.push_back(e);
-		throw ParseException(so.i, s.i, "hi", "");
-	}
-}
-
+/*
 void repeatHi(State &s) {
 	State so(s);
 	bool consumed = false;
@@ -59,31 +49,4 @@ void repeatHi(State &s) {
 		}
 		s.assign(so);
 	}
-}
-
-void helloWorld(State &s) {
-	State so(s);
-	try {
-		stringMatch(s, "hello");
-		whitespace(s);
-		stringMatch(s, "world");
-	} catch (ParseException &e) {
-		s.excps.push_back(e);
-		throw ParseException(so.i, s.i, "helloWorld", "");
-	}
-}
-
-void helloOrHihi(State &s) {
-	State so(s);
-	try {
-		repeatHi(s);
-	} catch(ParseException &e1) {
-		try {
-			s.assign(so);
-			helloWorld(s);
-		} catch(ParseException &e2) {
-			s.excps.push_back(e2);
-			throw ParseException(so.i, s.i, "helloOrHihi", "");
-		}
-	}
-}
+}*/
