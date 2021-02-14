@@ -194,7 +194,7 @@ string digit(State &s) {
 	return stringPredicate(s, &digitPred, "whitespace");
 }
 
-string alphanum(State &s) {
+string alphaNum(State &s) {
 	return stringPredicate(s, &alphanumPred, "whitespace");
 }
 

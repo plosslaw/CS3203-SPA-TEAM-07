@@ -4,6 +4,7 @@
 #include <fstream>
 #include <streambuf>
 #include "ParserLib.h"
+#include "ParserSimple.h"
 
 using namespace std;
 
@@ -22,7 +23,7 @@ int Parse (string file) {
 	State s(&str1);
 	
 	try{
-		helloOrHihi(s);
+		name(s);
 	} catch (ParseException &e) {
 		s.excps.push_back(e);
 		cout << prettyPrintException(s) << "\n";
