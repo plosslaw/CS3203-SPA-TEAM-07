@@ -3,17 +3,6 @@
 #include<string>
 #include<vector>
 
-class State {
-	public:
-    /** current index in source to consume by parser */
-		int i;
-    /** source string to be parsed */
-    std::string *source;
-		State(std::string *str);
-		State(State &s);
-		std::string toString();
-};
-
 class ParseException: public std::exception {
 	public:
     /** state.i when entering parser */
@@ -24,22 +13,27 @@ class ParseException: public std::exception {
 		std::string subparser;
     /** arguments to parser configuration */
 		std::string args;
-		std::string *str;
-    ParseException *childException;
-		ParseException(int f, int a, std::string s, std::string ar, std::string *source);
-    ParseException(int f, int a, std::string s, std::string ar, std::string *source, ParseException *c);
-    std::string prettyPrint();
+		ParseException(int f, int a, std::string s, std::string ar);
 		std::string errorMessage();
 		const char* what() const throw() override;
-	void froms(std::vector<int> &fs, std::vector<std::string> &es) {
-		ParseException *cur = this;
-		while(cur) {
-			fs.push_back(cur->from);
-			es.push_back(cur->errorMessage());
-			cur = cur->childException;
-		}
-	}
 };
+
+class State {
+	public:
+    /** current index in source to consume by parser */
+		int i;
+    /** source string to be parsed */
+    std::string *source;
+		/** exception stack */
+		std::vector<ParseException> excps;
+		State(std::string *str);
+		State(State &s);
+		std::string toString();
+		void assign(State &s);
+};
+
+void consExcp(State &s, int from, int at, std::string subparser, std::string arg);
+std::string prettyPrintException(State &s);
 
 
 std::string stringMatch(State &s, std::string str);

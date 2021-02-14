@@ -10,31 +10,33 @@ using namespace std;
 State::State(string *str) {
 	i = 0;
 	source = str;
+	excps.clear();
 }
 State::State(State &s) {
 	i = s.i;
 	source = s.source;
+	excps.clear();
+	for (int j = 0; j < s.excps.size(); j++) {
+		excps.push_back(s.excps[i]);
+	}
 }
 string State::toString() {
 	return "{ i: " + to_string(i) + " }";
 }
-
-ParseException::ParseException(int f, int a, string s, string ar, string *source) {
-	from = f;
-	at = a;
-	subparser = s;
-	args = ar;
-	childException = nullptr;
-	str = source;
+void State::assign(State &s) {
+	i = s.i;
+	source = s.source;
+	excps.clear();
+	for (int j = 0; j < s.excps.size(); j++) {
+		excps.push_back(s.excps[i]);
+	}
 }
 
-ParseException::ParseException(int f, int a, string s, string ar, string *source, ParseException *c) {
+ParseException::ParseException(int f, int a, string s, string ar) {
 	from = f;
 	at = a;
 	subparser = s;
 	args = ar;
-	childException = c;
-	str = source;
 }
 
 string ParseException::errorMessage() {
@@ -46,10 +48,18 @@ const char* ParseException::what() const throw()
 	return str.c_str();
 }
 
-string ParseException::prettyPrint() {
+string prettyPrintException(State &s) {
+	string *str = s.source;
+	vector<ParseException> e = s.excps;
+	int from = e[e.size() - 1].from;
+	int at = e[e.size() - 1].at;
+
 	vector<int> fs;
 	vector<string> es;
-	froms(fs, es);
+	for(int i = e.size() - 1; i >= 0; i--) {
+		fs.push_back(e[i].from);
+		es.push_back(e[i].errorMessage());
+	}
 	vector<int> fromLine(fs.size());
 	vector<int> fromCol(fs.size());
 
@@ -117,6 +127,13 @@ string ParseException::prettyPrint() {
   return outputstr;
 }
 
+// parser exception factory ---------------------------------------------------
+
+void consExcp(State &s, int from, int at, string subparser, string arg) {
+	ParseException excp(from, at, subparser, arg);
+	s.excps.push_back(excp);
+}
+
 // combinators ----------------------------------------------------------------
 
 string stringMatch(State &s, string str) {
@@ -124,7 +141,7 @@ string stringMatch(State &s, string str) {
 		if ((*s.source).at(s.i + j) != str.at(j)) {
 			int init = s.i;
 			s.i += j;
-			throw ParseException(init, s.i, "stringParse", str, s.source);
+			throw ParseException(init, s.i, "stringMatch", str);
 		}
 	}
 	s.i += str.size();
@@ -136,17 +153,20 @@ char charPredicate(State &s, bool (*pred)(char), string errorName) {
 	if (pred(c)) {
 		s.i += 1;
 	} else {
-		throw ParseException(s.i, s.i, "charPredicate", errorName, s.source);
+		throw ParseException(s.i, s.i, "charPredicate", errorName);
 	}
 	return c;
 }
 
 string stringPredicate(State &s, bool (*pred)(char), string errorName) {
 	vector<char> cs;
+	State so(s);
 	while(true) {
 		try {
 			cs.push_back(charPredicate(s, pred, errorName));
-		} catch(ParseException e) {
+			so.assign(s);
+		} catch(ParseException &e) {
+			s.assign(so);
 			break;
 		}
 	}
