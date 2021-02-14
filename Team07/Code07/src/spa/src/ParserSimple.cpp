@@ -59,6 +59,82 @@ TNode read(State &s) {
   }
 }
 
+TNode assign(State &s) {
+  int init = s.i;
+  try {
+    TNode t1 = variable(s);
+    whitespace(s);
+    stringMatch(s, "=");
+    whitespace(s);
+    TNode t2 = expr(s);
+    stringMatch(s, ";");
+    TNode t("", ASSIGN);
+    t.addChild(t1);
+    t.addChild(t2);
+    return t;
+  } catch(ParseException &e) {
+    s.excps.push_back(e);
+    throw ParseException(init, s.i, "assign", "");
+  }
+}
+
+/** cond_expr :- rel_expr | '!' '(' cond_expr ')' | '(' cond_expr ')' ('&&'|'||') '(' cond_expr ')' */
+TNode cond_expr(State &s) {
+  State so(s);
+  try {
+    return rel_expr(s);
+  } catch(ParseException &e) {
+    s.assign(so);
+    try {
+      stringMatch(s, "!");
+      whitespace(s);
+      stringMatch(s, "(");
+      whitespace(s);
+      TNode t1 = cond_expr(s);
+      stringMatch(s, ")");
+      whitespace(s);
+      TNode t("!", EXPR);
+      t.addChild(t1);
+      return t;
+    } catch(ParseException &e) {
+      s.assign(so);
+      try {
+        s.assign(so);
+        stringMatch(s, "(");
+        whitespace(s);
+        TNode t1 = cond_expr(s);
+        stringMatch(s, ")");
+        whitespace(s);
+        State so1(s);
+        string op;
+        try {
+          op = stringMatch(s, "&&");
+        } catch(ParseException &e) {
+          try {
+            op = stringMatch(s, "||");
+          } catch(ParseException &e) {
+            s.excps.push_back(e);
+            throw ParseException(so1.i, s.i, "cond_expr", "bin_op");
+          }
+        }
+        whitespace(s);
+        stringMatch(s, "(");
+        whitespace(s);
+        TNode t2 = cond_expr(s);
+        stringMatch(s, ")");
+        whitespace(s);
+        TNode t(op, EXPR);
+        t.addChild(t1);
+        t.addChild(t2);
+        return t;
+      } catch(ParseException &e) {
+        s.excps.push_back(e);
+        throw ParseException(so.i, s.i, "cond_expr", "root");
+      }
+    }
+  }
+}
+
 /** rel_expr :- expr ('>'|'>='|'<'|'<='|'=='|'!=') expr */
 TNode rel_expr(State &s) {
   State so(s);

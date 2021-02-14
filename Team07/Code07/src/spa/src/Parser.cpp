@@ -18,11 +18,11 @@ int Parse (string file) {
 	//cout << str <<"\n\n\n\n";
 	
 	// TESTING PARSE hello world :
-	string str1 = "7 - 24 / 8 * 4 + 6 >= 12";
+	string str1 = "x = 7 - 24 / 8 * 4 + 6;";
 	State s(&str1);
 	
 	try{
-		cout << rel_expr(s).toSexp() << "\n";
+		cout << assign(s).toSexp() << "\n";
 		if(s.i != (*s.source).size()) {
 			throw ParseException(s.i, s.i, "", "unconsumed characters");
 		}

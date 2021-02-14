@@ -8,6 +8,8 @@
 using namespace std;
 
 string name(State &s);
+TNode assign(State &s);
+TNode cond_expr(State &s);
 TNode rel_expr(State &s);
 TNode rel_factor(State &s);
 TNode expr(State &s);
