@@ -59,6 +59,76 @@ TNode read(State &s) {
   }
 }
 
+/** rel_expr :- expr ('>'|'>='|'<'|'<='|'=='|'!=') expr */
+TNode rel_expr(State &s) {
+  State so(s);
+  TNode lchild;
+  try {
+    lchild = rel_factor(s);
+    whitespace(s);
+  } catch (ParseException &e) {
+    s.excps.push_back(e);
+    throw ParseException(so.i, s.i, "rel_expr", "first_factor");
+  }
+  string op;
+  so.assign(s);
+  try {
+    op = stringMatch(s, ">=");
+  } catch(ParseException &e) {
+    s.assign(so);
+    try {
+      op = stringMatch(s, ">");
+    } catch(ParseException &e) {
+      s.assign(so);
+      try {
+        op = stringMatch(s, "<=");
+      } catch(ParseException &e) {
+        s.assign(so);
+        try {
+          op = stringMatch(s, "<");
+        } catch(ParseException &e) {
+          s.assign(so);
+          try {
+            op = stringMatch(s, "==");
+          } catch(ParseException &e) {
+            s.assign(so);
+            try {
+              op = stringMatch(s, "!=");
+            } catch(ParseException &e) {
+              s.excps.push_back(e);
+              throw ParseException(so.i, s.i, "rel_expr", "operator");
+            }
+          }
+        }
+      }
+    }
+  }
+  so.assign(s);
+  try {
+    whitespace(s);
+    TNode rchild = rel_factor(s);
+    whitespace(s);
+    TNode t(op, EXPR);
+    t.addChild(lchild);
+    t.addChild(rchild);
+    return t;
+  } catch(ParseException &e) {
+    s.excps.push_back(e);
+    throw ParseException(so.i, s.i, "rel_expr", "second_factor");
+  }
+}
+
+/** rel_factor :- expr */
+TNode rel_factor(State &s) {
+  State so(s);
+  try {
+    return expr(s);
+  } catch (ParseException &e) {
+    s.excps.push_back(e);
+    throw ParseException(so.i, s.i, "rel_factor", "");
+  }
+}
+
 /** expr :- term expr_1 */
 TNode expr(State &s) {
   int init = s.i;
