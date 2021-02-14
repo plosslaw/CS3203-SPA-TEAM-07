@@ -13,16 +13,11 @@ using namespace std;
 
 int Parse (string file) {
 	ifstream t(file);
-	string str((istreambuf_iterator<char>(t)),
-                 istreambuf_iterator<char>());
-	//cout << str <<"\n\n\n\n";
+	string str((istreambuf_iterator<char>(t)), istreambuf_iterator<char>());
 	
-	// TESTING PARSE hello world :
-	string str1 = "x = 7 - 24 / 8 * 4 + 6;";
-	State s(&str1);
-	
+	State s(&str);
 	try{
-		cout << assign(s).toSexp() << "\n";
+		cout << program(s).toSexp() << "\n";
 		if(s.i != (*s.source).size()) {
 			throw ParseException(s.i, s.i, "", "unconsumed characters");
 		}
@@ -31,25 +26,5 @@ int Parse (string file) {
 		cerr << prettyPrintException(s) << "\n";
 	}
 	cout << s.toString() << "\n";
-	// ------
 	return 0;
 }
-
-/*
-void repeatHi(State &s) {
-	State so(s);
-	bool consumed = false;
-	try {
-		while(true) {
-			hi(s);
-			so.assign(s);
-			consumed = true;
-		}
-	} catch (ParseException &e){
-		if(!consumed) {
-			s.excps.push_back(e);
-			throw ParseException(so.i, s.i, "repeatHi", "");
-		}
-		s.assign(so);
-	}
-}*/

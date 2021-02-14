@@ -1,5 +1,6 @@
 #include "TNode.h"
-#include <iostream>
+#include "Types.hpp"
+#include <string>
 
 TNode::TNode() {
   statementNum = NULL_STMT_REF;
@@ -44,17 +45,20 @@ std::string typeToString(stmt_type typ) {
     case OPERATOR: return "OPERATOR";
     case STATEMENTLIST: return "STATEMENTLIST";
     case EXPR: return "EXPR";
+    case PROGRAM: return "PROGRAM";
   }
   return "";
 }
 
-std::string TNode::toSexp() {
+std::string TNode::toSexp(int sep) {
+  std::string sepstr(sep, ' ');
   std::string str = children.size() == 0 ? "" : "( ";
+  str += statementNum == NULL_STMT_REF ? "" : "[" + std::to_string(statementNum) + "]";
   str += value + ":" + typeToString(type);
   for (int i = 0; i < children.size(); i++) {
-    str += " " + (children[i].toSexp());
+    str += "\n" + sepstr + "  " + (children[i].toSexp(sep + 2));
   }
-  str += children.size() == 0 ? "" : " )";
+  str += children.size() == 0 ? "" : ("\n" + sepstr + ")");
   return str;
 }
 

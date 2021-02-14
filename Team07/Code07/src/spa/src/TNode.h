@@ -22,5 +22,5 @@ public:
   std::string getValue();
   stmt_type getType();
   std::vector<TNode> getChildren();
-  std::string toSexp();
+  std::string toSexp(int sep = 0);
 };

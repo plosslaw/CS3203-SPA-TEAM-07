@@ -39,11 +39,112 @@ string integer(State &s) {
   }
 }
 
-/** read :- 'read' name ';' */
-TNode read(State &s) {
+/** program :- procedure+ */
+TNode program(State &s) {
+  State so(s);
+  TNode t("", PROGRAM);
+	bool consumed = false;
+	try {
+		while(true) {
+			t.addChild(procedure(s));
+			so.assign(s);
+			consumed = true;
+		}
+	} catch (ParseException &e){
+		if(!consumed) {
+			s.excps.push_back(e);
+			throw ParseException(so.i, s.i, "program", "");
+		}
+		s.assign(so);
+    return t;
+	}
+}
+
+/** procedure :- 'procedure' name '{' stmtLst '}' */
+TNode procedure(State &s) {
+  State so(s);
+  try {
+    stringMatch(s, "procedure");
+    whitespace(s);
+    string proc_name = name(s);
+    whitespace(s);
+    stringMatch(s, "{");
+    whitespace(s);
+    TNode t1 = stmtLst(s);
+    stringMatch(s, "}");
+    whitespace(s);
+    TNode t(proc_name, PROCEDURE);
+    t.addChild(t1);
+    return t;
+  } catch(ParseException &e) {
+    s.excps.push_back(e);
+    throw ParseException(so.i, s.i, "procedure", "");
+  }
+}
+
+/** stmtLst :- stmt+ */
+TNode stmtLst(State &s) {
+  State so(s);
+  TNode t("", STATEMENTLIST);
+	bool consumed = false;
+	try {
+		while(true) {
+			t.addChild(stmt(s));
+      whitespace(s);
+			so.assign(s);
+			consumed = true;
+		}
+	} catch (ParseException &e){
+		if(!consumed) {
+			s.excps.push_back(e);
+			throw ParseException(so.i, s.i, "stmtLst", "");
+		}
+		s.assign(so);
+    return t;
+	}
+}
+
+/** stmt :- read | print | call | while_stmt | if_stmt | assign */
+TNode stmt(State &s) {
+  State so(s);
+  try {
+    return read(s);
+  } catch(ParseException &e) {
+    s.assign(so);
+    try {
+      return print(s);
+    } catch(ParseException &e) {
+      s.assign(so);
+      try {
+        return call(s);
+      } catch(ParseException &e) {
+        s.assign(so);
+        try {
+          return while_stmt(s);
+        } catch(ParseException &e) {
+          s.assign(so);
+          try {
+            return if_stmt(s);
+          } catch(ParseException &e) {
+            s.assign(so);
+            try {
+              return assign(s);
+            } catch(ParseException &e) {
+              s.excps.push_back(e);
+              throw ParseException(so.i, s.i, "stmt", "");
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/** X :- <X> name ';' */
+TNode unaryOp(State &s, string op, stmt_type typ) {
   int init = s.i;
   try {
-    stringMatch(s, "read");
+    stringMatch(s, op);
     // :- 'read'
     whitespace(s);
     string n = name(s);
@@ -52,10 +153,91 @@ TNode read(State &s) {
     stringMatch(s, ";");
     // :- ';'
     whitespace(s);
-    return TNode(s.advCurStmtNum(), n, READ);
+    return TNode(s.advCurStmtNum(), n, typ);
   } catch(ParseException &e) {
     s.excps.push_back(e);
-    throw ParseException(init, s.i, "read", "");
+    throw ParseException(init, s.i, op, "");
+  }
+}
+
+/** read :- 'read' name ';' */
+TNode read(State &s) {
+  return unaryOp(s, "read", READ);
+}
+
+/** print :- 'print' name ';' */
+TNode print(State &s) {
+  return unaryOp(s, "print", PRINT);
+}
+
+/** call :- 'call' name ';' */
+TNode call(State &s) {
+  return unaryOp(s, "call", CALL);
+}
+
+/** while_stmt :- 'while' '(' cond_expr ')' '{' stmtLst '}' */
+TNode while_stmt(State &s) {
+  int init = s.i;
+  int initNum = s.curStmtNum;
+  TNode t(s.advCurStmtNum(), "", WHILE);
+  try {
+    stringMatch(s, "while");
+    whitespace(s);
+    stringMatch(s, "(");
+    whitespace(s);
+    TNode t1 = cond_expr(s);
+    stringMatch(s, ")");
+    whitespace(s);
+    stringMatch(s, "{");
+    whitespace(s);
+    TNode t2 = stmtLst(s);
+    stringMatch(s, "}");
+    whitespace(s);
+    t.addChild(t1);
+    t.addChild(t2);
+    return t;
+  } catch(ParseException &e) {
+    s.excps.push_back(e);
+    s.curStmtNum = initNum;
+    throw ParseException(init, s.i, "while_stmt", "");
+  }
+}
+
+/** if_stmt :- 'if' '(' cond_expr ')' 'then' '{' stmtLst '}' 'else' '{' stmtLst '}' */
+TNode if_stmt(State &s) {
+  int init = s.i;
+  int initNum = s.curStmtNum;
+  TNode t(s.advCurStmtNum(), "", IF);
+  try {
+    stringMatch(s, "if");
+    whitespace(s);
+    stringMatch(s, "(");
+    whitespace(s);
+    TNode t1 = cond_expr(s);
+    stringMatch(s, ")");
+    whitespace(s);
+    stringMatch(s, "then");
+    whitespace(s);
+    stringMatch(s, "{");
+    whitespace(s);
+    TNode t2 = stmtLst(s);
+    stringMatch(s, "}");
+    whitespace(s);
+    stringMatch(s, "else");
+    whitespace(s);
+    stringMatch(s, "{");
+    whitespace(s);
+    TNode t3 = stmtLst(s);
+    stringMatch(s, "}");
+    whitespace(s);
+    t.addChild(t1);
+    t.addChild(t2);
+    t.addChild(t3);
+    return t;
+  } catch(ParseException &e) {
+    s.excps.push_back(e);
+    s.curStmtNum = initNum;
+    throw ParseException(init, s.i, "if_stmt", "");
   }
 }
 

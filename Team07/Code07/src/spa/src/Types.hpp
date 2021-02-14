@@ -18,6 +18,7 @@ enum stmt_type {
   OPERATOR,
   STATEMENTLIST,
   EXPR,
+  PROGRAM,
 };
 
 // Statement number of the referenced assign statement

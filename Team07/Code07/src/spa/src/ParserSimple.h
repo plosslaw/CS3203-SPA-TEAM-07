@@ -8,6 +8,15 @@
 using namespace std;
 
 string name(State &s);
+TNode program(State &s);
+TNode procedure(State &s);
+TNode stmtLst(State &s);
+TNode stmt(State &s);
+TNode read(State &s);
+TNode print(State &s);
+TNode call(State &s);
+TNode while_stmt(State &s);
+TNode if_stmt(State &s);
 TNode assign(State &s);
 TNode cond_expr(State &s);
 TNode rel_expr(State &s);
