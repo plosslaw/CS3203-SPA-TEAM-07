@@ -1,9 +1,12 @@
 #include "ActionsGenerator.h";
 #include "ActionsExecutor.h";
 #include "QueryMap.h";
+#include "StringUtil.h";
+#include <sstream>;
 #include <"Action.h">;
 
-void ActionsGenerator::TraverseQueryMap(QueryMap queryMap) {
+
+std::vector<std::string> ActionsGenerator::TraverseQueryMap(QueryMap queryMap) {
     selectList= queryMap.getList(SELECT);
     declarationList = queryMap.getList(DECLARATION);
     suchThatList = queryMap.getList(SUCHTHAT);
@@ -65,42 +68,52 @@ void ActionsGenerator::TraverseQueryMap(QueryMap queryMap) {
     std::string selectValue = selectPayLoad.getValue();
     Single selectSynonym = storeDeclaration[selectValue];
     
+    //Default solution
+    std::vector<std::string> defaultSolution = mapStorage[selectSynonym][selectValue];
+
+    //Evaluated solution
+    std::vector<std::string> solutionSuchThat;
+    std::vector<std::string> solutionPattern;
+
     bool isSelectValueInSuchThatPattern = false;
 
     for(auto i : suchThatList) {
-        std::string firstArg = i.getValue;
-        std::string secondArg = i.getValue2;
-        if(firstArg.compare(selectValue) || secondArg.compare(selectValue)) {
+        std::vector<std::string> suchThatArgs = ActionsGenerator::extract(i.getValue());
+        std::string firstArg = suchThatArgs[0];
+        std::string secondArg = suchThatArgs[1];
+        if(!firstArg.compare(selectValue) || !secondArg.compare(selectValue)) {
             isSelectValueInSuchThatPattern = true;
         }
     }
     for(auto i : patternList) {
-        std::string firstArg = i.getValue;
-        std::string secondArg = i.getValue2;
-        if(firstArg.compare(selectValue) || secondArg.compare(selectValue)) {
+        std::vector<std::string> suchThatArgs = ActionsGenerator::extract(i.getValue());
+        std::string firstArg = suchThatArgs[0];
+        std::string secondArg = suchThatArgs[1];
+        if(!firstArg.compare(selectValue) || !secondArg.compare(selectValue)) {
             isSelectValueInSuchThatPattern = true;
         }
     }
+
     
     if (!isSelectValueInSuchThatPattern) {
         //SUCHTHAT
         // Follows,parent,uses
-        // assume suchThatList has only 1 such-that clause as part of iteration 1 requirement.
-        //need to validate constant string such as "1" and "_".
         for(auto i : suchThatList) {
-            evalSuchThatPre(i);
-            
+            solutionSuchThat = evalSuchThatPre(i, selectValue);
         }
 
         //PATTERN
         for(auto i : patternList) {
-            evalPattern(i);
+            solutionPattern = evalPattern(i);
         }
-    } else {
-        
-    }
-    
 
+        //do a crossproduct?
+        std::vector<std::string> evaluatedSolution;
+        return evaluatedSolution;
+    } else {
+        //return the default solution
+        return defaultSolution;
+    }
 };
 
 
@@ -130,38 +143,66 @@ std::vector<std::pair <std::string, std::string>> ActionsGenerator::bothAreVaria
     return std::vector<std::pair <std::string, std::string>>;
 }
 
-void ActionsGenerator::evalSuchThatPre(PayLoad loadPay) {
-    std::string firstArg = loadPay.getValue();
-    std::string secondArg = loadPay.getValue2();
+//return list
+std::vector<std::string> ActionsGenerator::evalSuchThatPre(PayLoad loadPay, std::string selectValue) {
+    std::vector<std::string> suchThatArgs = ActionsGenerator::extract(loadPay.getValue());
+    std::string firstArg = suchThatArgs[0];
+    std::string secondArg = suchThatArgs[1];
     std::pair<bool,bool> pairArgs = checkIfArgsAreVariable(firstArg, secondArg, storeDeclaration);
+    
+    int findSelectVal;
+    if(!selectValue.compare(firstArg)) {
+        findSelectVal = 0;
+    } else if (!selectValue.compare(secondArg)) {
+        findSelectVal = 1;
+    }
+
+    std::unordered_map<std::string, std::vector<std::string>> evaluatedStorage;
+    std::vector<std::string> evaluatedSolution;
+
     if(pairArgs.first && pairArgs.second) {
         std::vector<std::pair <std::string, std::string>> permutated = ActionsGenerator::bothAreVariables(firstArg, secondArg);
         for(auto j : permutated) {
             std::string actionFirstArg = j.first;
             std::string actionSecondArg = j.second;
-            evalSuchThat(loadPay.getType().pair, actionFirstArg, actionSecondArg);
+            bool isInPKB = evalSuchThat(loadPay.getType().pair, actionFirstArg, actionSecondArg);
+            if(isInPKB) {
+                //evaluatedSolution.push_back(suchThatArgs[findSelectVal]);
+                evaluatedStorage[firstArg].push_back(suchThatArgs[firstArg]);
+                evaluatedStorage[secondArg].push_back(suchThatArgs[secondArg]);
+            }
         }
     } else if(pairArgs.first && !pairArgs.second) {
         Single firstArgSynonym = storeDeclaration[firstArg];
         std::vector<std::string> firstArgLst = mapStorage[firstArgSynonym][firstArg];
         for(auto i : firstArgLst) {      
-            evalSuchThat(loadPay.getType().pair, i, secondArg);
-            //Generate an action check FOLLOWS (SUCH_THAT_FOLLOWS, argLst, )
+            bool isInPKB = evalSuchThat(loadPay.getType().pair, i, secondArg);
+            if(isInPKB) {
+                //evaluatedSolution.push_back(suchThatArgs[findSelectVal]);
+                evaluatedStorage[firstArg].push_back(suchThatArgs[firstArg]);
+            }
         }
     } else if (!pairArgs.first && pairArgs.second) {
         Single secondArgSynonym = storeDeclaration[secondArg];
         std::vector<std::string> secondArgLst = mapStorage[secondArgSynonym][secondArg];
         for(auto i : secondArgLst) {
-            evalSuchThat(loadPay.getType().pair, firstArg, i);
-            //Generate an action check FOLLOWS (SUCH_THAT_FOLLOWS, argLst, )
+            bool isInPKB = evalSuchThat(loadPay.getType().pair, firstArg, i);
+            if(isInPKB) {
+                //evaluatedSolution.push_back(suchThatArgs[findSelectVal]);
+                evaluatedStorage[secondArg].push_back(suchThatArgs[secondArg]);
+            }
         }
     } else {
-        evalSuchThat(loadPay.getType().pair, firstArg, secondArg);
-        //CONSTANT, CONSTANT. Generate an action check FOLLOWS 
+        bool isInPKB = evalSuchThat(loadPay.getType().pair, firstArg, secondArg);
+        if(isInPKB) {
+                evaluatedSolution.push_back(suchThatArgs[findSelectVal]);
+            }
     }
+    //return evaluatedSolution;
+    return evaluatedStorage[suchThatArgs[findSelectVal]];
 }
 
-void ActionsGenerator::evalSuchThat(Pair suchThatType, std::string actionFirstArg, std::string actionSecondArg) {
+bool ActionsGenerator::evalSuchThat(Pair suchThatType, std::string actionFirstArg, std::string actionSecondArg) {
     std::vector<std::string> argLst;
     argLst.push_back(actionFirstArg);
     argLst.push_back(actionSecondArg);
@@ -169,26 +210,37 @@ void ActionsGenerator::evalSuchThat(Pair suchThatType, std::string actionFirstAr
     {
     case FOLLOWS:
         
+        return true;
         break;
     case FOLLOWST:
+
+        return true;
         break;
     case PARENT:
+        return true;
         break;
     case PARENTT:
+        return true;
         break;
     case USES:
-
+        return true;
         break;
     case MODIFIES:
+        return true;
         break;
     default:
         break;
     }
 }
 
-void ActionsGenerator::evalPattern(PayLoad loadPay) {
-    std::string firstArg = loadPay.getValue();
-    std::string secondArg = loadPay.getValue2();
+std::vector<std::string> ActionsGenerator::evalPattern(PayLoad loadPay) {
+    std::vector<std::string> suchThatArgs = ActionsGenerator::extract(loadPay.getValue());
+    std::string firstArg = suchThatArgs[0];
+    std::string secondArg = suchThatArgs[1];
+
+    //generate action- Pattern (firstArg, SecondArg)
+
+    //return list    
 }
 std::vector<std::pair <std::string, std::string>> ActionsGenerator::permutateValues(std::vector<std::string> firstArg, 
     std::vector<std::string> secondArg){
@@ -201,3 +253,13 @@ std::vector<std::pair <std::string, std::string>> ActionsGenerator::permutateVal
     return permutated;
 };
 
+std::vector<std::string> ActionsGenerator::extract(std::string payloadVal) {
+    std::vector<std::string> output;
+    std::stringstream splitter(payloadVal);
+    std::string intermediate;
+
+    while(getline(splitter, intermediate, ',')) {
+        output.push_back(StringUtil::removeWhiteSpaces(intermediate));
+    }
+    return output;
+}
