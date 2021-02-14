@@ -38,35 +38,23 @@ bool PKBQueryController::satisfiesPattern(assign_ref a, pattern p) {
     return true;
 }
 
-std::vector<const_value> PKBQueryController::getAllConstants() {
-    std::vector<const_value> vect;
-    for (auto it : pkb.variables) {
-        vect.push_back(it);
-    }
+std::vector<constant> PKBQueryController::getAllConstants() {
+    std::vector<constant> vect;
     return vect;
 }
 
 std::vector<proc_ref> PKBQueryController::getAllProcedures() {
     std::vector<proc_ref> vect;
-    for (auto it : pkb.procedures) {
-        vect.push_back(it.first);
-    }
     return vect;
 }
 
-std::vector<stmt_ref> PKBQueryController::getAllStatements() {
-    std::vector<stmt_ref> vect;
-    for (auto it : pkb.statements) {
-        vect.push_back(it.first);
-    }
+std::vector<statement> PKBQueryController::getAllStatements() {
+    std::vector<statement> vect;
     return vect;
 }
 
 std::vector<var_ref> PKBQueryController::getAllVariables() {
     std::vector<var_ref> vect;
-    for (auto it : pkb.variables) {
-        vect.push_back(it.first);
-    }
     return vect;
 }
 

@@ -32,13 +32,13 @@ class PKBQueryController {
         bool satisfiesPattern(assign_ref a, pattern p);
 
         // Returns list of all constants in the SIMPLE program
-        std::vector<const_value> getAllConstants();
+        std::vector<constant> getAllConstants();
 
         // Returns list of all procedures in the SIMPLE program
         std::vector<proc_ref> getAllProcedures();
 
         // Returns list of all statements in the SIMPLE program
-        std::vector<stmt_ref> getAllStatements();
+        std::vector<statement> getAllStatements();
 
         // Returns list of all variables in the SIMPLE program
         std::vector<var_ref> getAllVariables();
