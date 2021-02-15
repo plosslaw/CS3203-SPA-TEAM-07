@@ -117,13 +117,6 @@ string prettyPrintException(State &s) {
   return outputstr;
 }
 
-// parser exception factory ---------------------------------------------------
-
-void consExcp(State &s, int from, int at, string subparser, string arg) {
-	ParseException excp(from, at, subparser, arg);
-	s.excps.push_back(excp);
-}
-
 // combinators ----------------------------------------------------------------
 
 string stringMatch(State &s, string str) {

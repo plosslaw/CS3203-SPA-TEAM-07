@@ -35,7 +35,6 @@ class State {
 		void assign(State &s);
 };
 
-void consExcp(State &s, int from, int at, std::string subparser, std::string arg);
 std::string prettyPrintException(State &s);
 
 
