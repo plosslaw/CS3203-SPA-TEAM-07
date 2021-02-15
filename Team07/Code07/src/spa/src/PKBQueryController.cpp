@@ -38,7 +38,7 @@ bool PKBQueryController::statementUses(stmt_ref s, var_ref v) {
 
 bool PKBQueryController::statementModifies(stmt_ref s, var_ref v) {
     statement stmt = pkb.statements.at(s);
-    return stmt.modifies.find(v) != pkb.modifies.end();
+    return stmt.modifies.find(v) != stmt.modifies.end();
 }
 
 bool PKBQueryController::satisfiesPattern(assign_ref a, pattern p) {
