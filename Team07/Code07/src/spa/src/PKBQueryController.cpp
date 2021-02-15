@@ -1,4 +1,5 @@
 #include <vector>
+#include "PKBEntities.hpp"
 #include "PKB.h"
 #include "PKBQueryController.hpp"
 
@@ -11,27 +12,33 @@ void PKBQueryController::setPKB(PKB pkbToSet) {
 }
 
 bool PKBQueryController::isFollows(stmt_ref s1, stmt_ref s2) {
-    return true;
+    statement statement1 = pkb.statements.at(s1);
+    return statement1.follows = s2;
 }
 
 bool PKBQueryController::isFollowsStar(stmt_ref s1, stmt_ref s2) {
-    return true;
+    statement statement1 = pkb.statements.at(s1);
+    return statement1.indirect_follows.find(s2) != statement1.indirect_follows.end();
 }
 
 bool PKBQueryController::isParent(stmt_ref s1, stmt_ref s2) {
-    return true;
+    statement statement2 = pkb.statements.at(s2);
+    return statement2.parent == s1;
 }
 
 bool PKBQueryController::isParentStar(stmt_ref s1, stmt_ref s2) {
-    return true;
+    statement statement2 = pkb.statements.at(s2);
+    return statement2.indirect_parent.find(s1) != statement2.indirect_parent.end();
 }
 
 bool PKBQueryController::statementUses(stmt_ref s, var_ref v) {
-    return true;
+    statement stmt = pkb.statements.at(s);
+    return stmt.uses.find(v) != stmt.uses.end();
 }
 
 bool PKBQueryController::statementModifies(stmt_ref s, var_ref v) {
-    return true;
+    statement stmt = pkb.statements.at(s);
+    return stmt.modifies.find(v) != pkb.modifies.end();
 }
 
 bool PKBQueryController::satisfiesPattern(assign_ref a, pattern p) {
