@@ -9,7 +9,7 @@ TNode::TNode() {
 TNode::TNode(std::string val, stmt_type typ) {
   statementNum = NULL_STMT_REF;
   value = val;
-  type = STATEMENT;
+  type = typ;
 }
 
 TNode::TNode(int num, std::string val, stmt_type typ) {
