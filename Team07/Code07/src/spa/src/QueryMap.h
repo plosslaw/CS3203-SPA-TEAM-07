@@ -34,16 +34,16 @@ class PayLoad {
 private:
   Tag tag;
   LoadType type;
-  std::string value;
+  std::vector<std::string> value;
 
 public:
-  PayLoad(Tag loadTag, Single loadType, std::string loadVal);
-  PayLoad(Tag loadTag, Pair loadType, std::string loadVal);
-  PayLoad(Tag loadTag, Triple loadType, std::string loadVal);
-  
+  PayLoad(Tag loadTag, Single loadType, std::vector<std::string> loadVal);
+  PayLoad(Tag loadTag, Pair loadType, std::vector<std::string> loadVal);
+  PayLoad(Tag loadTag, Triple loadType, std::vector<std::string> loadVal);
+
   Tag getTag();
   LoadType getType();
-  std::string getValue();
+  std::vector<std::string> getValue();
   friend bool operator==(const PayLoad &l, const PayLoad &r) {
     return (std::tie(l.tag, l.type.single, l.value) ==
             std::tie(r.tag, r.type.single, r.value)) ||
