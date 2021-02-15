@@ -5,13 +5,17 @@ PayLoad::PayLoad(Tag loadTag, Single loadType, std::string loadVal) {
   type.single = loadType;
   value = loadVal;
 }
+
 PayLoad::PayLoad(Tag loadTag, Pair loadType, std::string loadVal) {
   tag = loadTag;
   type.pair = loadType;
   value = loadVal;
 }
 
+Tag PayLoad::getTag() { return tag; }
+
 LoadType PayLoad::getType() { return type; }
+
 std::string PayLoad::getValue() { return value; }
 
 QueryMap::QueryMap() {
