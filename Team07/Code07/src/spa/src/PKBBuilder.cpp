@@ -1,17 +1,19 @@
 #include <unordered_map>
 #include <vector>
+#include <algorithm>
+#include <iostream>
 
 #include "PKBBuilder.hpp"
 
-std::vector<var_ref> extractVariableFromSubtree(TNode tree_root) {
+std::vector<var_ref> extractVariableFromSubtree(TNode cur_node) {
 
-    if (tree_root.getType() == VARIABLE) {
-        return std::vector<var_ref>({tree_root.getValue()});
+    if (cur_node.getType() == VARIABLE) {
+        return std::vector<var_ref>({cur_node.getValue()});
     }
 
     std::vector<var_ref> results;
-    for (auto child: tree_root.getChildren()) {
-        std::vector<var_ref> subtree_results;
+    for (auto child: cur_node.getChildren()) {
+        std::vector<var_ref> subtree_results = extractVariableFromSubtree(child);
         results.insert(results.end(), subtree_results.begin(), subtree_results.end());
     }
 
@@ -110,7 +112,7 @@ std::vector<var_ref> computeUses(TNode cur_node, PKB &pkb) {
         cur_node_uses.insert(cur_node_uses.end(), buffer.begin(), buffer.end());
         break;
     case PRINT:
-        buffer = computeUses(cur_node.getChildren()[0], pkb);
+        buffer = extractVariableFromSubtree(cur_node.getChildren()[0]);
         cur_node_uses.insert(cur_node_uses.end(), buffer.begin(), buffer.end());
         break;
     case STATEMENTLIST:
@@ -122,7 +124,7 @@ std::vector<var_ref> computeUses(TNode cur_node, PKB &pkb) {
         break;
     case PROCEDURE:
         // check the statement list
-        buffer = computeUses(cur_node.getChildren()[1], pkb);
+        buffer = computeUses(cur_node.getChildren()[0], pkb);
         cur_node_uses.insert(cur_node_uses.end(), buffer.begin(), buffer.end());
         pkb.procedures[cur_node.getValue()].uses.insert(cur_node_uses.begin(), 
                 cur_node_uses.end());
@@ -134,7 +136,7 @@ std::vector<var_ref> computeUses(TNode cur_node, PKB &pkb) {
     stmt_ref stmt_no = cur_node.getStatementNum();
 
     if (stmt_no != NULL_STMT_REF) {
-        pkb.statements[stmt_no].modifies.insert(cur_node_uses.begin(), 
+        pkb.statements[stmt_no].uses.insert(cur_node_uses.begin(), 
                 cur_node_uses.end());
     }
 
@@ -226,7 +228,7 @@ void extractDesignEntities(TNode cur_node, PKB &pkb) {
             break;
         case CONSTANT:
             c = std::stoi(cur_node.getValue());
-            pkb.constants.insert(c);
+            pkb.constants.emplace(c);
             break;
         case VARIABLE:
             v = {cur_node.getValue()};
@@ -249,7 +251,6 @@ void computePKB(PKB &pkb) {
         std::vector<stmt_ref>(),
         pkb.statements
     );
-
     for (auto proc: pkb.procedures) {
         computeModifies(proc.second.ast, pkb);
         computeUses(proc.second.ast, pkb);
