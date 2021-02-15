@@ -4,6 +4,9 @@
 #include <vector>
 
 class Action {
+    
+
+public: 
     enum search_type {
         PATTERN,
         SUCH_THAT_FOLLOWS,
@@ -31,8 +34,6 @@ class Action {
         STATEMENT_NUM,
         WILDCARD
     };
-
-public: 
     Action(search_type searchType, std::vector<std::string> argList, std::vector<arg_type> argTypeList);
 
 private:
