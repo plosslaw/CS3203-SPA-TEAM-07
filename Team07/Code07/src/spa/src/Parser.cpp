@@ -22,7 +22,5 @@ int Parse (string file) {
 		s.excps.push_back(e);
 		cerr << prettyPrintException(s) << "\n";
 	}
-	cout << s.toString() << "\n";
-	//TODO figure out error case
 	return 0;
 }
