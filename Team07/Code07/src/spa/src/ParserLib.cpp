@@ -17,10 +17,7 @@ State::State(State &s) {
 	i = s.i;
 	source = s.source;
 	curStmtNum = s.curStmtNum;
-	excps.clear();
-	for (int j = 0; j < s.excps.size(); j++) {
-		excps.push_back(s.excps[i]);
-	}
+	excps = s.excps;
 }
 int State::advCurStmtNum() {
 	return curStmtNum++;
@@ -32,10 +29,7 @@ void State::assign(State &s) {
 	i = s.i;
 	source = s.source;
 	curStmtNum = s.curStmtNum;
-	excps.clear();
-	for (int j = 0; j < s.excps.size(); j++) {
-		excps.push_back(s.excps[i]);
-	}
+	excps = s.excps;
 }
 
 ParseException::ParseException(int f, int a, string s, string ar) {
@@ -57,12 +51,11 @@ const char* ParseException::what() const throw()
 string prettyPrintException(State &s) {
 	string *str = s.source;
 	vector<ParseException> e = s.excps;
-	int from = e[e.size() - 1].from;
-	int at = e[e.size() - 1].at;
+	int at = e[0].at;
 
 	vector<int> fs;
 	vector<string> es;
-	for(int i = e.size() - 1; i >= 0; i--) {
+	for(int i = 0; i < e.size(); i++) {
 		fs.push_back(e[i].from);
 		es.push_back(e[i].errorMessage());
 	}
@@ -74,6 +67,7 @@ string prettyPrintException(State &s) {
 	vector<char> linebuilder;
 	
 	int curLineLength = 0;
+	int prevLineLength = 0;
 	int curLine = 0;
 	int atLine = 0;
 	int atCol = 0;
@@ -88,35 +82,24 @@ string prettyPrintException(State &s) {
 			linestr.push_back(linestrvalue);
 			linebuilder.clear();
 			curLine++;
+			prevLineLength = curLineLength;
 		} else {
 			linebuilder.push_back(c);
 		}
 		if(i == at) {
 			atLine = curLine;
+			atCol = curLineLength - prevLineLength - 1;
 		}
 		for(int j = 0; j < fs.size(); j++) {
 			if(i == fs[j]) {
 				fromLine[j] = curLine;
+				fromCol[j] = curLineLength - prevLineLength - 1;
 			}
 		}
 	}
 	linelengths.push_back(curLineLength);
 	string linestrvalue(linebuilder.begin(), linebuilder.end());
 	linestr.push_back(linestrvalue);
-	int prevline = atLine - 1;
-	if (prevline == -1) {
-		atCol = at;
-	} else {
-		atCol = linelengths[prevline] - at;
-	}
-	for(int j = 0; j < fs.size(); j++) {
-		int prevline = fromLine[j] - 1;
-		if(prevline == -1) {
-			fromCol[j] = fs[j];
-		} else {
-			fromCol[j] = linelengths[prevline] - fs[j];
-		}
-	}
 	// calculate from line cols and line strings
 
 	string outputstr = "";
@@ -125,6 +108,7 @@ string prettyPrintException(State &s) {
 	outputstr += preoutput + linestr[atLine] + "\n";
 	string whitespaceprefix = string(preoutput.length() + atCol, ' ');
 	outputstr += whitespaceprefix + "^\n";
+	outputstr += "  at line " + to_string(atLine + 1) + " col " + to_string(atCol + 1) + "\n";
 	for(int i = 0; i < fromLine.size(); i++) {
 		outputstr += "  " + es[i] + "\n";
 		outputstr += "    from line " + to_string(fromLine[i] + 1) + " col " + to_string(fromCol[i] + 1) + "\n";

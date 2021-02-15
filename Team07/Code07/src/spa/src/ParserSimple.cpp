@@ -52,10 +52,11 @@ TNode program(State &s) {
 		}
 	} catch (ParseException &e){
 		if(!consumed) {
-			s.excps.push_back(e);
-			throw ParseException(so.i, s.i, "program", "");
+			throw e;
 		}
-		s.assign(so);
+    if (so.i != (*s.source).size()) {
+      throw e;
+    }
     return t;
 	}
 }
@@ -63,6 +64,7 @@ TNode program(State &s) {
 /** procedure :- 'procedure' name '{' stmtLst '}' */
 TNode procedure(State &s) {
   State so(s);
+  bool stmtLstFail = false;
   try {
     stringMatch(s, "procedure");
     whitespace(s);
@@ -70,19 +72,19 @@ TNode procedure(State &s) {
     whitespace(s);
     stringMatch(s, "{");
     whitespace(s);
+    stmtLstFail = true;
     TNode t1 = stmtLst(s);
-    stringMatch(s, "}");
-    whitespace(s);
+    stmtLstFail = false;
     TNode t(proc_name, PROCEDURE);
     t.addChild(t1);
     return t;
   } catch(ParseException &e) {
     s.excps.push_back(e);
-    throw ParseException(so.i, s.i, "procedure", "");
+    throw ParseException(so.i, s.i, "procedure", stmtLstFail ? "stmtLst" : "");
   }
 }
 
-/** stmtLst :- stmt+ */
+/** stmtLst :- stmt+ '}' */
 TNode stmtLst(State &s) {
   State so(s);
   TNode t("", STATEMENTLIST);
@@ -96,11 +98,18 @@ TNode stmtLst(State &s) {
 		}
 	} catch (ParseException &e){
 		if(!consumed) {
-			s.excps.push_back(e);
-			throw ParseException(so.i, s.i, "stmtLst", "");
+		  throw e;
 		}
-		s.assign(so);
-    return t;
+    State so1(s);
+    s.assign(so);
+    try {
+      stringMatch(s, "}");
+      whitespace(s);
+      return t;
+    } catch (ParseException &eUnused) {
+      s.assign(so1);
+		  throw e;
+    }
 	}
 }
 
@@ -110,28 +119,42 @@ TNode stmt(State &s) {
   try {
     return read(s);
   } catch(ParseException &e) {
+    if (e.args.compare("partial") == 0) {
+      throw e;
+    }
     s.assign(so);
     try {
       return print(s);
     } catch(ParseException &e) {
+      if (e.args.compare("partial") == 0) {
+        throw e;
+      }
       s.assign(so);
       try {
         return call(s);
       } catch(ParseException &e) {
+        if (e.args.compare("partial") == 0) {
+          throw e;
+        }
         s.assign(so);
         try {
           return while_stmt(s);
         } catch(ParseException &e) {
+          if (e.args.compare("stmtLst") == 0) {
+            throw e;
+          }
           s.assign(so);
           try {
             return if_stmt(s);
           } catch(ParseException &e) {
+            if (e.args.compare("stmtLst") == 0) {
+              throw e;
+            }
             s.assign(so);
             try {
               return assign(s);
             } catch(ParseException &e) {
-              s.excps.push_back(e);
-              throw ParseException(so.i, s.i, "stmt", "");
+              throw e;
             }
           }
         }
@@ -143,8 +166,10 @@ TNode stmt(State &s) {
 /** X :- <X> name ';' */
 TNode unaryOp(State &s, string op, stmt_type typ) {
   int init = s.i;
+  bool partial = false;
   try {
     stringMatch(s, op);
+    partial = true;
     // :- 'read'
     whitespace(s);
     string n = name(s);
@@ -156,7 +181,7 @@ TNode unaryOp(State &s, string op, stmt_type typ) {
     return TNode(s.advCurStmtNum(), n, typ);
   } catch(ParseException &e) {
     s.excps.push_back(e);
-    throw ParseException(init, s.i, op, "");
+    throw ParseException(init, s.i, op, partial ? "partial" : "");
   }
 }
 
@@ -180,6 +205,7 @@ TNode while_stmt(State &s) {
   int init = s.i;
   int initNum = s.curStmtNum;
   TNode t(s.advCurStmtNum(), "", WHILE);
+  bool stmtLstFail = false;
   try {
     stringMatch(s, "while");
     whitespace(s);
@@ -190,16 +216,16 @@ TNode while_stmt(State &s) {
     whitespace(s);
     stringMatch(s, "{");
     whitespace(s);
+    stmtLstFail = true;
     TNode t2 = stmtLst(s);
-    stringMatch(s, "}");
-    whitespace(s);
+    stmtLstFail = false;
     t.addChild(t1);
     t.addChild(t2);
     return t;
   } catch(ParseException &e) {
     s.excps.push_back(e);
     s.curStmtNum = initNum;
-    throw ParseException(init, s.i, "while_stmt", "");
+    throw ParseException(init, s.i, "while_stmt", stmtLstFail ? "stmtLst" : "");
   }
 }
 
@@ -208,6 +234,7 @@ TNode if_stmt(State &s) {
   int init = s.i;
   int initNum = s.curStmtNum;
   TNode t(s.advCurStmtNum(), "", IF);
+  bool stmtLstFail = false;
   try {
     stringMatch(s, "if");
     whitespace(s);
@@ -220,16 +247,16 @@ TNode if_stmt(State &s) {
     whitespace(s);
     stringMatch(s, "{");
     whitespace(s);
+    stmtLstFail = true;
     TNode t2 = stmtLst(s);
-    stringMatch(s, "}");
-    whitespace(s);
+    stmtLstFail = false;
     stringMatch(s, "else");
     whitespace(s);
     stringMatch(s, "{");
     whitespace(s);
+    stmtLstFail = true;
     TNode t3 = stmtLst(s);
-    stringMatch(s, "}");
-    whitespace(s);
+    stmtLstFail = false;
     t.addChild(t1);
     t.addChild(t2);
     t.addChild(t3);
@@ -237,7 +264,7 @@ TNode if_stmt(State &s) {
   } catch(ParseException &e) {
     s.excps.push_back(e);
     s.curStmtNum = initNum;
-    throw ParseException(init, s.i, "if_stmt", "");
+    throw ParseException(init, s.i, "if_stmt", stmtLstFail ? "stmtLst" : "");
   }
 }
 

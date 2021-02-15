@@ -18,13 +18,11 @@ int Parse (string file) {
 	State s(&str);
 	try{
 		cout << program(s).toSexp() << "\n";
-		if(s.i != (*s.source).size()) {
-			throw ParseException(s.i, s.i, "", "unconsumed characters");
-		}
 	} catch (ParseException &e) {
 		s.excps.push_back(e);
 		cerr << prettyPrintException(s) << "\n";
 	}
 	cout << s.toString() << "\n";
+	//TODO figure out error case
 	return 0;
 }
