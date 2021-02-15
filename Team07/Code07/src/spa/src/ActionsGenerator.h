@@ -37,7 +37,8 @@ class ActionsGenerator {
         std::vector<std::pair <std::string, std::string>> ActionsGenerator::NotVarAndVar(std::string firstArg, std::string secondArg);
         std::pair<bool,bool> ActionsGenerator::checkIfArgsAreVariable(std::string firstArg, std::string secondArg);
         std::vector<std::string> ActionsGenerator::evalSuchThatPre(PayLoad loadPay, std::string selectValue);
-        std::vector<std::string> ActionsGenerator::evalPattern(PayLoad loadPay);
+        std::vector<std::string> ActionsGenerator::evalPattern(PayLoad loadPay, 
+            std::unordered_map<std::string, std::vector<std::string>> solutionStorage);
         bool ActionsGenerator::evalSuchThat(Pair suchThatType, std::string actionFirstArg, std::string actionSecondArg);
         std::vector<std::string> ActionsGenerator::extract(std::string payloadVal);
     public:
