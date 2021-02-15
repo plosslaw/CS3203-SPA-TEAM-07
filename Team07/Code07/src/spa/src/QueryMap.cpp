@@ -12,6 +12,12 @@ PayLoad::PayLoad(Tag loadTag, Pair loadType, std::string loadVal) {
   value = loadVal;
 }
 
+PayLoad::PayLoad(Tag loadTag, Triple loadType, std::string loadVal) {
+  tag = loadTag;
+  type.triple = loadType;
+  value = loadVal;
+}
+
 Tag PayLoad::getTag() { return tag; }
 
 LoadType PayLoad::getType() { return type; }

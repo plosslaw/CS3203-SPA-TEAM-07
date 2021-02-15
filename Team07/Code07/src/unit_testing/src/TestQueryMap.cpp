@@ -66,7 +66,6 @@ TEST_CASE("PayLoad with pair variable") {
   PayLoad parentt(PAIR, PARENTT, "s1,s2");
   PayLoad uses(PAIR, USES, "s1,v");
   PayLoad modifies(PAIR, MODIFIES, "s1,v");
-  PayLoad synonym_assign(PAIR, SYN_ASSIGN, "_,_");
 
   SECTION("PayLoad tag") {
     REQUIRE(follows.getTag() == PAIR);
@@ -75,7 +74,6 @@ TEST_CASE("PayLoad with pair variable") {
     REQUIRE(parentt.getTag() == PAIR);
     REQUIRE(uses.getTag() == PAIR);
     REQUIRE(modifies.getTag() == PAIR);
-    REQUIRE(synonym_assign.getTag() == PAIR);
   }
 
   SECTION("PayLoad type") {
@@ -85,7 +83,6 @@ TEST_CASE("PayLoad with pair variable") {
     REQUIRE(parentt.getType().pair == PARENTT);
     REQUIRE(uses.getType().pair == USES);
     REQUIRE(modifies.getType().pair == MODIFIES);
-    REQUIRE(synonym_assign.getType().pair == SYN_ASSIGN);
   }
 
   SECTION("PayLoad value") {
@@ -95,8 +92,19 @@ TEST_CASE("PayLoad with pair variable") {
     REQUIRE(parentt.getValue() == "s1,s2");
     REQUIRE(uses.getValue() == "s1,v");
     REQUIRE(modifies.getValue() == "s1,v");
-    REQUIRE(synonym_assign.getValue() == "_,_");
   }
+}
+
+TEST_CASE("PayLoad with triple variable") {
+  PayLoad synonym_assign(TRIPLE, SYN_ASSIGN, "a,_,_");
+
+  SECTION("PayLoad tag") { REQUIRE(synonym_assign.getTag() == TRIPLE); }
+
+  SECTION("PayLoad type") {
+    REQUIRE(synonym_assign.getType().triple == SYN_ASSIGN);
+  }
+
+  SECTION("PayLoad value") { REQUIRE(synonym_assign.getValue() == "a,_,_"); }
 }
 
 TEST_CASE("PQL with no such that and no pattern") {

@@ -18,14 +18,17 @@ enum Single {
   SYNONYM,
 };
 
-enum Pair { FOLLOWS, FOLLOWST, PARENT, PARENTT, USES, MODIFIES, SYN_ASSIGN };
+enum Pair { FOLLOWS, FOLLOWST, PARENT, PARENTT, USES, MODIFIES };
+
+enum Triple { SYN_ASSIGN };
 
 union LoadType {
   Single single;
   Pair pair;
+  Triple triple;
 };
 
-enum Tag { SINGLE, PAIR };
+enum Tag { SINGLE, PAIR, TRIPLE };
 
 class PayLoad {
 private:
@@ -36,6 +39,8 @@ private:
 public:
   PayLoad(Tag loadTag, Single loadType, std::string loadVal);
   PayLoad(Tag loadTag, Pair loadType, std::string loadVal);
+  PayLoad(Tag loadTag, Triple loadType, std::string loadVal);
+  
   Tag getTag();
   LoadType getType();
   std::string getValue();
@@ -43,7 +48,9 @@ public:
     return (std::tie(l.tag, l.type.single, l.value) ==
             std::tie(r.tag, r.type.single, r.value)) ||
            (std::tie(l.tag, l.type.pair, l.value) ==
-            std::tie(r.tag, r.type.pair, r.value));
+            std::tie(r.tag, r.type.pair, r.value)) ||
+           (std::tie(l.tag, l.type.triple, l.value) ==
+            std::tie(r.tag, r.type.triple, r.value));
   }
 };
 
