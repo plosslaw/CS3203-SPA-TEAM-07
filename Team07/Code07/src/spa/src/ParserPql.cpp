@@ -122,13 +122,16 @@ std::vector<PayLoad> declaration_cl(State &state) {
   return declarations;
 }
 
-PayLoad select_cl(State &state) {
+std::vector<PayLoad> select_cl(State &state) {
+  std::vector<PayLoad> selects;
   State so(state);
   try {
     stringMatch(state, "Select");
     whitespace(state);
     std::string synonym = ident(state);
-    return PayLoad(SINGLE, SYNONYM, synonym);
+    PayLoad select_payload(SINGLE, SYNONYM, synonym);
+    selects.push_back(select_payload);
+    return selects;
   } catch (ParseException &e) {
     throw ParseException(so.i, state.i, "select_cl", "");
   }
@@ -145,15 +148,18 @@ QueryMap pqlParse(std::string query) {
 
   try {
     std::vector<PayLoad> declarations = declaration_cl(state);
-    PayLoad p2 = select_cl(state);
+    std::vector<PayLoad> selects = select_cl(state);
 
+    std::vector<PayLoad> suchthats; // TODO(zs)
+    std::vector<PayLoad> patterns; // TODO(zs)
     std::cout << declarations[0].getValue() << std::endl;
-    std::cout << p2.getValue() << std::endl;
+    std::cout << selects[0].getValue() << std::endl;
 
+    return QueryMap(declarations, selects, suchthats, patterns);
   } catch (ParseException &e) {
     std::cout << e.what() << std::endl;
   }
 
   std::cout << std::endl;
-  return queryMap;
+  return QueryMap();
 }

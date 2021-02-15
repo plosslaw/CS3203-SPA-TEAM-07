@@ -60,6 +60,8 @@ private:
 
 public:
   QueryMap();
+  QueryMap(std::vector<PayLoad> declaration_cl, std::vector<PayLoad> select_cl,
+           std::vector<PayLoad> suchthat_cl, std::vector<PayLoad> pattern_cl);
   std::vector<PayLoad> getList(ClauseType key);
   void addItem(ClauseType key, PayLoad item);
 };
