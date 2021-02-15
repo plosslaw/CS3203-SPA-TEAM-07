@@ -111,6 +111,18 @@ TEST_CASE("PayLoad with triple variable") {
   }
 }
 
+TEST_CASE("PayLoad with triple variable") {
+  PayLoad synonym_assign(TRIPLE, SYN_ASSIGN, "a,_,_");
+
+  SECTION("PayLoad tag") { REQUIRE(synonym_assign.getTag() == TRIPLE); }
+
+  SECTION("PayLoad type") {
+    REQUIRE(synonym_assign.getType().triple == SYN_ASSIGN);
+  }
+
+  SECTION("PayLoad value") { REQUIRE(synonym_assign.getValue() == "a,_,_"); }
+}
+
 TEST_CASE("PQL with no such that and no pattern") {
   /*
   variable v;
