@@ -55,10 +55,15 @@ std::string TNode::toSexp(int sep) {
   std::string str = children.size() == 0 ? "" : "( ";
   str += statementNum == NULL_STMT_REF ? "" : "[" + std::to_string(statementNum) + "]";
   str += value + ":" + typeToString(type);
+  bool multiline = false;
   for (int i = 0; i < children.size(); i++) {
-    str += "\n" + sepstr + "  " + (children[i].toSexp(sep + 2));
+    multiline = multiline || (children[i].children.size() > 0);
   }
-  str += children.size() == 0 ? "" : ("\n" + sepstr + ")");
+  for (int i = 0; i < children.size(); i++) {
+    str += multiline ? "\n" + sepstr + "  " : " ";
+    str += (children[i].toSexp(sep + 2));
+  }
+  str += children.size() == 0 ? "" : multiline ? ("\n" + sepstr + ")") : " )";
   return str;
 }
 
