@@ -11,7 +11,7 @@ typedef struct {
     // Type of the statement (e.g. read / print / assign)
     stmt_type type;
 
-    // Node in the AST tree where the statement is defined at
+    // Node in the AST tree where the statement is rooted at
     TNode ast;
 
     // Set of variables used by the statement
@@ -44,6 +44,9 @@ typedef const_value constant;
 typedef struct {
     // Reference to this procedure (procedure name)
     proc_ref reference;
+    
+    // Node in the AST tree where the procedure is rooted at
+    TNode ast;
 
     // List of procedures called by this procedure
     std::unordered_set<proc_ref> children;
