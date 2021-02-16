@@ -32,12 +32,17 @@ public:
     std::vector<QueryResult> getAllStmtFollows(stmt_type stmtType, stmt_pos stmtPos, stmt_type otherStmtType);
     
     std::vector<QueryResult> getAllStmtParent(stmt_type stmtType);
+    std::vector<QueryResult> getAllStmtParent(stmt_type stmtType, stmt_pos stmtPos, stmt_ref otherStmt);
+    std::vector<QueryResult> getAllStmtParent(stmt_type stmtType, stmt_pos stmtPos, stmt_type otherStmtType);
 
     std::vector<QueryResult> getAllStmtModifies(var_ref v);
     std::vector<QueryResult> getAllStmtUses(var_ref v);
 
-    std::vector<QueryResult> getAllVariableModifies(stmt_ref stmt);
-    std::vector<QueryResult> getAllVariableUses(stmt_ref stmt);
+    std::vector<QueryResult> getAllVariableModifies(stmt_ref otherStmt);
+    std::vector<QueryResult> getAllVariableModifies(stmt_type otherStmtType);
+
+    std::vector<QueryResult> getAllVariableUses(stmt_ref otherStmt);
+    std::vector<QueryResult> getAllVariableUses(stmt_type otherStmtType);
 
     std::vector<QueryResult> getAllProcedureModifies(var_ref v);
     std::vector<QueryResult> getAllProcedureUses(var_ref v);
