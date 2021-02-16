@@ -161,4 +161,33 @@ TEST_CASE("One") {
     TNode root;
     PKB pkb = {procedures, statements, assignments, variables, constants, root};
 
+    PKBQueryController pkbQueryController = PKBQueryController(pkb);
+
+    SECTION("Check is Follows") {
+        REQUIRE(pkbQueryController.isFollows(1, 2) == true);
+        REQUIRE(pkbQueryController.isFollows(2, 3) == true);
+        REQUIRE(pkbQueryController.isFollows(4, 5) == true);
+        REQUIRE(pkbQueryController.isFollows(5, 6) == true);
+        REQUIRE(pkbQueryController.isFollows(1, 3) == false);
+        REQUIRE(pkbQueryController.isFollows(2, 1) == false);
+    }
+
+    SECTION("Check is Follows*") {
+        REQUIRE(pkbQueryController.isFollowsStar(1, 3) == true);
+        REQUIRE(pkbQueryController.isFollowsStar(1, 8) == true);
+        REQUIRE(pkbQueryController.isFollowsStar(2, 8) == true);
+        REQUIRE(pkbQueryController.isFollowsStar(2, 4) == false);
+        REQUIRE(pkbQueryController.isFollowsStar(3, 6) == false);
+        REQUIRE(pkbQueryController.isFollowsStar(6, 8) == false);
+    }
+
+    SECTION("Check is Parent") {
+        REQUIRE(pkbQueryController.isParent(1, 2) == false);
+        REQUIRE(pkbQueryController.isParent(1, 3) == false);
+        REQUIRE(pkbQueryController.isParent(2, 1) == false);
+        REQUIRE(pkbQueryController.isParent(3, 4) == true);
+        REQUIRE(pkbQueryController.isParent(3, 5) == true);
+        REQUIRE(pkbQueryController.isParent(3, 6) == true);
+    }
+
 }

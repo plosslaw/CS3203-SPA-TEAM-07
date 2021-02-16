@@ -13,7 +13,7 @@ void PKBQueryController::setPKB(PKB pkbToSet) {
 
 bool PKBQueryController::isFollows(stmt_ref s1, stmt_ref s2) {
     statement statement1 = pkb.statements.at(s1);
-    return statement1.follows = s2;
+    return statement1.follows == s2;
 }
 
 bool PKBQueryController::isFollowsStar(stmt_ref s1, stmt_ref s2) {
