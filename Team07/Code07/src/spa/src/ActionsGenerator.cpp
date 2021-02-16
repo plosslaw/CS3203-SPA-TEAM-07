@@ -69,7 +69,7 @@ std::vector<std::string> ActionsGenerator::TraverseQueryMap(QueryMap queryMap) {
     Single selectSynonym = selectPayLoad.getType().single;
     
     //Default solution is the solution to SELECT without considering SUCH THAT and PATTERN.
-    std::vector<std::string> defaultSolution = mapStorage[selectSynonym][selectValue];
+    std::vector<std::string> defaultSolution = std::vector<string>{"1","2","3"};//here mapStorage[selectSynonym][selectValue];
 
     //Evaluated solution
     std::unordered_map<std::string, std::vector<std::string>> solutionSuchThat;
@@ -94,7 +94,7 @@ std::vector<std::string> ActionsGenerator::TraverseQueryMap(QueryMap queryMap) {
             isSelectInSuchThat = true;
         }
         if (isSelectInSuchThat) {
-            std::unordered_map<std::string, std::vector<std::string>> evaluatedSuchThat = evalSuchThatPre(suchThatFirstArg, suchThatSecondArg, selectValue, suchThatPayLoad);
+            //std::unordered_map<std::string, std::vector<std::string>> evaluatedSuchThat = evalSuchThatPre(suchThatFirstArg, suchThatSecondArg, selectValue, suchThatPayLoad);
             //here return evaluatedSuchThat[selectValue];
             
             return std::vector<string>{"1","2","3"};
