@@ -221,23 +221,23 @@ std::string whitespace(State &s) {
 }
 
 std::string upper(State &s) {
-	return stringPredicate(s, &upperPred, "whitespace");
+	return stringPredicate(s, &upperPred, "upper");
 }
 
 std::string lower(State &s) {
-	return stringPredicate(s, &lowerPred, "whitespace");
+	return stringPredicate(s, &lowerPred, "lower");
 }
 
 std::string alpha(State &s) {
-	return stringPredicate(s, &alphaPred, "whitespace");
+	return stringPredicate(s, &alphaPred, "alpha");
 }
 
 std::string digit(State &s) {
-	return stringPredicate(s, &digitPred, "whitespace");
+	return stringPredicate(s, &digitPred, "digit");
 }
 
 std::string alphaNum(State &s) {
-	return stringPredicate(s, &alphanumPred, "whitespace");
+	return stringPredicate(s, &alphanumPred, "alphaNum");
 }
 
 // predicates -----------------------------------------------------------------
