@@ -12,36 +12,43 @@ void PKBQueryController::setPKB(PKB pkbToSet) {
 }
 
 bool PKBQueryController::isFollows(stmt_ref s1, stmt_ref s2) {
+    if (pkb.statements.find(s1) == pkb.statements.end()) return false;
     statement statement1 = pkb.statements.at(s1);
     return statement1.follows == s2;
 }
 
 bool PKBQueryController::isFollowsStar(stmt_ref s1, stmt_ref s2) {
+    if (pkb.statements.find(s1) == pkb.statements.end()) return false;
     statement statement1 = pkb.statements.at(s1);
     return statement1.indirect_follows.find(s2) != statement1.indirect_follows.end();
 }
 
 bool PKBQueryController::isParent(stmt_ref s1, stmt_ref s2) {
+    if (pkb.statements.find(s2) == pkb.statements.end()) return false;
     statement statement2 = pkb.statements.at(s2);
     return statement2.parent == s1;
 }
 
 bool PKBQueryController::isParentStar(stmt_ref s1, stmt_ref s2) {
+    if (pkb.statements.find(s2) == pkb.statements.end()) return false;
     statement statement2 = pkb.statements.at(s2);
     return statement2.indirect_parent.find(s1) != statement2.indirect_parent.end();
 }
 
 bool PKBQueryController::statementUses(stmt_ref s, var_ref v) {
+    if (pkb.statements.find(s) == pkb.statements.end()) return false;
     statement stmt = pkb.statements.at(s);
     return stmt.uses.find(v) != stmt.uses.end();
 }
 
 bool PKBQueryController::statementModifies(stmt_ref s, var_ref v) {
+    if (pkb.statements.find(s) == pkb.statements.end()) return false;
     statement stmt = pkb.statements.at(s);
     return stmt.modifies.find(v) != stmt.modifies.end();
 }
 
 bool PKBQueryController::satisfiesPattern(assign_ref a, pattern p) {
+    if (pkb.assignments.find(a) == pkb.assignments.end()) return false;
     assignment asmt = pkb.assignments.at(a);
     std::string text = asmt.rightValue;
     std::string substr = p.rvalue;
