@@ -163,7 +163,7 @@ TEST_CASE("One") {
 
     PKBQueryController pkbQueryController = PKBQueryController(pkb);
 
-    SECTION("Check is Follows") {
+    SECTION("Check isFollows") {
         REQUIRE(pkbQueryController.isFollows(1, 2) == true);
         REQUIRE(pkbQueryController.isFollows(2, 3) == true);
         REQUIRE(pkbQueryController.isFollows(4, 5) == true);
@@ -172,7 +172,7 @@ TEST_CASE("One") {
         REQUIRE(pkbQueryController.isFollows(2, 1) == false);
     }
 
-    SECTION("Check is Follows*") {
+    SECTION("Check isFollows*") {
         REQUIRE(pkbQueryController.isFollowsStar(1, 3) == true);
         REQUIRE(pkbQueryController.isFollowsStar(1, 8) == true);
         REQUIRE(pkbQueryController.isFollowsStar(2, 8) == true);
@@ -181,7 +181,7 @@ TEST_CASE("One") {
         REQUIRE(pkbQueryController.isFollowsStar(6, 8) == false);
     }
 
-    SECTION("Check is Parent") {
+    SECTION("Check isParent") {
         REQUIRE(pkbQueryController.isParent(1, 2) == false);
         REQUIRE(pkbQueryController.isParent(1, 3) == false);
         REQUIRE(pkbQueryController.isParent(2, 1) == false);
@@ -190,4 +190,12 @@ TEST_CASE("One") {
         REQUIRE(pkbQueryController.isParent(3, 6) == true);
     }
 
+    SECTION("Check statementUses") {
+        REQUIRE(pkbQueryController.statementUses(3, "b") == true);
+        REQUIRE(pkbQueryController.statementUses(4, "b") == true);
+        REQUIRE(pkbQueryController.statementUses(4, "a") == true);
+        REQUIRE(pkbQueryController.statementUses(5, "b") == true);
+        REQUIRE(pkbQueryController.statementUses(7, "a") == true);
+        REQUIRE(pkbQueryController.statementUses(4, "temp") == false);
+    }
 }
