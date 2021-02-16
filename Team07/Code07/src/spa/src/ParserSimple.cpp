@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <unordered_set>
 #include "ParserLib.h"
 #include "ParserSimple.h"
 #include "TNode.h"
@@ -63,10 +64,11 @@ TNode program(State &s) {
 TNode procedure(State &s) {
   State so(s);
   bool stmtLstFail = false;
+  std::string proc_name;
   try {
     stringMatch(s, "procedure");
     whitespace(s);
-    std::string proc_name = name(s);
+    proc_name = name(s);
     whitespace(s);
     stringMatch(s, "{");
     whitespace(s);
@@ -78,7 +80,7 @@ TNode procedure(State &s) {
     return t;
   } catch(ParseException &e) {
     s.excps.push_back(e);
-    throw ParseException(so.i, s.i, "procedure", stmtLstFail ? "stmtLst" : "");
+    throw ParseException(so.i, s.i, "procedure", stmtLstFail ? proc_name : "");
   }
 }
 
@@ -138,14 +140,14 @@ TNode stmt(State &s) {
         try {
           return while_stmt(s);
         } catch(ParseException &e) {
-          if (e.args.compare("stmtLst") == 0) {
+          if (e.args.compare("body") == 0) {
             throw e;
           }
           s.assign(so);
           try {
             return if_stmt(s);
           } catch(ParseException &e) {
-            if (e.args.compare("stmtLst") == 0) {
+            if (e.args.compare("body") == 0) {
               throw e;
             }
             s.assign(so);
@@ -169,6 +171,8 @@ TNode unaryOp(State &s, std::string op, stmt_type typ) {
     stringMatch(s, op);
     partial = true;
     // :- 'read'
+    stringMatch(s, " ");
+    // compulsory whitespace
     whitespace(s);
     std::string n = name(s);
     // :- name
@@ -223,7 +227,7 @@ TNode while_stmt(State &s) {
   } catch(ParseException &e) {
     s.excps.push_back(e);
     s.curStmtNum = initNum;
-    throw ParseException(init, s.i, "while_stmt", stmtLstFail ? "stmtLst" : "");
+    throw ParseException(init, s.i, "while_stmt", stmtLstFail ? "body" : "");
   }
 }
 
@@ -262,7 +266,7 @@ TNode if_stmt(State &s) {
   } catch(ParseException &e) {
     s.excps.push_back(e);
     s.curStmtNum = initNum;
-    throw ParseException(init, s.i, "if_stmt", stmtLstFail ? "stmtLst" : "");
+    throw ParseException(init, s.i, "if_stmt", stmtLstFail ? "body" : "");
   }
 }
 
@@ -458,7 +462,7 @@ TNode expr_1(State &s, TNode &lchild) {
     // :- expr_1
   } catch(ParseException &e) {
     s.excps.push_back(e);
-    throw ParseException(so.i, s.i, "expr_1", "");
+    throw ParseException(so.i, s.i, "expr", op);
   }
 }
 
@@ -511,7 +515,7 @@ TNode term_1(State &s, TNode &lchild) {
     // :- term_1
   } catch(ParseException &e) {
     s.excps.push_back(e);
-    throw ParseException(so.i, s.i, "term_1", "");
+    throw ParseException(so.i, s.i, "term", op);
   }
 }
 
@@ -534,7 +538,6 @@ TNode factor(State &s) {
         stringMatch(s, ")");
         return t;
       } catch (ParseException &e) {
-        s.excps.push_back(e);
         throw ParseException(so.i, s.i, "factor", "");
       }
     }
@@ -562,5 +565,43 @@ TNode constant(State &s) {
   } catch(ParseException &e) {
     s.excps.push_back(e);
     throw ParseException(init, s.i, "constant", "");
+  }
+}
+
+
+void validateUniqueProcedureNames(TNode &root, std::unordered_set<std::string> &procs) {
+  switch(root.getType()) {
+    case PROGRAM:
+      for(int i = 0; i < root.getChildren().size(); i++) {
+        validateUniqueProcedureNames(root.getChildren()[i], procs);
+      }
+      break;
+    case PROCEDURE:
+      std::string procName = root.getValue();
+      if(procs.find(procName) != procs.end()) {
+        throw root.getPos();
+      } else {
+        procs.insert(procName);
+      }
+      break;
+  }
+}
+
+void validateCallProcedureExists(TNode &root, std::unordered_set<std::string> &procs) {
+  if(root.getType() == PROGRAM || root.getType() == STATEMENTLIST) {
+    for(int i = 0; i < root.getChildren().size(); i++) {
+      validateCallProcedureExists(root.getChildren()[i], procs);
+    }
+  } else if(root.getType() == PROCEDURE) {
+    validateCallProcedureExists(root.getChildren()[0], procs);
+  } else if(root.getType() == CALL) {
+    if(procs.find(root.getValue()) == procs.end()) {
+      throw root.getPos();
+    }
+  } else if(root.getType() == WHILE) {
+    validateCallProcedureExists(root.getChildren()[1], procs);
+  } else if(root.getType() == IF) {
+    validateCallProcedureExists(root.getChildren()[1], procs);
+    validateCallProcedureExists(root.getChildren()[2], procs);
   }
 }
