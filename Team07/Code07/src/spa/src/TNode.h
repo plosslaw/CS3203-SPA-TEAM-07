@@ -27,4 +27,5 @@ public:
   stmt_type getType();
   std::vector<TNode> getChildren();
   std::string toSexp(int sep = 0);
+  bool eq(TNode &t);
 };

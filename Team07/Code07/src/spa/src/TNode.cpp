@@ -83,3 +83,13 @@ std::string TNode::toSexp(int sep) {
   return str;
 }
 
+bool TNode::eq(TNode &t) {
+  if(statementNum == t.getStatementNum() && value == t.getValue() && type == t.getType() && pos == t.getPos() && children.size() == t.getChildren().size()) {
+    for (int i = 0; i < children.size(); i++) {
+      bool res = children[i].eq(t.getChildren()[i]);
+      if(!res) return false;
+    }
+    return true;
+  }
+  return false;
+}

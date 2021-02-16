@@ -35,7 +35,8 @@ TNode checkTNodeParse(std::string str, TNode (*parser)(State&)) {
 
 TEST_CASE("TNode parsers") {
   SECTION("constant") {
-    REQUIRE_NOTHROW(checkTNodeParse("123", &constant));
+    TNode stub_1_1("123", CONSTANT, 0);
+    REQUIRE(checkTNodeParse("123", &constant).eq(stub_1_1));
     REQUIRE_THROWS(checkTNodeParse("x", &constant));
   }
 
@@ -74,15 +75,15 @@ TEST_CASE("TNode parsers") {
   }
 
   SECTION("cond_expr") {
-    std::string stub1 = checkTNodeParse("1 == 1", &cond_expr).toSexp();
+    TNode stub1 = checkTNodeParse("1 == 1", &cond_expr);
     REQUIRE_NOTHROW(checkTNodeParse("! ( 1 == 1)", &cond_expr));
     REQUIRE_THROWS(checkTNodeParse("! 1 == 1", &cond_expr));
     REQUIRE_NOTHROW(checkTNodeParse("(1 == 1) && (2 == 2)", &cond_expr));
-    REQUIRE(checkTNodeParse("1 == 1 && 2 == 2", &cond_expr).toSexp() == stub1);
-    REQUIRE_FALSE(checkTNodeParse("(1 == 1) || (2 == 2)", &cond_expr).toSexp() == checkTNodeParse("1 == 1", &cond_expr).toSexp());
-    REQUIRE(checkTNodeParse("1 == 1 || 2 == 2", &cond_expr).toSexp() == stub1);
+    REQUIRE(checkTNodeParse("1 == 1 && 2 == 2", &cond_expr).eq(stub1));
+    REQUIRE_FALSE(checkTNodeParse("(1 == 1) || (2 == 2)", &cond_expr).eq(stub1));
+    REQUIRE(checkTNodeParse("1 == 1 || 2 == 2", &cond_expr).eq(stub1));
     REQUIRE_THROWS(checkTNodeParse("(1 == 1) &|& (2 == 2)", &cond_expr));
-    REQUIRE(checkTNodeParse("1 == 1 |&| 2 == 2", &cond_expr).toSexp() == stub1);
+    REQUIRE(checkTNodeParse("1 == 1 |&| 2 == 2", &cond_expr).eq(stub1));
   }
 
   SECTION("assign") {
