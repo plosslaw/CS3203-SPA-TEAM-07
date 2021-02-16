@@ -33,21 +33,19 @@ std::vector<std::string> ActionsGenerator::TraverseQueryMap(QueryMap queryMap) {
     for(auto i: storeDeclaration) {
         Single s = i.second;
         if (s == Single::STATEMENT) {
-            Action stmtAction(Action::search_type::DECLARATION, std::vector<std::string>{i.first},std::vector<Action::arg_type>{Action::arg_type::STATEMENT});
             // put inside statementstorage
         } else if (s == Single::READ) {    
-            Action readAction(Action::search_type::DECLARATION, std::vector<std::string>{i.first},std::vector<Action::arg_type>{Action::arg_type::READ});
-        
+            
         } else if (s == Single::PRINT) {
-            Action printAction(Action::search_type::DECLARATION, std::vector<std::string>{i.first},std::vector<Action::arg_type>{Action::arg_type::PRINT});
+        
         } else if (s == Single::CALL) {
-            Action callAction(Action::search_type::DECLARATION, std::vector<std::string>{i.first},std::vector<Action::arg_type>{Action::arg_type::CALL});
+        
         } else if (s == Single::WHILE) {
-            Action whileAction(Action::search_type::DECLARATION, std::vector<std::string>{i.first},std::vector<Action::arg_type>{Action::arg_type::WHILE});
+        
         } else if (s == Single::IF) {
-            Action ifAction(Action::search_type::DECLARATION, std::vector<std::string>{i.first},std::vector<Action::arg_type>{Action::arg_type::IF});
+        
         } else if (s == Single::ASSIGN) {
-            Action assignAction(Action::search_type::DECLARATION, std::vector<std::string>{i.first},std::vector<Action::arg_type>{Action::arg_type::ASSIGN});   
+        
         } else {
             throw "Payload Single is not STATEMENT/READ/PRINT/CALL/WHILE/IF/ASSIGN.";
         }
@@ -57,10 +55,10 @@ std::vector<std::string> ActionsGenerator::TraverseQueryMap(QueryMap queryMap) {
                 break;
             
             case Single::CONSTANT:
-                //constantStorage[i.first] = generate action => retrieve all constants from PKB
-                break;
+          
+                 break;
             case Single::VARIABLE:
-                Action varAction(Action::search_type::DECLARATION, std::vector<std::string>{i.first},std::vector{Action::arg_type::})
+          
                 //variableStorage[i.first] = generate action => retrieve all variables from PKB
                 break;
         */
@@ -258,32 +256,32 @@ bool ActionsGenerator::evalSuchThat(Pair suchThatType, std::string actionFirstAr
     {
         {
             case Pair::FOLLOWS:
-            Action followsAction(Action::search_type::SUCH_THAT_FOLLOWS, argLst, std::vector<Action::arg_type>{Action::arg_type::STRING,Action::arg_type::STRING});        
+            
             return true;
             break;
         } {
         case Pair::FOLLOWST:
-            Action followsTAction(Action::search_type::SUCH_THAT_FOLLOWST, argLst, std::vector<Action::arg_type>{Action::arg_type::STRING,Action::arg_type::STRING});        
+            
             return true;
             break;
         } {
         case Pair::PARENT:
-            Action parentAction(Action::search_type::SUCH_THAT_PARENT, argLst, std::vector<Action::arg_type>{Action::arg_type::STRING,Action::arg_type::STRING});              
+            
             return true;
             break;
         } {
         case Pair::PARENTT:
-            Action parentTAction(Action::search_type::SUCH_THAT_PARENTT, argLst, std::vector<Action::arg_type>{Action::arg_type::STRING,Action::arg_type::STRING});              
+            
             return true;
             break;
         } {
         case Pair::USES:
-            Action usesAction(Action::search_type::SUCH_THAT_USES, argLst, std::vector<Action::arg_type>{Action::arg_type::STRING,Action::arg_type::STRING});              
+            
             return true;
             break;
         } {
         case Pair::MODIFIES:
-            Action modifiesAction(Action::search_type::SUCH_THAT_MODIFIES, argLst, std::vector<Action::arg_type>{Action::arg_type::STRING,Action::arg_type::STRING});              
+            
             return true;
             break;
         }    

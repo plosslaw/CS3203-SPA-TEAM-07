@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <string>
 #include <vector>
 
@@ -93,5 +92,4 @@ private:
     PKBQueryController pkb_query_controller;
 
 };
-
 
