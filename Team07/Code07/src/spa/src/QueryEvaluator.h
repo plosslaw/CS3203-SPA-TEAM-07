@@ -21,6 +21,8 @@ private:
     std::vector<std::string> QEExecuteActions (std::vector<Action> queryActions);
     std::vector<std::string> QERenderResults(std::vector<std::string> queryResults);
 
+    ActionsExecutor actionsExecutor;
+
 };
 
 
