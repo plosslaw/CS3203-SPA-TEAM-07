@@ -5,15 +5,13 @@
 #include "TNode.h"
 #include "Types.hpp"
 
-using namespace std;
-
 /** name :- letter (letter | digit)* */
-string name(State &s) {
+std::string name(State &s) {
   int init = s.i;
   try {
     char r1 = charPredicate(s, &alphaPred, "letter");
     // :- letter
-    string r2 = alphaNum(s);
+    std::string r2 = alphaNum(s);
     // :- (letter | digit)*
     r2.insert(r2.begin(), r1);
     return r2;
@@ -24,12 +22,12 @@ string name(State &s) {
 }
 
 /** integer :- digit digit* */
-string integer(State &s) {
+std::string integer(State &s) {
   int init = s.i;
   try {
     char r1 = charPredicate(s, &digitPred, "digit");
     // :- digit
-    string r2 = digit(s);
+    std::string r2 = digit(s);
     // :- digit*
     r2.insert(r2.begin(), r1);
     return r2;
@@ -68,14 +66,14 @@ TNode procedure(State &s) {
   try {
     stringMatch(s, "procedure");
     whitespace(s);
-    string proc_name = name(s);
+    std::string proc_name = name(s);
     whitespace(s);
     stringMatch(s, "{");
     whitespace(s);
     stmtLstFail = true;
     TNode t1 = stmtLst(s);
     stmtLstFail = false;
-    TNode t(proc_name, PROCEDURE);
+    TNode t(proc_name, PROCEDURE, so.i);
     t.addChild(t1);
     return t;
   } catch(ParseException &e) {
@@ -87,7 +85,7 @@ TNode procedure(State &s) {
 /** stmtLst :- stmt+ '}' */
 TNode stmtLst(State &s) {
   State so(s);
-  TNode t("", STATEMENTLIST);
+  TNode t("", STATEMENTLIST, so.i);
 	bool consumed = false;
 	try {
 		while(true) {
@@ -164,7 +162,7 @@ TNode stmt(State &s) {
 }
 
 /** X :- <X> name ';' */
-TNode unaryOp(State &s, string op, stmt_type typ) {
+TNode unaryOp(State &s, std::string op, stmt_type typ) {
   int init = s.i;
   bool partial = false;
   try {
@@ -172,13 +170,13 @@ TNode unaryOp(State &s, string op, stmt_type typ) {
     partial = true;
     // :- 'read'
     whitespace(s);
-    string n = name(s);
+    std::string n = name(s);
     // :- name
     whitespace(s);
     stringMatch(s, ";");
     // :- ';'
     whitespace(s);
-    return TNode(s.advCurStmtNum(), n, typ);
+    return TNode(s.advCurStmtNum(), n, typ, init);
   } catch(ParseException &e) {
     s.excps.push_back(e);
     throw ParseException(init, s.i, op, partial ? "partial" : "");
@@ -204,7 +202,7 @@ TNode call(State &s) {
 TNode while_stmt(State &s) {
   int init = s.i;
   int initNum = s.curStmtNum;
-  TNode t(s.advCurStmtNum(), "", WHILE);
+  TNode t(s.advCurStmtNum(), "", WHILE, init);
   bool stmtLstFail = false;
   try {
     stringMatch(s, "while");
@@ -233,7 +231,7 @@ TNode while_stmt(State &s) {
 TNode if_stmt(State &s) {
   int init = s.i;
   int initNum = s.curStmtNum;
-  TNode t(s.advCurStmtNum(), "", IF);
+  TNode t(s.advCurStmtNum(), "", IF, init);
   bool stmtLstFail = false;
   try {
     stringMatch(s, "if");
@@ -278,7 +276,7 @@ TNode assign(State &s) {
     whitespace(s);
     TNode t2 = expr(s);
     stringMatch(s, ";");
-    TNode t(s.advCurStmtNum(), "", ASSIGN);
+    TNode t(s.advCurStmtNum(), "", ASSIGN, init);
     t.addChild(t1);
     t.addChild(t2);
     return t;
@@ -304,7 +302,7 @@ TNode cond_expr(State &s) {
       TNode t1 = cond_expr(s);
       stringMatch(s, ")");
       whitespace(s);
-      TNode t("!", EXPR);
+      TNode t("!", EXPR, so.i);
       t.addChild(t1);
       return t;
     } catch(ParseException &e) {
@@ -317,7 +315,7 @@ TNode cond_expr(State &s) {
         stringMatch(s, ")");
         whitespace(s);
         State so1(s);
-        string op;
+        std::string op;
         try {
           op = stringMatch(s, "&&");
         } catch(ParseException &e) {
@@ -334,7 +332,7 @@ TNode cond_expr(State &s) {
         TNode t2 = cond_expr(s);
         stringMatch(s, ")");
         whitespace(s);
-        TNode t(op, EXPR);
+        TNode t(op, EXPR, so.i);
         t.addChild(t1);
         t.addChild(t2);
         return t;
@@ -349,6 +347,7 @@ TNode cond_expr(State &s) {
 /** rel_expr :- expr ('>'|'>='|'<'|'<='|'=='|'!=') expr */
 TNode rel_expr(State &s) {
   State so(s);
+  int init = so.i;
   TNode lchild;
   try {
     lchild = rel_factor(s);
@@ -357,7 +356,7 @@ TNode rel_expr(State &s) {
     s.excps.push_back(e);
     throw ParseException(so.i, s.i, "rel_expr", "first_factor");
   }
-  string op;
+  std::string op;
   so.assign(s);
   try {
     op = stringMatch(s, ">=");
@@ -395,7 +394,7 @@ TNode rel_expr(State &s) {
     whitespace(s);
     TNode rchild = rel_factor(s);
     whitespace(s);
-    TNode t(op, EXPR);
+    TNode t(op, EXPR, init);
     t.addChild(lchild);
     t.addChild(rchild);
     return t;
@@ -434,7 +433,7 @@ TNode expr(State &s) {
 /** expr_1 :- ('+'|'-') term expr_1 | e */
 TNode expr_1(State &s, TNode &lchild) {
   State so(s);
-  string op;
+  std::string op;
   try {
     op = stringMatch(s, "+");
   } catch(ParseException &e) {
@@ -452,7 +451,7 @@ TNode expr_1(State &s, TNode &lchild) {
     whitespace(s);
     TNode rchild = term(s);
     // :- term
-    TNode t(op, EXPR);
+    TNode t(op, EXPR, so.i);
     t.addChild(lchild);
     t.addChild(rchild);
     return expr_1(s, t);
@@ -481,7 +480,7 @@ TNode term(State &s) {
 /** term_1 :- ('*'|'/'|'%') factor term_1 | e */
 TNode term_1(State &s, TNode &lchild) {
   State so(s);
-  string op;
+  std::string op;
   try {
     op = stringMatch(s, "*");
   } catch(ParseException &e) {
@@ -505,7 +504,7 @@ TNode term_1(State &s, TNode &lchild) {
     TNode rchild = factor(s);
     // :- factor
     whitespace(s);
-    TNode t(op, EXPR);
+    TNode t(op, EXPR, so.i);
     t.addChild(lchild);
     t.addChild(rchild);
     return term_1(s, t);
@@ -546,8 +545,8 @@ TNode factor(State &s) {
 TNode variable(State &s) {
   int init = s.i;
   try {
-    string v = name(s);
-    return TNode(v, VARIABLE);
+    std::string v = name(s);
+    return TNode(v, VARIABLE, init);
   } catch(ParseException &e) {
     s.excps.push_back(e);
     throw ParseException(init, s.i, "variable", "");
@@ -558,8 +557,8 @@ TNode variable(State &s) {
 TNode constant(State &s) {
   int init = s.i;
   try {
-    string v = integer(s);
-    return TNode(v, CONSTANT);
+    std::string v = integer(s);
+    return TNode(v, CONSTANT, init);
   } catch(ParseException &e) {
     s.excps.push_back(e);
     throw ParseException(init, s.i, "constant", "");

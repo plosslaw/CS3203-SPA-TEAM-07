@@ -20,6 +20,20 @@ TNode::TNode(int num, std::string val, stmt_type typ) {
   type = typ;
 }
 
+TNode::TNode(std::string val, stmt_type typ, int p) {
+  statementNum = NULL_STMT_REF;
+  value = val;
+  type = typ;
+  pos = p;
+}
+
+TNode::TNode(int num, std::string val, stmt_type typ, int p) {
+  statementNum = num;
+  value = val;
+  type = typ;
+  pos = p;
+}
+
 void TNode::addChild(TNode child) { children.push_back(child); }
 
 int TNode::getStatementNum() { return statementNum; }
