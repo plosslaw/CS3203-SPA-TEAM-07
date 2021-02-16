@@ -25,6 +25,7 @@ void TestWrapper::parse(std::string filename) {
   try {
     TNode ast = Parse(filename);
     // parse
+    std::cout << ast.toSexp() << "\n";
     // pass to pkb (placeholder)
   } catch(std::string &e) {
     std::cerr << e << "\n";
