@@ -64,6 +64,7 @@ std::string prettyPrintValidation(std::string *str, int pos, std::string msg) {
 			} else {
 				lineNum++;
 				colBegin = i;
+				linebuilder.clear();
 			}
 		} else {
 			linebuilder.push_back(c);

@@ -564,3 +564,26 @@ TNode constant(State &s) {
     throw ParseException(init, s.i, "constant", "");
   }
 }
+
+
+int validateUniqueProcedureNames(TNode &root, std::set<std::string> &procs) {
+  switch(root.getType()) {
+    case PROGRAM:
+      for(int i = 0; i < root.getChildren().size(); i++) {
+        int res = validateUniqueProcedureNames(root.getChildren()[i], procs);
+        if (res != -1) {
+          return res;
+        }
+      }
+      break;
+    case PROCEDURE:
+      std::string procName = root.getValue();
+      if(procs.find(procName) != procs.end()) {
+        return root.getPos();
+      } else {
+        procs.insert(procName);
+      }
+      break;
+  }
+  return -1;
+}

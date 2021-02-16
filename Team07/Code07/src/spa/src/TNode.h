@@ -22,6 +22,7 @@ public:
 
   void addChild(TNode child);
   int getStatementNum();
+  int getPos();
   std::string getValue();
   stmt_type getType();
   std::vector<TNode> getChildren();

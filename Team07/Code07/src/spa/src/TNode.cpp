@@ -38,6 +38,8 @@ void TNode::addChild(TNode child) { children.push_back(child); }
 
 int TNode::getStatementNum() { return statementNum; }
 
+int TNode::getPos() { return pos; }
+
 std::string TNode::getValue() { return value; }
 
 stmt_type TNode::getType() { return type; }
