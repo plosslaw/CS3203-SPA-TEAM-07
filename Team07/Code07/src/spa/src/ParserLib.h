@@ -35,6 +35,7 @@ class State {
 		void assign(State &s);
 };
 
+std::string prettyPrintValidation(std::string *str, int pos, std::string msg);
 std::string prettyPrintException(State &s);
 
 

@@ -6,14 +6,11 @@
 #include "ParserLib.h"
 #include "ParserSimple.h"
 
-using namespace std;
-
-
 // core functions -------------------------------------------------------------
 
 int Parse (string file) {
 	ifstream t(file);
-	string str((istreambuf_iterator<char>(t)), istreambuf_iterator<char>());
+	std::string str((istreambuf_iterator<char>(t)), istreambuf_iterator<char>());
 	
 	State s(&str);
 	try{

@@ -47,6 +47,44 @@ const char* ParseException::what() const throw()
 	return str.c_str();
 }
 
+std::string prettyPrintValidation(std::string *str, int pos, std::string msg) {
+	std::string strv = *str;
+	std::vector<char> linebuilder;
+	bool atLine = false;
+	int lineNum = 0;
+	int colBegin = -1;
+	for (int i = 0; i < strv.length(); i++) {
+		char c = strv.at(i);
+		if(i == pos) {
+			atLine = true;
+		}
+		if (c == '\n') {
+			if (atLine) {
+				break;
+			} else {
+				lineNum++;
+				colBegin = i;
+			}
+		} else {
+			linebuilder.push_back(c);
+		}
+	}
+	std::string linestrvalue(linebuilder.begin(), linebuilder.end());
+	int colNum = pos - colBegin;
+	// calculate line and col from pos
+	
+	std::string outputstr = "";
+	outputstr += "ValidationException\n\n";
+	std::string preoutput = "  " + std::to_string(lineNum + 1) + "|  " ;
+	outputstr += preoutput + linestrvalue + "\n";
+	std::string whitespaceprefix = std::string(preoutput.length() + colNum - 1, ' ');
+	outputstr += whitespaceprefix + "^\n";
+	outputstr += "  at line " + std::to_string(lineNum + 1) + " col " + std::to_string(colNum) + "\n";
+	outputstr += "  " + msg + "\n";
+	return outputstr;
+	// pretty print
+}
+
 std::string prettyPrintException(State &s) {
 	std::string *str = s.source;
 	std::vector<ParseException> e = s.excps;
