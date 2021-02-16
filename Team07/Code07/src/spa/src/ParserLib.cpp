@@ -167,6 +167,7 @@ std::string stringMatch(State &s, std::string str) {
 			}
 		}
 	} catch(...) {
+		s.i = (*s.source).size();
 		throw ParseException(init, s.i, "stringMatch", str);
 	}
 	s.i += str.size();
@@ -183,6 +184,7 @@ char charPredicate(State &s, bool (*pred)(char), std::string errorName) {
 		}
 		return c;
 	} catch (...) {
+		s.i = (*s.source).size();
 		throw ParseException(s.i, s.i, "charPredicate", errorName);
 	}
 }
