@@ -4,7 +4,7 @@
 
 enum ClauseType { SELECT, DECLARATION, SUCHTHAT, PATTERN };
 
-enum Single {
+enum class Single {
   STATEMENT,
   READ,
   PRINT,

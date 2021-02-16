@@ -2,24 +2,19 @@
 
 using namespace std;
 
-QueryEvaluator::QueryEvaluator(PKBQueryController pkbQueryController) {
-    this->actionsExecutor = ActionsExecutor(pkbQueryController);
+QueryEvaluator::QueryEvaluator(PKBQueryController pkb_query_controller) {
+    this->actionsExecutor = ActionsExecutor(pkb_query_controller);
 }
 
-vector<string> QueryEvaluator::QERunQuery(TNode *PQL_AST_Root) {
-    vector<Action> queryActions = QEGenerateActions(PQL_AST_Root);
-    vector<string> queryResults = QEExecuteActions(queryActions);
+vector<string> QueryEvaluator::QERunQuery(QueryMap query_map) {
+    vector<string> queryResults = QEGenerateActions(query_map);
     return QERenderResults(queryResults);
 }
 
-vector<Action> QueryEvaluator::QEGenerateActions(TNode* PQL_AST_Root) {
+vector<string> QueryEvaluator::QEGenerateActions(QueryMap query_map) {
     //skeleton code
-    vector<Action> actions;
-    return actions;
-}
-
-vector<string> QueryEvaluator::QEExecuteActions (vector<Action> queryActions) {
-    return this->actionsExecutor.executeActions(queryActions);
+    vector<string> results;
+    return results;
 }
 
 vector<string> QueryEvaluator::QERenderResults (vector<string> queryResults) {
