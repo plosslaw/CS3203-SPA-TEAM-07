@@ -9,15 +9,20 @@ std::vector<std::string> ActionsGenerator::TraverseQueryMap(QueryMap queryMap) {
     suchThatList = queryMap.getList(ClauseType::SUCHTHAT);
     patternList = queryMap.getList(ClauseType::PATTERN);
     
-    mapStorage[Single::PROCEDURE] = procedureStorage;
-    mapStorage[Single::STATEMENT] = stmtStorage;
-    mapStorage[Single::READ] = readStorage;
-    mapStorage[Single::PRINT] = printStorage;
-    mapStorage[Single::ASSIGN] = assignStorage;
-    mapStorage[Single::WHILE] = whileStorage;
-    mapStorage[Single::IF] = ifStorage;
-    mapStorage[Single::CONSTANT] = constantStorage;
-
+    // //here
+    // std::string dummyS = "s";
+    // std::vector<std::string> dummyVS;
+    // dummyVS.push_back("1");dummyVS.push_back("2"); dummyVS.push_back("3");
+    // std::string dummyA = "a";
+    // std::vector<std::string> dummyAS;
+    // dummyAS.push_back("1");dummyAS.push_back("2"); dummyAS.push_back("3");
+    // stmtStorage[dummyS] = dummyVS; 
+    // assignStorage[dummyA] = dummyAS;
+    // std::string dummyV = "v";
+    // std::vector<std::string> dummyVar;
+    // dummyVar.push_back("a");dummyVar.push_back("b"); dummyVar.push_back("c");
+    // variableStorage[dummyV] = dummyVar;
+    
     //DECLARATION
     for(auto i: declarationList) {
         if (i.getType().single != Single::SYNONYM) {
@@ -59,6 +64,17 @@ std::vector<std::string> ActionsGenerator::TraverseQueryMap(QueryMap queryMap) {
                 //variableStorage[i.first] = generate action => retrieve all variables from PKB
                 break;
         */
+    
+    mapStorage[Single::PROCEDURE] = procedureStorage;
+    mapStorage[Single::STATEMENT] = stmtStorage;
+    mapStorage[Single::READ] = readStorage;
+    mapStorage[Single::PRINT] = printStorage;
+    mapStorage[Single::ASSIGN] = assignStorage;
+    mapStorage[Single::WHILE] = whileStorage;
+    mapStorage[Single::IF] = ifStorage;
+    mapStorage[Single::CONSTANT] = constantStorage;
+    mapStorage[Single::VARIABLE] = variableStorage;
+    
     //SELECT
     PayLoad selectPayLoad = selectList[0];
         //retrieve from pkb select synonym. example stmts s, Select s..., retrieve all stmts from pkb
@@ -94,13 +110,12 @@ std::vector<std::string> ActionsGenerator::TraverseQueryMap(QueryMap queryMap) {
             isSelectInSuchThat = true;
         }
         if (isSelectInSuchThat) {
-            //std::unordered_map<std::string, std::vector<std::string>> evaluatedSuchThat = evalSuchThatPre(suchThatFirstArg, suchThatSecondArg, selectValue, suchThatPayLoad);
-            //here return evaluatedSuchThat[selectValue];
-            
-            return std::vector<string>{"1","2","3"};
+            std::unordered_map<std::string, std::vector<std::string>> evaluatedSuchThat = evalSuchThatPre(suchThatFirstArg, suchThatSecondArg, selectValue, suchThatPayLoad);
+            return evaluatedSuchThat[selectValue];
+            //return std::vector<string>{"1","2","3"};
         } else {
-            return std::vector<string>{"1","2","3"};
-            //here return defaultSolution;
+            // return std::vector<string>{"1","2","3"};
+            return defaultSolution;
         }
     } else if (isSuchThatEmpty && !isPatternEmpty) {  
         // there is pattern clause but no such that clause.
@@ -207,6 +222,7 @@ std::string selectValue, PayLoad loadpay) {
         std::vector<std::string> firstArgLst = mapStorage[firstArgSynonym][firstArg];
         for(auto i : firstArgLst) {      
             bool isInPKB = evalSuchThat(loadpay.getType().pair, i, secondArg);
+            
             if(isInPKB) {
                 if(std::find(evaluatedSuchThat[firstArg].begin(), evaluatedSuchThat[firstArg].end(),i) == evaluatedSuchThat[firstArg].end()) {
                     evaluatedSuchThat[firstArg].push_back(i);
@@ -230,6 +246,7 @@ std::string selectValue, PayLoad loadpay) {
                 //evaluated.push_back(suchThatArgs[findSelectVal]);
             }
     }
+    //testing evaluatedSuchThat["s"]= std::vector<std::string>{"1","2","3",firstArg,secondArg,to_string(pairArgs.first),to_string(pairArgs.second)};
     return evaluatedSuchThat;
 }
 

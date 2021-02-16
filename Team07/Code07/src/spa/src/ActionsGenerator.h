@@ -23,6 +23,7 @@ class ActionsGenerator {
         std::unordered_map<std::string, std::vector<std::string>> whileStorage;
         std::unordered_map<std::string, std::vector<std::string>> ifStorage;
         std::unordered_map<std::string, std::vector<std::string>> constantStorage;
+        std::unordered_map<std::string, std::vector<std::string>> variableStorage;
 
 
         //storeDeclaration maps declaration name to entitity type for fast conversion, example: v1 => VARIABLE
@@ -36,8 +37,6 @@ class ActionsGenerator {
         // helper methods
         std::vector<std::pair <std::string,string>> permutateValues(std::vector<std::string> firstArg, std::vector<std::string> secondArg);
         std::vector<std::pair <std::string, std::string>> bothAreVariables(std::string firstArg, std::string secondArg);
-        //std::vector<std::pair <std::string, std::string>> VarAndNotVar(std::string firstArg, std::string secondArg);
-        //std::vector<std::pair <std::string, std::string>> NotVarAndVar(std::string firstArg, std::string secondArg);
         std::pair<bool,bool> checkIfArgsAreVariable(std::string firstArg, std::string secondArg);
         
         // evaluation methods
