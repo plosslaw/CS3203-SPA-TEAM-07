@@ -2,6 +2,8 @@
 #include "PKB.h"
 #include "PKBQueryController.hpp"
 
+PKBQueryController::PKBQueryController() {}
+
 PKBQueryController::PKBQueryController(PKB pkbToSet) {
     setPKB(pkbToSet);
 }

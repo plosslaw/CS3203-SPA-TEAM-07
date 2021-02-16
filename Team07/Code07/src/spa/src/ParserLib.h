@@ -1,20 +1,9 @@
 #pragma once
 #include<exception>
 #include<string>
-using namespace std;
+#include<vector>
 
-class State {
-	public:
-    /** current index in source to consume by parser */
-		int i;
-    /** source string to be parsed */
-    string source;
-		State(string str);
-		State(State &s);
-		string toString();
-};
-
-class ParseException: public exception {
+class ParseException: public std::exception {
 	public:
     /** state.i when entering parser */
 		int from;
@@ -24,32 +13,43 @@ class ParseException: public exception {
 		std::string subparser;
     /** arguments to parser configuration */
 		std::string args;
-    /** compiled error message by ParseException */
-		std::string errmsg;
-    ParseException *childException;
-		ParseException(int f, int a, string s, string ar);
-    ParseException(int f, int a, string s, string ar, ParseException *c);
-    void init(int f, int a, string s, string ar, ParseException *c);
-    string prettyPrint();
-	virtual const char* what() const throw()
-	{
-	  return errmsg.c_str();
-	}
+		ParseException(int f, int a, std::string s, std::string ar);
+		std::string errorMessage();
+		const char* what() const throw() override;
 };
 
+class State {
+	public:
+    /** current index in source to consume by parser */
+		int i;
+    /** source string to be parsed */
+    std::string *source;
+		/** current statement num index */
+		int curStmtNum;
+		/** exception stack */
+		std::vector<ParseException> excps;
+		State(std::string *str);
+		State(State &s);
+		std::string toString();
+		int advCurStmtNum();
+		void assign(State &s);
+};
 
-string stringMatch(State &s, string str);
-char charPredicate(State &s, bool (*pred)(char), string errorName);
-string stringPredicate(State &s, bool (*pred)(char), string errorName);
+std::string prettyPrintException(State &s);
+
+
+std::string stringMatch(State &s, std::string str);
+char charPredicate(State &s, bool (*pred)(char), std::string errorName);
+std::string stringPredicate(State &s, bool (*pred)(char), std::string errorName);
 bool whitespacePred(char c);
-string whitespace(State &s);
+std::string whitespace(State &s);
 bool upperPred(char c);
-string upper(State &s);
+std::string upper(State &s);
 bool lowerPred(char c);
-string lower(State &s);
+std::string lower(State &s);
 bool alphaPred(char c);
-string alpha(State &s);
+std::string alpha(State &s);
 bool digitPred(char c);
-string digit(State &s);
+std::string digit(State &s);
 bool alphanumPred(char c);
-string alphaNum(State &s);
+std::string alphaNum(State &s);

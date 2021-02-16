@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include "Action.h"
 #include "QueryMap.h"
 using namespace std;
@@ -52,3 +53,4 @@ class ActionsGenerator {
         std::vector<std::string> TraverseQueryMap(QueryMap queryMap);
         
 };
+

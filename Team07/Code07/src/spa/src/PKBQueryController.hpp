@@ -7,7 +7,9 @@ class PKBQueryController {
     private:
         PKB pkb;
     public:
-        PKBQueryController(PKB pkbToSet);
+        PKBQueryController();
+
+        explicit PKBQueryController(PKB pkbToSet);
 
         void setPKB(PKB pkbToSet);
         // Returns true if and only if Follows(s1,s2)
