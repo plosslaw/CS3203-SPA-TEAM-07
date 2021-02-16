@@ -11,46 +11,61 @@
 
 class ActionsExecutor {
 public:
-    enum stmt_pos {
+    enum arg_pos {
         FIRST_ARG,
         SECOND_ARG
     };
 
     ActionsExecutor();
-    explicit ActionsExecutor(PKBQueryController pkbQueryController);
+    explicit ActionsExecutor(PKBQueryController pkb_query_controller);
 
-    // Basic api
-    std::vector<QueryResult> getAllConstants();
-    std::vector<QueryResult> getAllEntitiesOfType(stmt_type entityType);
-    std::vector<QueryResult> getAllProcedures();
-    std::vector<QueryResult> getAllStatements();
-    std::vector<QueryResult> getAllVariables();
-
-    // Single clause api
-    std::vector<QueryResult> getAllStmtFollows(stmt_type stmtType, stmt_pos stmtPos);
-    std::vector<QueryResult> getAllStmtFollows(stmt_type stmtType, stmt_pos stmtPos, stmt_ref otherStmt);
-    std::vector<QueryResult> getAllStmtFollows(stmt_type stmtType, stmt_pos stmtPos, stmt_type otherStmtType);
+    /*
+     * Basic api
+     */
     
-    std::vector<QueryResult> getAllStmtParent(stmt_type stmtType);
-    std::vector<QueryResult> getAllStmtParent(stmt_type stmtType, stmt_pos stmtPos, stmt_ref otherStmt);
-    std::vector<QueryResult> getAllStmtParent(stmt_type stmtType, stmt_pos stmtPos, stmt_type otherStmtType);
+    std::vector<constant> get_all_constants();
+    std::vector<proc_ref> get_all_procedures();
+    std::vector<statement> get_all_statements();
+    std::vector<stmt_ref> get_all_statements_of_type(stmt_type type);
+    std::vector<var_ref> get_all_variables();
 
-    std::vector<QueryResult> getAllStmtModifies(var_ref v);
-    std::vector<QueryResult> getAllStmtUses(var_ref v);
+    /*
+     * Single clause api
+     */
+    
+    // Such That Clauses
+    std::vector<QueryResult> get_all_stmt_follows(stmt_type type, arg_pos pos, bool is_starred); // wildcard operation
+    std::vector<QueryResult> get_all_stmt_follows(stmt_type type, arg_pos pos, stmt_ref other_stmt, bool is_starred);
+    std::vector<QueryResult> get_all_stmt_follows(stmt_type type, arg_pos pos, stmt_type other_stmt_type, bool is_starred);
+    
+    std::vector<QueryResult> get_all_stmt_parent(stmt_type type, arg_pos pos, bool is_starred); // wildcard operation
+    std::vector<QueryResult> get_all_stmt_parent(stmt_type type, arg_pos pos, stmt_ref other_stmt, bool is_starred);
+    std::vector<QueryResult> get_all_stmt_parent(stmt_type type, arg_pos pos, stmt_type other_stmt_type, bool is_starred);
 
-    std::vector<QueryResult> getAllVariableModifies(stmt_ref otherStmt);
-    std::vector<QueryResult> getAllVariableModifies(stmt_type otherStmtType);
+    std::vector<QueryResult> get_all_stmt_modifies(var_ref var);
+    std::vector<QueryResult> get_all_stmt_uses(var_ref var);
 
-    std::vector<QueryResult> getAllVariableUses(stmt_ref otherStmt);
-    std::vector<QueryResult> getAllVariableUses(stmt_type otherStmtType);
+    std::vector<QueryResult> get_all_procedure_modifies(var_ref var);
+    std::vector<QueryResult> get_all_procedure_uses(var_ref var);
 
-    std::vector<QueryResult> getAllProcedureModifies(var_ref v);
-    std::vector<QueryResult> getAllProcedureUses(var_ref v);
+    std::vector<QueryResult> get_all_variable_modifies(proc_ref procedure);
+    std::vector<QueryResult> get_all_variable_modifies(stmt_ref other_stmt);
+    std::vector<QueryResult> get_all_variable_modifies(stmt_type other_stmt_type);
+
+    std::vector<QueryResult> get_all_variable_uses(proc_ref procedure);
+    std::vector<QueryResult> get_all_variable_uses(stmt_ref otherStmt);
+    std::vector<QueryResult> get_all_variable_uses(stmt_type otherStmtType);
+
+    // Pattern Clauses for Assign
+    std::vector<QueryResult> get_all_stmt_pattern(pattern pattern); // default: assign statements
+
+    std::vector<QueryResult> get_all_variables_pattern(arg_pos var_pos); // wildcard operation
+    std::vector<QueryResult> get_all_variables_pattern(arg_pos var_pos, std::string pattern_string);
 
     // std::vector<std::string> executeActions(std::vector<Action> queryActions);
 
 private:
-    PKBQueryController pkbQueryController;
+    PKBQueryController pkb_query_controller;
 
 };
 
