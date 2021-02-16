@@ -3,6 +3,10 @@
 #include <sstream>
 //#include "QueryEvaluator.h"
 
+ActionsGenerator::ActionsGenerator() {
+
+}
+
 ActionsGenerator::ActionsGenerator(QueryMap mapQuery, ActionsExecutor executerActions) {
     executer = executerActions;
     queryMap = mapQuery;
