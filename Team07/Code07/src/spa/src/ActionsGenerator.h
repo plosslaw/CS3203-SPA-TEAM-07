@@ -55,5 +55,6 @@ class ActionsGenerator {
     public:
         std::vector<std::string> TraverseQueryMap();
         ActionsGenerator(QueryMap mapQuery, ActionsExecutor executerActions);
+        ActionsGenerator();
 };
 
