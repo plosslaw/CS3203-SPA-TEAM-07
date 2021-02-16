@@ -156,8 +156,7 @@ std::vector<PayLoad> declaration_cl(State &state) {
   return declarations;
 }
 
-std::vector<PayLoad> select_cl(State &state) {
-  std::vector<PayLoad> selects;
+PayLoad select(State &state, Single load_type) {
   State so(state);
   try {
     stringMatch(state, "Select");
@@ -166,19 +165,70 @@ std::vector<PayLoad> select_cl(State &state) {
     std::vector<std::string> values;
     std::string synonym = ident(state);
     values.push_back(synonym);
+    whitespace(state);
 
-    PayLoad select_payload(SINGLE, SYNONYM, values);
-    selects.push_back(select_payload);
+    so.assign(state);
+    return PayLoad(SINGLE, SYNONYM, values);
+  } catch (ParseException &e) {
+    State so1(state);
+    state.assign(so);
+    state.excps.push_back(e);
+    throw ParseException(so.i, state.i, "select", "");
+  }
+}
+
+std::vector<PayLoad> select_cl(State &state) {
+  std::vector<PayLoad> selects;
+  State so(state);
+  try {
+    selects.push_back(select(state, SYNONYM));
     return selects;
   } catch (ParseException &e) {
     throw ParseException(so.i, state.i, "select_cl", "");
   }
 }
-// TODO(zs)
+
+PayLoad suchthat(State &state, std::string design_relation, Pair load_type) {
+  State so(state);
+  try {
+    stringMatch(state, design_relation);
+    whitespace(state);
+
+    std::vector<std::string> values;
+    std::string v1 =
+        "s1"; // TODO(zs): Extract based on design relation / load type
+    values.push_back(v1);
+    std::string v2 = "s2"; // TODO(zs):
+    values.push_back(v2);
+    whitespace(state);
+
+    so.assign(state);
+    return PayLoad(SINGLE, load_type, values);
+  } catch (ParseException &e) {
+    State so1(state);
+    state.assign(so);
+    state.excps.push_back(e);
+    throw ParseException(so.i, state.i, "suchthat", "");
+  }
+}
+
 std::vector<PayLoad> suchthat_cl(State &state) {
+  // suchthat-cl : ‘such that’ relRef
+  // relRef : Follows | FollowsT | Parent | ParentT | UsesS | UsesP | ModifiesS
+  // | ModifiesP
   std::vector<PayLoad> suchthats;
   State so(state);
-  return suchthats;
+  try {
+    stringMatch(state, "such that");
+    whitespace(state);
+
+    PayLoad suchthat_payload = suchthat(state, "Parent", PARENT);
+    suchthats.push_back(suchthat_payload);
+    return suchthats;
+  } catch (ParseException &e) {
+    throw ParseException(so.i, state.i, "select_cl", "");
+  }
+  // return suchthats;
 }
 // TODO(zs)
 std::vector<PayLoad> pattern_cl(State &state) {
@@ -189,13 +239,21 @@ std::vector<PayLoad> pattern_cl(State &state) {
 
 QueryMap pqlParse(std::string query) {
   QueryMap queryMap;
+  std::vector<PayLoad> declarations;
+  std::vector<PayLoad> selects;
+  std::vector<PayLoad> suchthats;
+  std::vector<PayLoad> patterns;
   State state(&query);
-
   try {
     std::vector<PayLoad> declarations = declaration_cl(state);
     std::vector<PayLoad> selects = select_cl(state);
-    std::vector<PayLoad> suchthats = suchthat_cl(state);
-    std::vector<PayLoad> patterns = pattern_cl(state);
+
+    // try {
+    //   std::vector<PayLoad> suchthats = suchthat_cl(state);
+    // } catch (ParseException &e) {
+    //   throw e;
+    // }
+    // std::vector<PayLoad> patterns = pattern_cl(state);
     return QueryMap(declarations, selects, suchthats, patterns);
   } catch (ParseException &e) {
     std::cout << e.what() << std::endl;
