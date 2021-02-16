@@ -36,7 +36,7 @@ class State {
 };
 
 std::string prettyPrintValidation(std::string *str, int pos, std::string msg);
-std::string prettyPrintException(State &s);
+std::string prettyPrintException(State &s, bool show_stack = true);
 
 
 std::string stringMatch(State &s, std::string str);
