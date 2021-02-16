@@ -200,7 +200,7 @@ std::vector<PayLoad> suchthat_cl(State &state) {
     stringMatch(state, "such that");
     whitespace(state);
 
-    // TODO(zs):  suchthat_cl
+    // suchthat_cl
 
     return suchthats;
   } catch (ParseException &e) {
@@ -216,7 +216,7 @@ std::vector<PayLoad> pattern_cl(State &state) {
     stringMatch(state, "pattern");
     whitespace(state);
 
-    // TODO(zs): pattern_cl
+    // pattern_cl
 
     return patterns;
   } catch (ParseException &e) {
@@ -235,29 +235,42 @@ QueryMap pqlParse(std::string query) {
 
   State state(&query);
   State so(state);
+
+  // declaration*
   try {
-    std::vector<PayLoad> declarations = declaration_cl(state);
-    std::vector<PayLoad> selects = select_cl(state);
-
-    // [suchthat-cl]
-    try {
-      std::vector<PayLoad> suchthats = suchthat_cl(state);
-    } catch (ParseException &e) {
-      State so1(state);
-      state.assign(so);
-
-      // [pattern-cl]
-      try {
-        std::vector<PayLoad> patterns = pattern_cl(state);
-      } catch (ParseException &e) {
-        State so2(state);
-        state.assign(so1);
-        return QueryMap(declarations, selects, suchthats, patterns);
-      }
+    while (true) {
+      std::vector<PayLoad> single_grp_declarations = declaration_cl(state);
+      declarations.insert(declarations.end(), single_grp_declarations.begin(),
+                          single_grp_declarations.end());
+      so.assign(state);
     }
-    return QueryMap(declarations, selects, suchthats, patterns);
   } catch (ParseException &e) {
-    std::cout << e.what() << std::endl;
+    state.assign(so);
   }
+
+  // select-cl
+  try {
+    selects = select_cl(state);
+    so.assign(state);
+  } catch (ParseException &e) {
+    state.assign(so);
+  }
+
+  // [suchthat-cl]
+  try {
+    suchthats = suchthat_cl(state);
+    so.assign(state);
+  } catch (ParseException &e) {
+    state.assign(so);
+  }
+
+  // [pattern-cl]
+  try {
+    patterns = pattern_cl(state);
+    so.assign(state);
+  } catch (ParseException &e) {
+    state.assign(so);
+  }
+
   return QueryMap(declarations, selects, suchthats, patterns);
 }
