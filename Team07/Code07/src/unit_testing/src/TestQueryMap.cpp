@@ -92,25 +92,6 @@ TEST_CASE("PayLoad with pair variable") {
     REQUIRE(parentt.getValue() == std::vector<std::string>{"s1", "s2"});
     REQUIRE(uses.getValue() == std::vector<std::string>{"s1", "v"});
     REQUIRE(modifies.getValue() == std::vector<std::string>{"s1", "v"});
-<<<<<<< HEAD
-  }
-}
-
-TEST_CASE("PayLoad with triple variable") {
-  PayLoad synonym_assign(TRIPLE, SYN_ASSIGN,
-                         std::vector<std::string>{"a", "_", "_"});
-
-  SECTION("PayLoad tag") { REQUIRE(synonym_assign.getTag() == TRIPLE); }
-
-  SECTION("PayLoad type") {
-    REQUIRE(synonym_assign.getType().triple == SYN_ASSIGN);
-  }
-
-  SECTION("PayLoad value") {
-    REQUIRE(synonym_assign.getValue() ==
-            std::vector<std::string>{"a", "_", "_"});
-=======
->>>>>>> Convert PayLoad value to vector of strings
   }
 }
 

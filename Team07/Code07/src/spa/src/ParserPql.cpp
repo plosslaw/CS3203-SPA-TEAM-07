@@ -21,10 +21,14 @@ PayLoad declaration(State &state, std::string design_entity, Single load_type) {
   try {
     stringMatch(state, design_entity);
     whitespace(state);
+
+    std::vector<std::string> values;
     std::string synonym = ident(state);
+    values.push_back(synonym);
     whitespace(state);
+
     so.assign(state);
-    return PayLoad(SINGLE, load_type, synonym);
+    return PayLoad(SINGLE, load_type, values);
   } catch (ParseException &e) {
     State so1(state);
     state.assign(so);
@@ -159,8 +163,12 @@ std::vector<PayLoad> select_cl(State &state) {
   try {
     stringMatch(state, "Select");
     whitespace(state);
+
+    std::vector<std::string> values;
     std::string synonym = ident(state);
-    PayLoad select_payload(SINGLE, SYNONYM, synonym);
+    values.push_back(synonym);
+
+    PayLoad select_payload(SINGLE, SYNONYM, values);
     selects.push_back(select_payload);
     return selects;
   } catch (ParseException &e) {
