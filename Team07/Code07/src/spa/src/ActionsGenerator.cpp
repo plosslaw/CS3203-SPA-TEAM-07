@@ -3,7 +3,12 @@
 #include <sstream>
 //#include "QueryEvaluator.h"
 
-std::vector<std::string> ActionsGenerator::TraverseQueryMap(QueryMap queryMap) {
+ActionsGenerator::ActionsGenerator(QueryMap mapQuery, ActionsExecutor executerActions) {
+    executer = executerActions;
+    queryMap = mapQuery;
+}
+
+std::vector<std::string> ActionsGenerator::TraverseQueryMap() {
     selectList= queryMap.getList(ClauseType::SELECT);
     declarationList = queryMap.getList(ClauseType::DECLARATION);
     suchThatList = queryMap.getList(ClauseType::SUCHTHAT);

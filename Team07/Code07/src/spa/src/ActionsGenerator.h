@@ -1,11 +1,16 @@
 #pragma once
 
 #include "QueryMap.h"
+#include "ActionsExecutor.h"
+
 using namespace std;
 
 class ActionsGenerator {
 
     private:
+        ActionsExecutor executer;
+        QueryMap queryMap;
+
         // List of payloads from respective clauses - SELECT, DECLARATION, SUCHTHAT, PATTERN
         std::vector<PayLoad> selectList;
         std::vector<PayLoad> declarationList;
@@ -48,7 +53,7 @@ class ActionsGenerator {
         //std::vector<std::string> ActionsGenerator::extract(std::string payloadVal);
 
     public:
-        std::vector<std::string> TraverseQueryMap(QueryMap queryMap);
-        
+        std::vector<std::string> TraverseQueryMap();
+        ActionsGenerator(QueryMap mapQuery, ActionsExecutor executerActions);
 };
 
