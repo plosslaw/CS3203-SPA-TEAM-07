@@ -2,7 +2,9 @@
 #include <string>
 #include "../../spa/src/TNode.h"
 #include "../../spa/src/ParserSimple.h"
+#include "../../spa/src/ParserLib.h"
 #include "../../../lib/catch.hpp"
+#include <iostream>
 
 std::string checkStringParse(std::string str, std::string (*parser)(State&)) {
   std::string strv = str;
@@ -27,7 +29,6 @@ TEST_CASE("string parsers") {
 }
 
 TNode checkTNodeParse(std::string str, TNode (*parser)(State&)) {
-  std::string strv = str;
   State state(&str);
   return parser(state);
 }

@@ -1,4 +1,5 @@
 #include <limits>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <cctype>
@@ -134,6 +135,16 @@ std::string prettyPrintException(State &s, bool show_stack) {
 			}
 		}
 	}
+	if(at == strv.size()) {
+		atLine = curLine;
+		atCol = strv.size() - prevLineLength - 1;
+	}
+	for(int i = 0; i < fs.size(); i++) {
+		if (fs[i] == strv.size()) {
+			fromLine[i] = curLine;
+			fromCol[i] = strv.size() - prevLineLength - 1;
+		}
+	}
 	linelengths.push_back(curLineLength);
 	std::string linestrvalue(linebuilder.begin(), linebuilder.end());
 	linestr.push_back(linestrvalue);
@@ -166,12 +177,12 @@ std::string stringMatch(State &s, std::string str) {
 				throw ParseException(init, s.i, "stringMatch", str);
 			}
 		}
-	} catch(...) {
+		s.i += str.size();
+		return str;
+	} catch(std::out_of_range &e) {
 		s.i = (*s.source).size();
 		throw ParseException(init, s.i, "stringMatch", str);
 	}
-	s.i += str.size();
-	return str;
 }
 
 char charPredicate(State &s, bool (*pred)(char), std::string errorName) {
@@ -183,7 +194,7 @@ char charPredicate(State &s, bool (*pred)(char), std::string errorName) {
 			throw ParseException(s.i, s.i, "charPredicate", errorName);
 		}
 		return c;
-	} catch (...) {
+	} catch (std::out_of_range &e) {
 		s.i = (*s.source).size();
 		throw ParseException(s.i, s.i, "charPredicate", errorName);
 	}
