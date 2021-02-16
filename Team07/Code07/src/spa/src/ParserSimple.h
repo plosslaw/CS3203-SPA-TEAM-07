@@ -5,7 +5,8 @@
 #include "ParserLib.h"
 #include "TNode.h"
 
-int validateUniqueProcedureNames(TNode &root, std::set<std::string> &procs);
+void validateUniqueProcedureNames(TNode &root, std::set<std::string> &procs);
+void validateCallProcedureExists(TNode &root, std::set<std::string> &procs);
 
 std::string name(State &s);
 TNode program(State &s);

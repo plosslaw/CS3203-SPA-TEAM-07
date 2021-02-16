@@ -7,6 +7,7 @@
 #include "ParserLib.h"
 #include "ParserSimple.h"
 #include "TNode.h"
+#include <iostream>
 
 // core functions -------------------------------------------------------------
 
@@ -22,12 +23,15 @@ int Parse (std::string file) {
 		s.excps.push_back(e);
 		std::cerr << prettyPrintException(s) << "\n";
 	}
-	std::set<std::string> procs;
-	int valRes = validateUniqueProcedureNames(ast, procs);
-	if (valRes == -1) {
+	int valPhase = 0;
+	try {
+		std::set<std::string> procs;
+		validateUniqueProcedureNames(ast, procs);
+		valPhase = 1;
+		validateCallProcedureExists(ast, procs);
 		std::cout << ast.toSexp() << "\n";
-	} else{
-		std::cerr << prettyPrintValidation(&str, valRes, "repeated procedure definition");
+	} catch (int &valRes) {
+		std::cerr << prettyPrintValidation(&str, valRes, valPhase == 0 ? "repeated procedure definition" : "call on undefined procedure");
 	}
 	return 0;
 }

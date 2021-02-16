@@ -4,6 +4,7 @@
 #include "ParserSimple.h"
 #include "TNode.h"
 #include "Types.hpp"
+#include <iostream>
 
 /** name :- letter (letter | digit)* */
 std::string name(State &s) {
@@ -566,24 +567,39 @@ TNode constant(State &s) {
 }
 
 
-int validateUniqueProcedureNames(TNode &root, std::set<std::string> &procs) {
+void validateUniqueProcedureNames(TNode &root, std::set<std::string> &procs) {
   switch(root.getType()) {
     case PROGRAM:
       for(int i = 0; i < root.getChildren().size(); i++) {
-        int res = validateUniqueProcedureNames(root.getChildren()[i], procs);
-        if (res != -1) {
-          return res;
-        }
+        validateUniqueProcedureNames(root.getChildren()[i], procs);
       }
       break;
     case PROCEDURE:
       std::string procName = root.getValue();
       if(procs.find(procName) != procs.end()) {
-        return root.getPos();
+        throw root.getPos();
       } else {
         procs.insert(procName);
       }
       break;
   }
-  return -1;
+}
+
+void validateCallProcedureExists(TNode &root, std::set<std::string> &procs) {
+  if(root.getType() == PROGRAM || root.getType() == STATEMENTLIST) {
+    for(int i = 0; i < root.getChildren().size(); i++) {
+      validateCallProcedureExists(root.getChildren()[i], procs);
+    }
+  } else if(root.getType() == PROCEDURE) {
+    validateCallProcedureExists(root.getChildren()[0], procs);
+  } else if(root.getType() == CALL) {
+    if(procs.find(root.getValue()) == procs.end()) {
+      throw root.getPos();
+    }
+  } else if(root.getType() == WHILE) {
+    validateCallProcedureExists(root.getChildren()[1], procs);
+  } else if(root.getType() == IF) {
+    validateCallProcedureExists(root.getChildren()[1], procs);
+    validateCallProcedureExists(root.getChildren()[2], procs);
+  }
 }
