@@ -6,8 +6,8 @@
 std::string ident(State &state) {
   int init = state.i;
   try {
-    char r1 = charPredicate(state, &alphaPred, "letter"); // :- letter
-    std::string r2 = alphaNum(state); // :- (letter | digit)*
+    char r1 = charPredicate(state, &alphaPred, "letter"); // letter
+    std::string r2 = alphaNum(state); // (letter | digit)*
     r2.insert(r2.begin(), r1);
     return r2;
   } catch (ParseException &e) {
@@ -39,6 +39,7 @@ PayLoad declaration(State &state, std::string design_entity, Single load_type) {
 
 std::vector<PayLoad> repeat_declaration(State &state, std::string design_entity,
                                         Single load_type) {
+  // declaration : design-entity synonym (‘,’ synonym)* ‘;’
   State so(state);
   std::vector<PayLoad> declarations;
 
@@ -68,7 +69,6 @@ std::vector<PayLoad> repeat_declaration(State &state, std::string design_entity,
 }
 
 std::vector<PayLoad> declaration_cl(State &state) {
-  // declaration : design-entity synonym (‘,’ synonym)* ‘;’
   // design-entity : ‘stmt’ | ‘read’ | ‘print’ | ‘call’ | ‘while’ | ‘if’ |
   // ‘assign’ | ‘variable’ | ‘constant’ | ‘procedure’
   State so(state);
