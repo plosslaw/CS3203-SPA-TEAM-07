@@ -169,31 +169,17 @@ std::vector<PayLoad> select_cl(State &state) {
 }
 
 QueryMap pqlParse(std::string query) {
-  std::cout << std::endl;
-  std::cout << query << std::endl;
   QueryMap queryMap;
-
-  // State state(&query);
-  std::string str = "while w1, w2, w3; Select w1";
-  State state(&str);
+  State state(&query);
 
   try {
     std::vector<PayLoad> declarations = declaration_cl(state);
     std::vector<PayLoad> selects = select_cl(state);
-
     std::vector<PayLoad> suchthats; // TODO(zs)
     std::vector<PayLoad> patterns;  // TODO(zs)
-    std::cout << declarations[0].getValue() << std::endl;
-    std::cout << declarations[1].getValue() << std::endl;
-    std::cout << declarations[2].getValue() << std::endl;
-
-    std::cout << selects[0].getValue() << std::endl;
-
     return QueryMap(declarations, selects, suchthats, patterns);
   } catch (ParseException &e) {
     std::cout << e.what() << std::endl;
   }
-
-  std::cout << std::endl;
   return QueryMap();
 }

@@ -64,4 +64,7 @@ public:
            std::vector<PayLoad> suchthat_cl, std::vector<PayLoad> pattern_cl);
   std::vector<PayLoad> getList(ClauseType key);
   void addItem(ClauseType key, PayLoad item);
+  friend bool operator==(const QueryMap &l, const QueryMap &r) {
+    return (l.table == r.table);
+  }
 };
