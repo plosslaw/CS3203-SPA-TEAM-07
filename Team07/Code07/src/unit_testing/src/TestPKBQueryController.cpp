@@ -198,4 +198,6 @@ TEST_CASE("One") {
         REQUIRE(pkbQueryController.statementUses(7, "a") == true);
         REQUIRE(pkbQueryController.statementUses(4, "temp") == false);
     }
+
+    // implement the rest in iteration/v1.3
 }

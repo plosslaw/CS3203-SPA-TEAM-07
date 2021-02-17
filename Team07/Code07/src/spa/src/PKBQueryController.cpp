@@ -48,37 +48,37 @@ bool PKBQueryController::statementModifies(stmt_ref s, var_ref v) {
 }
 
 bool PKBQueryController::satisfiesPattern(assign_ref a, pattern p) {
-    if (pkb.assignments.find(a) == pkb.assignments.end()) return false;
-    assignment asmt = pkb.assignments.at(a);
-    std::string text = asmt.rightValue;
-    std::string substr = p.rvalue;
-    if (substr == "_") return true;
+    // if (pkb.assignments.find(a) == pkb.assignments.end()) return false;
+    // assignment asmt = pkb.assignments.at(a);
+    // std::string text = asmt.rightValue;
+    // std::string substr = p.rvalue;
+    // if (substr == "_") return true;
     // KMP algorithm
-    int m = text.length();
-    int n = substr.length();
-    if (n == 0) return true;
-    if (m < n) return false;
-    int next[n + 1];
-    for (int i = 0; i <= n; i++) {
-        next[i] = 0;
-    }
-    for (int i = 1; i < n; i++) {
-        int j = next[i + 1];
-        while ( j > 0 && substr[j] != substr[i]) {
-            j = next[j];
-        }
-        if (j > 0 || substr[j] == substr[j]) {
-            next[i + 1] = j + 1;
-        }
-    }
-    for (int i = 0, j = 0; i < m; i++) {
-        if (text[i] == substr[j]) {
-            if (++j == n) return true;
-        } else if (j > 0) {
-            j = next[j];
-            i--;
-        }
-    }
+    // int m = text.length();
+    // int n = substr.length();
+    // if (n == 0) return true;
+    // if (m < n) return false;
+    // int next[n + 1];
+    // for (int i = 0; i <= n; i++) {
+    //     next[i] = 0;
+    // }
+    // for (int i = 1; i < n; i++) {
+    //     int j = next[i + 1];
+    //     while ( j > 0 && substr[j] != substr[i]) {
+    //         j = next[j];
+    //     }
+    //     if (j > 0 || substr[j] == substr[j]) {
+    //         next[i + 1] = j + 1;
+    //     }
+    // }
+    // for (int i = 0, j = 0; i < m; i++) {
+    //     if (text[i] == substr[j]) {
+    //         if (++j == n) return true;
+    //     } else if (j > 0) {
+    //         j = next[j];
+    //         i--;
+    //     }
+    // }
     return false;
 }
 
