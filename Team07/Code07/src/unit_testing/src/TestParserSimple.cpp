@@ -35,41 +35,92 @@ TNode checkTNodeParse(std::string str, TNode (*parser)(State&)) {
 
 TEST_CASE("TNode parsers") {
   SECTION("constant") {
-    TNode stub_1_1("123", CONSTANT, 0);
-    REQUIRE(checkTNodeParse("123", &constant).eq(stub_1_1));
+    REQUIRE(checkTNodeParse("123", &constant).eq(
+      TNode("123", CONSTANT, 0)
+    ));
     REQUIRE_THROWS(checkTNodeParse("x", &constant));
   }
 
   SECTION("variable") {
     REQUIRE_THROWS(checkTNodeParse("123", &variable));
-    REQUIRE_NOTHROW(checkTNodeParse("x", &variable));
+    REQUIRE(checkTNodeParse("x", &variable).eq(
+      TNode("x", VARIABLE, 0)
+    ));
   }
 
   SECTION("factor") {
-    REQUIRE_NOTHROW(checkTNodeParse("123", &factor));
-    REQUIRE_NOTHROW(checkTNodeParse("(123)", &factor));
-    REQUIRE_NOTHROW(checkTNodeParse("x", &factor));
-    REQUIRE_NOTHROW(checkTNodeParse("(x)", &factor));
+    REQUIRE(checkTNodeParse("123", &factor).eq(
+      TNode("123", CONSTANT, 0)
+    ));
+    REQUIRE(checkTNodeParse("(123)", &factor).eq(
+      TNode("123", CONSTANT, 1)
+    ));
+    REQUIRE(checkTNodeParse("x", &factor).eq(
+      TNode("x", VARIABLE, 0)
+    ));
+    REQUIRE(checkTNodeParse("(x)", &factor).eq(
+      TNode("x", VARIABLE, 1)
+    ));
     REQUIRE_THROWS(checkTNodeParse("-123", &factor));
   }
 
   SECTION("term") {
-    REQUIRE_NOTHROW(checkTNodeParse("1 * 1", &term));
-    REQUIRE_NOTHROW(checkTNodeParse("1 / 1", &term));
-    REQUIRE_NOTHROW(checkTNodeParse("1 % 1", &term));
+    REQUIRE(checkTNodeParse("1 * 1", &term).eq(
+      TNode("*", EXPR, 2).addChild(
+        TNode("1", CONSTANT, 0)).addChild(
+        TNode("1", CONSTANT, 4))
+    ));
+    REQUIRE(checkTNodeParse("1 / 1", &term).eq(
+      TNode("/", EXPR, 2).addChild(
+        TNode("1", CONSTANT, 0)).addChild(
+        TNode("1", CONSTANT, 4))
+    ));
+    REQUIRE(checkTNodeParse("1 % 1", &term).eq(
+      TNode("%", EXPR, 2).addChild(
+        TNode("1", CONSTANT, 0)).addChild(
+        TNode("1", CONSTANT, 4))
+    ));
     REQUIRE_THROWS(checkTNodeParse("1 * -1", &term));
   }
 
   SECTION("expr") {
-    REQUIRE_NOTHROW(checkTNodeParse("1 + 1", &expr));
-    REQUIRE_NOTHROW(checkTNodeParse("1 - 1", &expr));
+    REQUIRE(checkTNodeParse("1 + 1", &expr).eq(
+      TNode("+", EXPR, 2).addChild(
+        TNode("1", CONSTANT, 0)).addChild(
+        TNode("1", CONSTANT, 4))
+    ));
+    REQUIRE(checkTNodeParse("1 - 1", &expr).eq(
+      TNode("-", EXPR, 2).addChild(
+        TNode("1", CONSTANT, 0)).addChild(
+        TNode("1", CONSTANT, 4))
+    ));
     REQUIRE_THROWS(checkTNodeParse("1 - -1", &expr));
   }
 
   SECTION("rel_expr") {
-    REQUIRE_NOTHROW(checkTNodeParse("1 + 1 > 2 + 2", &rel_expr));
-    REQUIRE_NOTHROW(checkTNodeParse("1 - 1 < 3 / 2", &rel_expr));
-    REQUIRE_NOTHROW(checkTNodeParse("1 == 1", &rel_expr));
+    REQUIRE(checkTNodeParse("1 + 1 > 2 + 2", &rel_expr).eq(
+      TNode(">", EXPR, 0).addChild(
+        TNode("+", EXPR, 2).addChild(
+          TNode("1", CONSTANT, 0)).addChild(
+          TNode("1", CONSTANT, 4))).addChild(
+        TNode("+", EXPR, 10).addChild(
+          TNode("2", CONSTANT, 8)).addChild(
+          TNode("2", CONSTANT, 12)))
+    ));
+    REQUIRE(checkTNodeParse("1 - 1 < 3 / 2", &rel_expr).eq(
+      TNode("<", EXPR, 0).addChild(
+        TNode("-", EXPR, 2).addChild(
+          TNode("1", CONSTANT, 0)).addChild(
+          TNode("1", CONSTANT, 4))).addChild(
+        TNode("/", EXPR, 10).addChild(
+          TNode("3", CONSTANT, 8)).addChild(
+          TNode("2", CONSTANT, 12)))
+    ));
+    REQUIRE(checkTNodeParse("1 == 1", &rel_expr).eq(
+      TNode("==", EXPR, 0).addChild(
+        TNode("1", CONSTANT, 0)).addChild(
+        TNode("1", CONSTANT, 5))
+    ));
     REQUIRE_THROWS(checkTNodeParse("(1 == 1)", &rel_expr));
     REQUIRE_THROWS(checkTNodeParse("1 === 1", &rel_expr));
   }

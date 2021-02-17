@@ -34,7 +34,7 @@ TNode::TNode(int num, std::string val, stmt_type typ, int p) {
   pos = p;
 }
 
-void TNode::addChild(TNode child) { children.push_back(child); }
+TNode TNode::addChild(TNode child) { children.push_back(child); return *this; }
 
 int TNode::getStatementNum() { return statementNum; }
 
@@ -83,7 +83,7 @@ std::string TNode::toSexp(int sep) {
   return str;
 }
 
-bool TNode::eq(TNode &t) {
+bool TNode::eq(TNode t) {
   if(statementNum == t.getStatementNum() && value == t.getValue() && type == t.getType() && pos == t.getPos() && children.size() == t.getChildren().size()) {
     for (int i = 0; i < children.size(); i++) {
       bool res = children[i].eq(t.getChildren()[i]);
