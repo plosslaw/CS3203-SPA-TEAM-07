@@ -1,0 +1,5 @@
+.DS_Store
+.vscode
+Team07/Code07/build
+Team07/Code07/tests/*.xml
+
