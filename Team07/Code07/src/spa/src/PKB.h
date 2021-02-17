@@ -11,6 +11,11 @@ typedef struct {
 	// PKB Table for statements
 	std::unordered_map<stmt_ref, statement> statements;
 
+    // when parsing AST, insert into this table if the statement is an assignment.
+    // assign_ref is a superclass of stmt_ref
+    // an assignment should be included in statements
+    std::unordered_map<assign_ref, assignment> assignments;
+
 	// PKB Table for variables
 	std::unordered_map<var_ref, variable> variables;
 
