@@ -200,7 +200,7 @@ vector<string> ActionsGenerator::zero_such_that_one_pattern(PayLoad pattern_pay_
     if(arg_pairs.first && !arg_pairs.second) {
         //select a pattern a(v,_) first arg is same as select value
         pattern p; p.lvalue = "_"; p.rvalue = third_arg;
-        vector<stmt_ref> all_stmts_p_pkb;// = executer.get_all_stmts_pattern(p); //stmt_ref is int
+        vector<stmt_ref> all_stmts_p_pkb;//kiv #4 = executer.get_all_stmts_pattern(p); //stmt_ref is int
         vector<string> result;
         for(auto i : all_stmts_p_pkb) {
             result.push_back(to_string(i));
