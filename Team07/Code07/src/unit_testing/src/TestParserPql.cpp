@@ -517,7 +517,7 @@ TEST_CASE("one such that Uses") {
 // TODO(zs)
 TEST_CASE("one pattern syn_assign, ent_ref and expr_spec ") {
   SECTION("synonym and _factor_") {
-    std::string query = "stmt s; assign a; Select a pattern a(s, _var_)";
+    std::string query = "stmt s; assign a; Select a pattern a(s, _\"var\"_)";
     QueryMap expectedQueryMap;
     expectedQueryMap.addItem(
         ClauseType::DECLARATION,
@@ -531,7 +531,7 @@ TEST_CASE("one pattern syn_assign, ent_ref and expr_spec ") {
     expectedQueryMap.addItem(
         ClauseType::PATTERN,
         PayLoad(TRIPLE, SYN_ASSIGN,
-                std::vector<std::string>{"a", "s", "_var_"}));
+                std::vector<std::string>{"a", "s", "_\"var\"_"}));
 
     QueryMap actualQueryMap = pqlParse(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
@@ -618,6 +618,38 @@ TEST_CASE("one such that and one pattern") {
     expectedQueryMap.addItem(
         ClauseType::PATTERN,
         PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "s", "_"}));
+
+    QueryMap actualQueryMap = pqlParse(query);
+    REQUIRE(expectedQueryMap == actualQueryMap);
+  }
+
+  SECTION("modifies and pattern") {
+    std::string query =
+        "while w1, w2; stmt s; assign a; Select a such that Modifies(s, "
+        "\"var\") pattern a(s, _\"123\"_)";
+    QueryMap expectedQueryMap;
+    expectedQueryMap.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::WHILE, std::vector<std::string>{"w1"}));
+    expectedQueryMap.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::WHILE, std::vector<std::string>{"w2"}));
+    expectedQueryMap.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    expectedQueryMap.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
+    expectedQueryMap.addItem(
+        ClauseType::SELECT,
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}));
+    expectedQueryMap.addItem(
+        ClauseType::SUCHTHAT,
+        PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s", "\"var\""}));
+    expectedQueryMap.addItem(
+        ClauseType::PATTERN,
+        PayLoad(TRIPLE, SYN_ASSIGN,
+                std::vector<std::string>{"a", "s", "_\"123\"_"}));
 
     QueryMap actualQueryMap = pqlParse(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
