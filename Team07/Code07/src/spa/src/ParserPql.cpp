@@ -4,14 +4,7 @@
 #include <iostream>
 #include <vector>
 
-// std::string wildcard(State &state) {
-//   State so(state);
-//   try {
-//     return stringMatch(state, "_");
-//   } catch (ParseException &e) {
-//     throw ParseException(so.i, state.i, "wildcard", "");
-//   }
-// }
+// -------------------- Low Level Abstractions -------------------- //
 
 // var_name: NAME
 std::string var_name(State &state) {
@@ -33,6 +26,7 @@ std::string constant(State &state) {
   }
 }
 
+// factor: var_name | const_value
 std::string factor(State &state) {
   State so(state);
   try {
@@ -132,6 +126,96 @@ std::string expr_spec(State &state) {
   }
 }
 
+// TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent, ent and expr
+// ‘(’ stmtRef ‘,’ stmtRef ‘)’
+std::vector<std::string> stmt_and_stmt_ref(State &state) {
+  std::vector<std::string> values;
+  State so(state);
+  try {
+    stringMatch(state, "(");
+    whitespace(state);
+
+    values.push_back(stmt_ref(state));
+    whitespace(state);
+
+    stringMatch(state, ",");
+    whitespace(state);
+
+    values.push_back(stmt_ref(state));
+    whitespace(state);
+
+    stringMatch(state, ")");
+    whitespace(state);
+
+    return values;
+  } catch (ParseException &e) {
+    state.assign(so);
+    throw ParseException(so.i, state.i, "stmt_and_stmt_ref", "");
+  }
+  return values;
+}
+
+// TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent, ent and expr
+// ‘(’ stmtRef ‘,’ entRef ‘)’
+std::vector<std::string> stmt_and_ent_ref(State &state) {
+  std::vector<std::string> values;
+  State so(state);
+  try {
+    stringMatch(state, "(");
+    whitespace(state);
+
+    values.push_back(stmt_ref(state));
+    whitespace(state);
+
+    stringMatch(state, ",");
+    whitespace(state);
+
+    values.push_back(ent_ref(state));
+    whitespace(state);
+
+    stringMatch(state, ")");
+    whitespace(state);
+
+    return values;
+  } catch (ParseException &e) {
+    state.assign(so);
+    throw ParseException(so.i, state.i, "stmt_and_ent_ref", "");
+  }
+  return values;
+}
+
+// TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent, ent and expr
+// ‘(‘entRef ’,’ expression-spec ’)’
+std::vector<std::string> ent_and_expr_spec(State &state) {
+  std::vector<std::string> values;
+  State so(state);
+  try {
+    stringMatch(state, "(");
+    whitespace(state);
+
+    values.push_back(ent_ref(state));
+    whitespace(state);
+
+    stringMatch(state, ",");
+    whitespace(state);
+
+    values.push_back(expr_spec(state));
+    whitespace(state);
+
+    stringMatch(state, ")");
+    whitespace(state);
+
+    return values;
+  } catch (ParseException &e) {
+    state.assign(so);
+    throw ParseException(so.i, state.i, "ent_and_expr_spec", "");
+  }
+  return values;
+}
+
+// -------------------- Declaration Clause -------------------- //
+
+// declaration : design-entity synonym
 PayLoad declaration(State &state, std::string design_entity, Single load_type) {
   State so(state);
   try {
@@ -152,9 +236,9 @@ PayLoad declaration(State &state, std::string design_entity, Single load_type) {
   }
 }
 
+// declaration : design-entity synonym (‘,’ synonym)* ‘;’
 std::vector<PayLoad> repeat_declaration(State &state, std::string design_entity,
                                         Single load_type) {
-  // declaration : design-entity synonym (‘,’ synonym)* ‘;’
   State so(state);
   std::vector<PayLoad> declarations;
 
@@ -183,9 +267,9 @@ std::vector<PayLoad> repeat_declaration(State &state, std::string design_entity,
   return declarations;
 }
 
+// design-entity : ‘stmt’ | ‘read’ | ‘print’ | ‘call’ | ‘while’ | ‘if’ |
+// ‘assign’ | ‘variable’ | ‘constant’ | ‘procedure’
 std::vector<PayLoad> declaration_cl(State &state) {
-  // design-entity : ‘stmt’ | ‘read’ | ‘print’ | ‘call’ | ‘while’ | ‘if’ |
-  // ‘assign’ | ‘variable’ | ‘constant’ | ‘procedure’
   State so(state);
   std::vector<PayLoad> declarations;
   try {
@@ -273,6 +357,9 @@ std::vector<PayLoad> declaration_cl(State &state) {
   return declarations;
 }
 
+// -------------------- Select Clause -------------------- //
+
+// ‘Select’ synonym
 PayLoad select(State &state, Single load_type) {
   State so(state);
   try {
@@ -293,6 +380,7 @@ PayLoad select(State &state, Single load_type) {
   }
 }
 
+// select-cl: ... ‘Select’ synonym ...
 std::vector<PayLoad> select_cl(State &state) {
   std::vector<PayLoad> selects;
   State so(state);
@@ -305,94 +393,11 @@ std::vector<PayLoad> select_cl(State &state) {
   }
 }
 
-// TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent
-std::vector<std::string> stmt_and_stmt_ref(State &state) {
-  std::vector<std::string> values;
-  State so(state);
-  try {
-    stringMatch(state, "(");
-    whitespace(state);
+// -------------------- Such That Clause -------------------- //
 
-    values.push_back(stmt_ref(state));
-    whitespace(state);
-
-    stringMatch(state, ",");
-    whitespace(state);
-
-    values.push_back(stmt_ref(state));
-    whitespace(state);
-
-    stringMatch(state, ")");
-    whitespace(state);
-
-    return values;
-  } catch (ParseException &e) {
-    state.assign(so);
-    throw ParseException(so.i, state.i, "stmt_and_stmt_ref", "");
-  }
-  return values;
-}
-
-// TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent
-std::vector<std::string> stmt_and_ent_ref(State &state) {
-  std::vector<std::string> values;
-  State so(state);
-  try {
-    stringMatch(state, "(");
-    whitespace(state);
-
-    values.push_back(stmt_ref(state));
-    whitespace(state);
-
-    stringMatch(state, ",");
-    whitespace(state);
-
-    values.push_back(ent_ref(state));
-    whitespace(state);
-
-    stringMatch(state, ")");
-    whitespace(state);
-
-    return values;
-  } catch (ParseException &e) {
-    state.assign(so);
-    throw ParseException(so.i, state.i, "stmt_and_ent_ref", "");
-  }
-  return values;
-}
-
-// TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent,
-// ent and expr
-std::vector<std::string> ent_and_expr_spec(State &state) {
-  std::vector<std::string> values;
-  State so(state);
-  try {
-    stringMatch(state, "(");
-    whitespace(state);
-
-    values.push_back(ent_ref(state));
-    whitespace(state);
-
-    stringMatch(state, ",");
-    whitespace(state);
-
-    values.push_back(expr_spec(state));
-    whitespace(state);
-
-    stringMatch(state, ")");
-    whitespace(state);
-
-    return values;
-  } catch (ParseException &e) {
-    state.assign(so);
-    throw ParseException(so.i, state.i, "ent_and_expr_spec", "");
-  }
-  return values;
-}
-
+// relRef : Follows | FollowsT | Parent | ParentT | UsesS | UsesP | ModifiesS
+// | ModifiesP
 PayLoad rel_ref(State &state, std::string design_relation, Pair load_type) {
-  // relRef : Follows | FollowsT | Parent | ParentT | UsesS | UsesP | ModifiesS
-  // | ModifiesP
   std::vector<std::string> values;
   State so(state);
   try {
@@ -509,8 +514,8 @@ PayLoad suchthat(State &state) {
   }
 }
 
+// suchthat-cl : ‘such that’ relRef
 PayLoad suchthat_cl(State &state) {
-  // suchthat-cl : ‘such that’ relRef
   std::vector<PayLoad> suchthats;
   State so(state);
   try {
@@ -527,6 +532,8 @@ PayLoad suchthat_cl(State &state) {
     throw ParseException(so.i, state.i, "suchthat_cl", "");
   }
 }
+
+// -------------------- Pattern Clause -------------------- //
 
 PayLoad syn_assign(State &state) {
   std::vector<std::string> values;
@@ -556,8 +563,8 @@ PayLoad pattern(State &state) {
   }
 }
 
+// pattern-cl: ‘pattern’ syn-assign ‘(‘entRef ’,’ expression-spec ’)’
 PayLoad pattern_cl(State &state) {
-  // pattern-cl: ‘pattern’ syn-assign ‘(‘entRef ’,’ expression-spec ’)’
   std::vector<PayLoad> patterns;
   State so(state);
   try {
