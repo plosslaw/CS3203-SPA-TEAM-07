@@ -162,11 +162,64 @@ TEST_CASE("QueryMap with one such that") {
         DECLARATION,
         PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s2"}));
     expectedQueryMap.addItem(
-        SELECT,
-        PayLoad(SINGLE, SYNONYM, std::vector<std::string>{"s1"}));
+        SELECT, PayLoad(SINGLE, SYNONYM, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        SUCHTHAT, PayLoad(PAIR, PARENT, std::vector<std::string>{"s1", "s2"}));
+
+    QueryMap actualQueryMap = pqlParse(query);
+    REQUIRE(expectedQueryMap == actualQueryMap);
+  }
+
+  SECTION("Parent*") {
+    std::string query = "stmt s1, s2; Select s1 such that Parent*(s1, s2)";
+    QueryMap expectedQueryMap;
+    expectedQueryMap.addItem(
+        DECLARATION,
+        PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        DECLARATION,
+        PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s2"}));
+    expectedQueryMap.addItem(
+        SELECT, PayLoad(SINGLE, SYNONYM, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        SUCHTHAT, PayLoad(PAIR, PARENTT, std::vector<std::string>{"s1", "s2"}));
+
+    QueryMap actualQueryMap = pqlParse(query);
+    REQUIRE(expectedQueryMap == actualQueryMap);
+  }
+
+  SECTION("Follows") {
+    std::string query = "stmt s1, s2; Select s1 such that Follows(s1, s2)";
+    QueryMap expectedQueryMap;
+    expectedQueryMap.addItem(
+        DECLARATION,
+        PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        DECLARATION,
+        PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s2"}));
+    expectedQueryMap.addItem(
+        SELECT, PayLoad(SINGLE, SYNONYM, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        SUCHTHAT, PayLoad(PAIR, FOLLOWS, std::vector<std::string>{"s1", "s2"}));
+
+    QueryMap actualQueryMap = pqlParse(query);
+    REQUIRE(expectedQueryMap == actualQueryMap);
+  }
+
+  SECTION("Follows*") {
+    std::string query = "stmt s1, s2; Select s1 such that Follows*(s1, s2)";
+    QueryMap expectedQueryMap;
+    expectedQueryMap.addItem(
+        DECLARATION,
+        PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        DECLARATION,
+        PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s2"}));
+    expectedQueryMap.addItem(
+        SELECT, PayLoad(SINGLE, SYNONYM, std::vector<std::string>{"s1"}));
     expectedQueryMap.addItem(
         SUCHTHAT,
-        PayLoad(PAIR, PARENT, std::vector<std::string>{"s1", "s2"}));
+        PayLoad(PAIR, FOLLOWST, std::vector<std::string>{"s1", "s2"}));
 
     QueryMap actualQueryMap = pqlParse(query);
     REQUIRE(expectedQueryMap == actualQueryMap);

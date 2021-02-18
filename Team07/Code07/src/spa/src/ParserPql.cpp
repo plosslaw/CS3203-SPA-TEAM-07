@@ -209,11 +209,12 @@ std::vector<PayLoad> select_cl(State &state) {
   }
 }
 
-PayLoad parent(State &state) {
+PayLoad stmt_and_stmt_ref(State &state, std::string relation_ref,
+                          Pair load_type) {
   std::vector<std::string> values;
   State so(state);
   try {
-    stringMatch(state, "Parent");
+    stringMatch(state, relation_ref);
     whitespace(state);
 
     stringMatch(state, "(");
@@ -231,41 +232,89 @@ PayLoad parent(State &state) {
     stringMatch(state, ")");
     whitespace(state);
 
-    return PayLoad(PAIR, PARENT, values);
+    return PayLoad(PAIR, load_type, values);
   } catch (ParseException &e) {
     state.assign(so);
+    throw ParseException(so.i, state.i, "stmt_and_stmt_ref", "");
+  }
+}
+
+PayLoad parent(State &state) {
+  State so(state);
+  try {
+    return stmt_and_stmt_ref(state, "Parent", PARENT);
+  } catch (ParseException &e) {
     throw ParseException(so.i, state.i, "parent", "");
   }
 }
 
-PayLoad suchthat(State &state, std::string relation_ref, Pair load_type) {
+PayLoad parent_t(State &state) {
   State so(state);
   try {
-    PayLoad parent_st = parent(state);
-    so.assign(state);
-    return parent_st;
+    return stmt_and_stmt_ref(state, "Parent*", PARENTT);
   } catch (ParseException &e) {
-    state.assign(so);
-    throw ParseException(so.i, state.i, "suchthat", "");
+    throw ParseException(so.i, state.i, "parent_t", "");
   }
 }
 
-std::vector<PayLoad> suchthat_cl(State &state) {
-  // suchthat-cl : ‘such that’ relRef
+PayLoad follows(State &state) {
+  State so(state);
+  try {
+    return stmt_and_stmt_ref(state, "Follows", FOLLOWS);
+  } catch (ParseException &e) {
+    throw ParseException(so.i, state.i, "follows", "");
+  }
+}
+
+PayLoad follows_t(State &state) {
+  State so(state);
+  try {
+    return stmt_and_stmt_ref(state, "Follows*", FOLLOWST);
+  } catch (ParseException &e) {
+    throw ParseException(so.i, state.i, "follows_t", "");
+  }
+}
+
+PayLoad suchthat(State &state) {
   // relRef : Follows | FollowsT | Parent | ParentT | UsesS | UsesP | ModifiesS
   // | ModifiesP
+  State so(state);
+  try {
+    return parent(state);
+  } catch (ParseException &e) {
+    state.assign(so);
+    try {
+      return parent_t(state);
+    } catch (ParseException &e) {
+      state.assign(so);
+      try {
+        return follows(state);
+      } catch (ParseException &e) {
+        state.assign(so);
+        try {
+          return follows_t(state);
+        } catch (ParseException &e) {
+          state.assign(so);
+          throw ParseException(so.i, state.i, "suchthat", "");
+        }
+      }
+    }
+  }
+}
+
+PayLoad suchthat_cl(State &state) {
+  // suchthat-cl : ‘such that’ relRef
   std::vector<PayLoad> suchthats;
   State so(state);
   try {
     stringMatch(state, "such that");
     whitespace(state);
-    try {
-      suchthats.push_back(suchthat(state, "Parent", PARENT));
-    } catch (ParseException &e) {
-      state.assign(so);
-    }
 
-    return suchthats;
+    PayLoad clause = suchthat(state);
+    whitespace(state);
+
+    so.assign(state);
+    return clause;
   } catch (ParseException &e) {
     state.assign(so);
     throw ParseException(so.i, state.i, "suchthat_cl", "");
@@ -321,7 +370,7 @@ QueryMap pqlParse(std::string query) {
 
   // [suchthat-cl]
   try {
-    suchthats = suchthat_cl(state);
+    suchthats.push_back(suchthat_cl(state));
     so.assign(state);
   } catch (ParseException &e) {
     state.assign(so);
