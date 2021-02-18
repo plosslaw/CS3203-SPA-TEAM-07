@@ -239,9 +239,9 @@ std::string double_quotes(State &s) {
   return stringPredicate(s, &double_quotes_pred, "double_quotes");
 }
 
-// std::string wildcard(State &s) {
-//   return stringPredicate(s, &wildcard_pred, "wildcard");
-// }
+std::string wildcard(State &s) {
+  return stringPredicate(s, &wildcard_pred, "wildcard");
+}
 
 // predicates -----------------------------------------------------------------
 
@@ -259,7 +259,7 @@ bool alphanumPred(char c) { return std::isalnum(c); }
 
 bool double_quotes_pred(char c) { return c == '\"'; }
 
-// bool wildcard_pred(char c) { return c == '_'; }
+bool wildcard_pred(char c) { return c == '_'; }
 
 // Low level abstractions
 // -----------------------------------------------------------------

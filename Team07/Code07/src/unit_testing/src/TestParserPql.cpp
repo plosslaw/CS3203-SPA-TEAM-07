@@ -224,6 +224,8 @@ TEST_CASE("one such that Parent") {
         PayLoad(PAIR, PARENT, std::vector<std::string>{"s1", "1"}));
 
     QueryMap actualQueryMap = pqlParse(query);
+    // std::cout << actualQueryMap.getList(ClauseType::SUCHTHAT)[0].getValue()[0] << std::endl;
+    // std::cout << actualQueryMap.getList(ClauseType::SUCHTHAT)[0].getValue()[1] << std::endl;
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -426,7 +428,7 @@ TEST_CASE("one such that Modifies") {
   // TODO(zs)
   SECTION("synonym and wildcard") {}
 
-  SECTION("synonym and \"idnet\"") {
+  SECTION("synonym and \"ident\"") {
     std::string query = "stmt s1; Select s1 such that Modifies(s1, \"x\")";
     QueryMap expectedQueryMap;
     expectedQueryMap.addItem(

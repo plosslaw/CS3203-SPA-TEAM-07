@@ -4,14 +4,14 @@
 #include <iostream>
 #include <vector>
 
-std::string wildcard(State &state) {
-  State so(state);
-  try {
-    return stringMatch(state, "_");
-  } catch (ParseException &e) {
-    throw ParseException(so.i, state.i, "wildcard", "");
-  }
-}
+// std::string wildcard(State &state) {
+//   State so(state);
+//   try {
+//     return stringMatch(state, "_");
+//   } catch (ParseException &e) {
+//     throw ParseException(so.i, state.i, "wildcard", "");
+//   }
+// }
 
 // var_name: NAME
 std::string var_name(State &state) {
@@ -57,11 +57,11 @@ std::string stmt_ref(State &state) {
   } catch (ParseException &e) {
     state.assign(so);
     try {
-      return wildcard(state);
+      return integer(state);
     } catch (ParseException &e) {
       state.assign(so);
       try {
-        return integer(state);
+        return wildcard(state);
       } catch (ParseException &e) {
         state.assign(so);
         throw ParseException(so.i, state.i, "stmt_ref", "");
@@ -78,20 +78,21 @@ std::string ent_ref(State &state) {
   } catch (ParseException &e) {
     state.assign(so);
     try {
-      return wildcard(state);
+      std::string dbl_quotes_1 = double_quotes(state);
+      whitespace(state);
+
+      std::string val = ident(state);
+      whitespace(state);
+
+      std::string dbl_quotes_2 = double_quotes(state);
+      whitespace(state);
+
+      return dbl_quotes_1 + val + dbl_quotes_2;
     } catch (ParseException &e) {
       state.assign(so);
+
       try {
-        std::string dbl_quotes_1 = double_quotes(state);
-        whitespace(state);
-
-        std::string val = ident(state);
-        whitespace(state);
-
-        std::string dbl_quotes_2 = double_quotes(state);
-        whitespace(state);
-
-        return dbl_quotes_1 + val + dbl_quotes_2;
+        return wildcard(state);
       } catch (ParseException &e) {
         state.assign(so);
         throw ParseException(so.i, state.i, "ent_ref", "");
