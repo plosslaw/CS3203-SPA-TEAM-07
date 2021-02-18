@@ -1,5 +1,6 @@
 #include "ParserPql.h"
 #include "ParserLib.h"
+#include <functional>
 #include <iostream>
 #include <vector>
 
@@ -34,8 +35,29 @@ std::string stmt_ref(State &state) {
   }
 }
 
-// TODO(zs):
 // entRef: synonym | ‘_’ | ‘"’ IDENT ‘"’
+std::string ent_ref(State &state) {
+  State so(state);
+  try {
+    return synonym(state);
+  } catch (ParseException &e) {
+    state.assign(so);
+    try {
+      return wildcard(state);
+    } catch (ParseException &e) {
+      state.assign(so);
+      try {
+        stringMatch(state, "\"");
+        std::string val = ident(state);
+        stringMatch(state, "\"");
+        return val;
+      } catch (ParseException &e) {
+        state.assign(so);
+        throw ParseException(so.i, state.i, "ent_ref", "");
+      }
+    }
+  }
+}
 
 PayLoad declaration(State &state, std::string design_entity, Single load_type) {
   State so(state);
@@ -209,14 +231,11 @@ std::vector<PayLoad> select_cl(State &state) {
   }
 }
 
-PayLoad stmt_and_stmt_ref(State &state, std::string relation_ref,
-                          Pair load_type) {
+// TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent
+std::vector<std::string> stmt_and_stmt_ref(State &state) {
   std::vector<std::string> values;
   State so(state);
   try {
-    stringMatch(state, relation_ref);
-    whitespace(state);
-
     stringMatch(state, "(");
     whitespace(state);
 
@@ -232,6 +251,59 @@ PayLoad stmt_and_stmt_ref(State &state, std::string relation_ref,
     stringMatch(state, ")");
     whitespace(state);
 
+    return values;
+  } catch (ParseException &e) {
+    state.assign(so);
+    throw ParseException(so.i, state.i, "stmt_and_stmt_ref", "");
+  }
+  return values;
+}
+
+// TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent
+std::vector<std::string> stmt_and_ent_ref(State &state) {
+  std::vector<std::string> values;
+  State so(state);
+  try {
+    stringMatch(state, "(");
+    whitespace(state);
+
+    values.push_back(stmt_ref(state));
+    whitespace(state);
+
+    stringMatch(state, ",");
+    whitespace(state);
+
+    values.push_back(ent_ref(state));
+    whitespace(state);
+
+    stringMatch(state, ")");
+    whitespace(state);
+
+    return values;
+  } catch (ParseException &e) {
+    state.assign(so);
+    throw ParseException(so.i, state.i, "stmt_and_ent_ref", "");
+  }
+  return values;
+}
+
+PayLoad rel_ref(State &state, std::string design_relation, Pair load_type) {
+  // relRef : Follows | FollowsT | Parent | ParentT | UsesS | UsesP | ModifiesS
+  // | ModifiesP
+  std::vector<std::string> values;
+  State so(state);
+  try {
+    stringMatch(state, design_relation);
+    whitespace(state);
+
+    if (load_type == PARENT || load_type == PARENTT || load_type == FOLLOWS ||
+        load_type == FOLLOWST) {
+      values = stmt_and_stmt_ref(state);
+    }
+    if (load_type == MODIFIES || load_type == USES) {
+      values = stmt_and_ent_ref(state);
+    }
+
     return PayLoad(PAIR, load_type, values);
   } catch (ParseException &e) {
     state.assign(so);
@@ -242,8 +314,9 @@ PayLoad stmt_and_stmt_ref(State &state, std::string relation_ref,
 PayLoad parent(State &state) {
   State so(state);
   try {
-    return stmt_and_stmt_ref(state, "Parent", PARENT);
+    return rel_ref(state, "Parent", PARENT);
   } catch (ParseException &e) {
+    state.assign(so);
     throw ParseException(so.i, state.i, "parent", "");
   }
 }
@@ -251,8 +324,9 @@ PayLoad parent(State &state) {
 PayLoad parent_t(State &state) {
   State so(state);
   try {
-    return stmt_and_stmt_ref(state, "Parent*", PARENTT);
+    return rel_ref(state, "Parent*", PARENTT);
   } catch (ParseException &e) {
+    state.assign(so);
     throw ParseException(so.i, state.i, "parent_t", "");
   }
 }
@@ -260,8 +334,9 @@ PayLoad parent_t(State &state) {
 PayLoad follows(State &state) {
   State so(state);
   try {
-    return stmt_and_stmt_ref(state, "Follows", FOLLOWS);
+    return rel_ref(state, "Follows", FOLLOWS);
   } catch (ParseException &e) {
+    state.assign(so);
     throw ParseException(so.i, state.i, "follows", "");
   }
 }
@@ -269,15 +344,34 @@ PayLoad follows(State &state) {
 PayLoad follows_t(State &state) {
   State so(state);
   try {
-    return stmt_and_stmt_ref(state, "Follows*", FOLLOWST);
+    return rel_ref(state, "Follows*", FOLLOWST);
   } catch (ParseException &e) {
+    state.assign(so);
     throw ParseException(so.i, state.i, "follows_t", "");
   }
 }
 
+PayLoad modifies(State &state) {
+  State so(state);
+  try {
+    return rel_ref(state, "Modifies", MODIFIES);
+  } catch (ParseException &e) {
+    state.assign(so);
+    throw ParseException(so.i, state.i, "modifies", "");
+  }
+}
+
+PayLoad uses(State &state) {
+  State so(state);
+  try {
+    return rel_ref(state, "Uses", USES);
+  } catch (ParseException &e) {
+    state.assign(so);
+    throw ParseException(so.i, state.i, "uses", "");
+  }
+}
+
 PayLoad suchthat(State &state) {
-  // relRef : Follows | FollowsT | Parent | ParentT | UsesS | UsesP | ModifiesS
-  // | ModifiesP
   State so(state);
   try {
     return parent(state);
@@ -295,7 +389,17 @@ PayLoad suchthat(State &state) {
           return follows_t(state);
         } catch (ParseException &e) {
           state.assign(so);
-          throw ParseException(so.i, state.i, "suchthat", "");
+          try {
+            return modifies(state);
+          } catch (ParseException &e) {
+            state.assign(so);
+            try {
+              return uses(state);
+            } catch (ParseException &e) {
+              state.assign(so);
+              throw ParseException(so.i, state.i, "suchthat", "");
+            }
+          }
         }
       }
     }

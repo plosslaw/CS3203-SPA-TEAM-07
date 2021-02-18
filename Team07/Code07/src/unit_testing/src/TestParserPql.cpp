@@ -224,6 +224,44 @@ TEST_CASE("QueryMap with one such that") {
     QueryMap actualQueryMap = pqlParse(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
+
+  SECTION("Modifies") {
+    std::string query = "stmt s1, s2; Select s1 such that Modifies(s1, s2)";
+    QueryMap expectedQueryMap;
+    expectedQueryMap.addItem(
+        DECLARATION,
+        PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        DECLARATION,
+        PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s2"}));
+    expectedQueryMap.addItem(
+        SELECT, PayLoad(SINGLE, SYNONYM, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        SUCHTHAT,
+        PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s1", "s2"}));
+
+    QueryMap actualQueryMap = pqlParse(query);
+    REQUIRE(expectedQueryMap == actualQueryMap);
+  }
+
+  SECTION("Uses") {
+    std::string query = "stmt s1, s2; Select s1 such that Uses(s1, s2)";
+    QueryMap expectedQueryMap;
+    expectedQueryMap.addItem(
+        DECLARATION,
+        PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        DECLARATION,
+        PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s2"}));
+    expectedQueryMap.addItem(
+        SELECT, PayLoad(SINGLE, SYNONYM, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        SUCHTHAT,
+        PayLoad(PAIR, USES, std::vector<std::string>{"s1", "s2"}));
+
+    QueryMap actualQueryMap = pqlParse(query);
+    REQUIRE(expectedQueryMap == actualQueryMap);
+  }
 }
 // TODO(zs)
 TEST_CASE("QueryMap with one pattern") {}
