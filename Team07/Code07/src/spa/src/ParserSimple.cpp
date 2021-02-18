@@ -41,7 +41,7 @@ std::string integer(State &s) {
 /** program :- procedure+ */
 TNode program(State &s) {
   State so(s);
-  TNode t("", PROGRAM);
+  TNode t("", PROGRAM, 0);
 	bool consumed = false;
 	try {
 		while(true) {
