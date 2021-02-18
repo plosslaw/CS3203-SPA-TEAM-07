@@ -3,6 +3,40 @@
 #include <iostream>
 #include <vector>
 
+std::string wildcard(State &state) {
+  State so(state);
+  try {
+    stringMatch(state, "_");
+    return "_";
+  } catch (ParseException &e) {
+    throw ParseException(so.i, state.i, "wildcard", "");
+  }
+}
+
+// stmtRef: synonym | ‘_’ | INTEGER
+std::string stmt_ref(State &state) {
+  State so(state);
+  try {
+    return synonym(state);
+  } catch (ParseException &e) {
+    state.assign(so);
+    try {
+      return wildcard(state);
+    } catch (ParseException &e) {
+      state.assign(so);
+      try {
+        return integer(state);
+      } catch (ParseException &e) {
+        state.assign(so);
+        throw ParseException(so.i, state.i, "stmt_ref", "");
+      }
+    }
+  }
+}
+
+// TODO(zs):
+// entRef: synonym | ‘_’ | ‘"’ IDENT ‘"’
+
 PayLoad declaration(State &state, std::string design_entity, Single load_type) {
   State so(state);
   try {
@@ -174,6 +208,40 @@ std::vector<PayLoad> select_cl(State &state) {
     throw ParseException(so.i, state.i, "select_cl", "");
   }
 }
+
+PayLoad suchthat(State &state, std::string relation_ref, Pair load_type) {
+  State so(state);
+  try {
+    std::vector<std::string> values;
+
+    stringMatch(state, relation_ref);
+    whitespace(state);
+
+    stringMatch(state, "(");
+    whitespace(state);
+
+    values.push_back(stmt_ref(state));
+    whitespace(state);
+
+    stringMatch(state, ",");
+    whitespace(state);
+
+    values.push_back(stmt_ref(state));
+    whitespace(state);
+
+    stringMatch(state, ")");
+    whitespace(state);
+
+    so.assign(state);
+    return PayLoad(PAIR, load_type, values);
+  } catch (ParseException &e) {
+    State so1(state);
+    state.assign(so);
+    state.excps.push_back(e);
+    throw ParseException(so.i, state.i, "suchthat", "");
+  }
+}
+
 std::vector<PayLoad> suchthat_cl(State &state) {
   // suchthat-cl : ‘such that’ relRef
   // relRef : Follows | FollowsT | Parent | ParentT | UsesS | UsesP | ModifiesS
@@ -183,6 +251,7 @@ std::vector<PayLoad> suchthat_cl(State &state) {
   try {
     stringMatch(state, "such that");
     whitespace(state);
+    suchthats.push_back(suchthat(state, "Parent", PARENT));
 
     return suchthats;
   } catch (ParseException &e) {

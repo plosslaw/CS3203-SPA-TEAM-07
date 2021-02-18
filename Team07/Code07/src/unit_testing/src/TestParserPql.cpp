@@ -151,27 +151,27 @@ TEST_CASE("QueryMap repeated declaration with no such that and no pattern") {
 }
 
 // TODO(zs)
-// TEST_CASE("QueryMap with one such that") {
-//   SECTION("Parent") {
-//     std::string query = "stmt s1, s2; Select s1 such that Parent(s1, s2)";
-//     QueryMap expectedQueryMap;
-//     expectedQueryMap.addItem(
-//         DECLARATION,
-//         PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s1"}));
-//     expectedQueryMap.addItem(
-//         DECLARATION,
-//         PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s2"}));
-//     expectedQueryMap.addItem(
-//         SELECT,
-//         PayLoad(SINGLE, SYNONYM, std::vector<std::string>{"s1"}));
-//     expectedQueryMap.addItem(
-//         SUCHTHAT,
-//         PayLoad(PAIR, PARENT, std::vector<std::string>{"s1", "s2"}));
+TEST_CASE("QueryMap with one such that") {
+  SECTION("Parent") {
+    std::string query = "stmt s1, s2; Select s1 such that Parent(s1, s2)";
+    QueryMap expectedQueryMap;
+    expectedQueryMap.addItem(
+        DECLARATION,
+        PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        DECLARATION,
+        PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s2"}));
+    expectedQueryMap.addItem(
+        SELECT,
+        PayLoad(SINGLE, SYNONYM, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        SUCHTHAT,
+        PayLoad(PAIR, PARENT, std::vector<std::string>{"s1", "s2"}));
 
-//     QueryMap actualQueryMap = pqlParse(query);
-//     REQUIRE(expectedQueryMap == actualQueryMap);
-//   }
-// }
+    QueryMap actualQueryMap = pqlParse(query);
+    REQUIRE(expectedQueryMap == actualQueryMap);
+  }
+}
 // TODO(zs)
 TEST_CASE("QueryMap with one pattern") {}
 // TODO(zs)
