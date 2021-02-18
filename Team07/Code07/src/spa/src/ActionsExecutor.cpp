@@ -42,9 +42,15 @@ vector<proc_ref> ActionsExecutor::get_all_procedures() {
     return this->pkb_query_controller.getAllProcedures();
 }
 
+<<<<<<< HEAD
 vector<stmt_ref> ActionsExecutor::get_all_statements() {
+=======
+/*
+vector<statement> ActionsExecutor::get_all_statements() {
+>>>>>>> 372839081b00346884a1262d3ffa44ea5a87e8ce
     return this->pkb_query_controller.getAllStatements();
 }
+*/
 
 vector<stmt_ref> ActionsExecutor::get_all_statements_of_type(stmt_type type) {
     return this->pkb_query_controller.getStatementsOfType(type);

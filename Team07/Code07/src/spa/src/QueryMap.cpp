@@ -25,10 +25,10 @@ LoadType PayLoad::getType() { return type; }
 std::vector<std::string> PayLoad::getValue() { return value; }
 
 QueryMap::QueryMap() {
-  table[SELECT] = std::vector<PayLoad>();
-  table[DECLARATION] = std::vector<PayLoad>();
-  table[SUCHTHAT] = std::vector<PayLoad>();
-  table[PATTERN] = std::vector<PayLoad>();
+  table[ClauseType::SELECT] = std::vector<PayLoad>();
+  table[ClauseType::DECLARATION] = std::vector<PayLoad>();
+  table[ClauseType::SUCHTHAT] = std::vector<PayLoad>();
+  table[ClauseType::PATTERN] = std::vector<PayLoad>();
 }
 
 std::vector<PayLoad> QueryMap::getList(ClauseType key) { return table[key]; }

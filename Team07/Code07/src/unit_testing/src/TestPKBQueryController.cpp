@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
+/*
 TEST_CASE("One") {
     // SIMPLE code:
     // 0.  procedure gcd {
@@ -202,3 +203,4 @@ TEST_CASE("One") {
 
     // implement the rest in iteration/v1.3
 }
+*/

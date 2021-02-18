@@ -117,38 +117,44 @@ TEST_CASE("PQL with no such that and no pattern") {
   Select v
   */
   QueryMap query;
-  query.addItem(DECLARATION,
-                PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"v"}));
-  query.addItem(SELECT,
-                PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"v"}));
+  query.addItem(ClauseType::DECLARATION, PayLoad(SINGLE, Single::VARIABLE,
+                                     std::vector<std::string>{"v"}));
+  query.addItem(
+      ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"v"}));
 
-  REQUIRE(query.getList(DECLARATION).size() == 1);
-  REQUIRE(query.getList(SELECT).size() == 1);
-  REQUIRE(query.getList(SUCHTHAT).empty());
-  REQUIRE(query.getList(PATTERN).empty());
+  REQUIRE(query.getList(ClauseType::DECLARATION).size() == 1);
+  REQUIRE(query.getList(ClauseType::SELECT).size() == 1);
+  REQUIRE(query.getList(ClauseType::SUCHTHAT).empty());
+  REQUIRE(query.getList(ClauseType::PATTERN).empty());
 
   SECTION("Declaration clause") {
-    REQUIRE(query.getList(DECLARATION)[0] ==
+    REQUIRE(query.getList(ClauseType::DECLARATION)[0] ==
             PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"v"}));
 
-    REQUIRE_FALSE(query.getList(DECLARATION)[0] ==
-                  PayLoad(PAIR, Single::VARIABLE, std::vector<std::string>{"v"}));
-    REQUIRE_FALSE(query.getList(DECLARATION)[0] ==
-                  PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"s"}));
-    REQUIRE_FALSE(query.getList(DECLARATION)[0] ==
-                  PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    REQUIRE_FALSE(
+        query.getList(ClauseType::DECLARATION)[0] ==
+        PayLoad(PAIR, Single::VARIABLE, std::vector<std::string>{"v"}));
+    REQUIRE_FALSE(
+        query.getList(ClauseType::DECLARATION)[0] ==
+        PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"s"}));
+    REQUIRE_FALSE(
+        query.getList(ClauseType::DECLARATION)[0] ==
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
   }
 
   SECTION("Select clause") {
-    REQUIRE(query.getList(SELECT)[0] ==
+    REQUIRE(query.getList(ClauseType::SELECT)[0] ==
             PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"v"}));
 
-    REQUIRE_FALSE(query.getList(SELECT)[0] ==
-                  PayLoad(PAIR, Single::SYNONYM, std::vector<std::string>{"v"}));
-    REQUIRE_FALSE(query.getList(SELECT)[0] ==
-                  PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"v"}));
-    REQUIRE_FALSE(query.getList(SELECT)[0] ==
-                  PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s"}));
+    REQUIRE_FALSE(
+        query.getList(ClauseType::SELECT)[0] ==
+        PayLoad(PAIR, Single::SYNONYM, std::vector<std::string>{"v"}));
+    REQUIRE_FALSE(
+        query.getList(ClauseType::SELECT)[0] ==
+        PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"v"}));
+    REQUIRE_FALSE(
+        query.getList(ClauseType::SELECT)[0] ==
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s"}));
   }
 
   SECTION("Such that clause") {}
@@ -162,30 +168,31 @@ TEST_CASE("PQL with one such that") {
   Select s such that Follows* (6, s)
   */
   QueryMap query;
-  query.addItem(DECLARATION,
-                PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
-  query.addItem(SELECT,
-                PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s"}));
-  query.addItem(SUCHTHAT,
+  query.addItem(
+      ClauseType::DECLARATION,
+      PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+  query.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                            std::vector<std::string>{"s"}));
+  query.addItem(ClauseType::SUCHTHAT,
                 PayLoad(PAIR, FOLLOWST, std::vector<std::string>{"6", "s"}));
 
-  REQUIRE(query.getList(DECLARATION).size() == 1);
-  REQUIRE(query.getList(SELECT).size() == 1);
-  REQUIRE(query.getList(SUCHTHAT).size() == 1);
-  REQUIRE(query.getList(PATTERN).empty());
+  REQUIRE(query.getList(ClauseType::DECLARATION).size() == 1);
+  REQUIRE(query.getList(ClauseType::SELECT).size() == 1);
+  REQUIRE(query.getList(ClauseType::SUCHTHAT).size() == 1);
+  REQUIRE(query.getList(ClauseType::PATTERN).empty());
 
   SECTION("Declaration clause") {
-    REQUIRE(query.getList(DECLARATION)[0] ==
+    REQUIRE(query.getList(ClauseType::DECLARATION)[0] ==
             PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
   }
 
   SECTION("Select clause") {
-    REQUIRE(query.getList(SELECT)[0] ==
+    REQUIRE(query.getList(ClauseType::SELECT)[0] ==
             PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s"}));
   }
 
   SECTION("Such that clause") {
-    REQUIRE(query.getList(SUCHTHAT)[0] ==
+    REQUIRE(query.getList(ClauseType::SUCHTHAT)[0] ==
             PayLoad(PAIR, FOLLOWST, std::vector<std::string>{"6", "s"}));
   }
 
@@ -198,33 +205,33 @@ TEST_CASE("PQL with one pattern") {
   Select a pattern a (_,“count + 1”)
   */
   QueryMap query;
-  query.addItem(DECLARATION,
+  query.addItem(ClauseType::DECLARATION,
                 PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
-  query.addItem(SELECT,
-                PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}));
-  query.addItem(PATTERN,
+  query.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                            std::vector<std::string>{"a"}));
+  query.addItem(ClauseType::PATTERN,
                 PayLoad(TRIPLE, SYN_ASSIGN,
                         std::vector<std::string>{"a", "_", "count + 1"}));
 
-  REQUIRE(query.getList(DECLARATION).size() == 1);
-  REQUIRE(query.getList(SELECT).size() == 1);
-  REQUIRE(query.getList(SUCHTHAT).empty());
-  REQUIRE(query.getList(PATTERN).size() == 1);
+  REQUIRE(query.getList(ClauseType::DECLARATION).size() == 1);
+  REQUIRE(query.getList(ClauseType::SELECT).size() == 1);
+  REQUIRE(query.getList(ClauseType::SUCHTHAT).empty());
+  REQUIRE(query.getList(ClauseType::PATTERN).size() == 1);
 
   SECTION("Declaration clause") {
-    REQUIRE(query.getList(DECLARATION)[0] ==
+    REQUIRE(query.getList(ClauseType::DECLARATION)[0] ==
             PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
   }
 
   SECTION("Select clause") {
-    REQUIRE(query.getList(SELECT)[0] ==
+    REQUIRE(query.getList(ClauseType::SELECT)[0] ==
             PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}));
   }
 
   SECTION("Such that clause") {}
 
   SECTION("Pattern clause") {
-    REQUIRE(query.getList(PATTERN)[0] ==
+    REQUIRE(query.getList(ClauseType::PATTERN)[0] ==
             PayLoad(TRIPLE, SYN_ASSIGN,
                     std::vector<std::string>{"a", "_", "count + 1"}));
   }
@@ -237,41 +244,42 @@ TEST_CASE("PQL with one such that and one pattern") {
   */
 
   QueryMap query;
-  query.addItem(DECLARATION,
+  query.addItem(ClauseType::DECLARATION,
                 PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
-  query.addItem(DECLARATION,
+  query.addItem(ClauseType::DECLARATION,
                 PayLoad(SINGLE, Single::WHILE, std::vector<std::string>{"w"}));
-  query.addItem(SELECT,
-                PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"w"}));
-  query.addItem(SUCHTHAT,
+  query.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                            std::vector<std::string>{"w"}));
+  query.addItem(ClauseType::SUCHTHAT,
                 PayLoad(PAIR, PARENTT, std::vector<std::string>{"w", "a"}));
-  query.addItem(PATTERN, PayLoad(TRIPLE, SYN_ASSIGN,
-                                 std::vector<std::string>{"a", "count", "_"}));
+  query.addItem(
+      ClauseType::PATTERN,
+      PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "count", "_"}));
 
-  REQUIRE(query.getList(SELECT).size() == 1);
-  REQUIRE(query.getList(DECLARATION).size() == 2);
-  REQUIRE(query.getList(SUCHTHAT).size() == 1);
-  REQUIRE(query.getList(PATTERN).size() == 1);
+  REQUIRE(query.getList(ClauseType::SELECT).size() == 1);
+  REQUIRE(query.getList(ClauseType::DECLARATION).size() == 2);
+  REQUIRE(query.getList(ClauseType::SUCHTHAT).size() == 1);
+  REQUIRE(query.getList(ClauseType::PATTERN).size() == 1);
 
   SECTION("Declaration clause") {
-    REQUIRE(query.getList(DECLARATION)[0] ==
+    REQUIRE(query.getList(ClauseType::DECLARATION)[0] ==
             PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
-    REQUIRE(query.getList(DECLARATION)[1] ==
+    REQUIRE(query.getList(ClauseType::DECLARATION)[1] ==
             PayLoad(SINGLE, Single::WHILE, std::vector<std::string>{"w"}));
   }
 
   SECTION("Select clause") {
-    REQUIRE(query.getList(SELECT)[0] ==
+    REQUIRE(query.getList(ClauseType::SELECT)[0] ==
             PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"w"}));
   }
 
   SECTION("Such that clause") {
-    REQUIRE(query.getList(SUCHTHAT)[0] ==
+    REQUIRE(query.getList(ClauseType::SUCHTHAT)[0] ==
             PayLoad(PAIR, PARENTT, std::vector<std::string>{"w", "a"}));
   }
 
   SECTION("Pattern clause") {
-    REQUIRE(query.getList(PATTERN)[0] ==
+    REQUIRE(query.getList(ClauseType::PATTERN)[0] ==
             PayLoad(TRIPLE, SYN_ASSIGN,
                     std::vector<std::string>{"a", "count", "_"}));
   }
