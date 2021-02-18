@@ -403,8 +403,6 @@ TEST_CASE("one such that Modifies") {
         PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s1", "\"x\""}));
 
     QueryMap actualQueryMap = pqlParse(query);
-    std::cout << actualQueryMap.getList(SUCHTHAT)[0].getValue()[1] << std::endl;
-
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
