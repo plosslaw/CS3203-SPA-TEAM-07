@@ -209,12 +209,11 @@ std::vector<PayLoad> select_cl(State &state) {
   }
 }
 
-PayLoad suchthat(State &state, std::string relation_ref, Pair load_type) {
+PayLoad parent(State &state) {
+  std::vector<std::string> values;
   State so(state);
   try {
-    std::vector<std::string> values;
-
-    stringMatch(state, relation_ref);
+    stringMatch(state, "Parent");
     whitespace(state);
 
     stringMatch(state, "(");
@@ -232,12 +231,21 @@ PayLoad suchthat(State &state, std::string relation_ref, Pair load_type) {
     stringMatch(state, ")");
     whitespace(state);
 
-    so.assign(state);
-    return PayLoad(PAIR, load_type, values);
+    return PayLoad(PAIR, PARENT, values);
   } catch (ParseException &e) {
-    State so1(state);
     state.assign(so);
-    state.excps.push_back(e);
+    throw ParseException(so.i, state.i, "parent", "");
+  }
+}
+
+PayLoad suchthat(State &state, std::string relation_ref, Pair load_type) {
+  State so(state);
+  try {
+    PayLoad parent_st = parent(state);
+    so.assign(state);
+    return parent_st;
+  } catch (ParseException &e) {
+    state.assign(so);
     throw ParseException(so.i, state.i, "suchthat", "");
   }
 }
@@ -251,7 +259,11 @@ std::vector<PayLoad> suchthat_cl(State &state) {
   try {
     stringMatch(state, "such that");
     whitespace(state);
-    suchthats.push_back(suchthat(state, "Parent", PARENT));
+    try {
+      suchthats.push_back(suchthat(state, "Parent", PARENT));
+    } catch (ParseException &e) {
+      state.assign(so);
+    }
 
     return suchthats;
   } catch (ParseException &e) {
