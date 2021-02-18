@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "PKB.H"
+#include "PKB.h"
 #include "PKBQueryController.cpp"
 #include "PKBEntities.hpp"
 #include "Types.hpp"
