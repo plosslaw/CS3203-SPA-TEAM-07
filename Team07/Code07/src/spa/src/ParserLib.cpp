@@ -1,4 +1,5 @@
 #include <limits>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <cctype>
@@ -47,7 +48,45 @@ const char* ParseException::what() const throw()
 	return str.c_str();
 }
 
-std::string prettyPrintException(State &s) {
+std::string prettyPrintValidation(std::string *str, int pos, std::string msg) {
+	std::string strv = *str;
+	std::vector<char> linebuilder;
+	bool atLine = false;
+	int lineNum = 0;
+	int colBegin = -1;
+	for (int i = 0; i < strv.length(); i++) {
+		char c = strv.at(i);
+		if(i == pos) {
+			atLine = true;
+		}
+		if (c == '\n') {
+			if (atLine) {
+				break;
+			} else {
+				lineNum++;
+				colBegin = i;
+				linebuilder.clear();
+			}
+		} else {
+			linebuilder.push_back(c);
+		}
+	}
+	std::string linestrvalue(linebuilder.begin(), linebuilder.end());
+	int colNum = pos - colBegin;
+	// calculate line and col from pos
+	
+	std::string outputstr("ValidationError");
+	outputstr += " at line " + std::to_string(lineNum + 1) + " col " + std::to_string(colNum) + "\n\n";
+	std::string preoutput = "  " + std::to_string(lineNum + 1) + "|  " ;
+	outputstr += preoutput + linestrvalue + "\n";
+	std::string whitespaceprefix = std::string(preoutput.length() + colNum - 1, ' ');
+	outputstr += whitespaceprefix + "^\n";
+	outputstr += "  " + msg + "\n";
+	return outputstr;
+	// pretty print
+}
+
+std::string prettyPrintException(State &s, bool show_stack) {
 	std::string *str = s.source;
 	std::vector<ParseException> e = s.excps;
 	int at = e[0].at;
@@ -96,21 +135,32 @@ std::string prettyPrintException(State &s) {
 			}
 		}
 	}
+	if(at == strv.size()) {
+		atLine = curLine;
+		atCol = strv.size() - prevLineLength - 1;
+	}
+	for(int i = 0; i < fs.size(); i++) {
+		if (fs[i] == strv.size()) {
+			fromLine[i] = curLine;
+			fromCol[i] = strv.size() - prevLineLength - 1;
+		}
+	}
 	linelengths.push_back(curLineLength);
 	std::string linestrvalue(linebuilder.begin(), linebuilder.end());
 	linestr.push_back(linestrvalue);
 	// calculate from line cols and line strings
 
-	std::string outputstr = "";
-	outputstr += "ParseException\n\n";
+	std::string outputstr("ParseError");
+	outputstr += " at line " + std::to_string(atLine + 1) + " col " + std::to_string(atCol + 1) + "\n\n";
 	std::string preoutput = "  " + std::to_string(atLine + 1) + "|  " ;
 	outputstr += preoutput + linestr[atLine] + "\n";
 	std::string whitespaceprefix = std::string(preoutput.length() + atCol, ' ');
 	outputstr += whitespaceprefix + "^\n";
-	outputstr += "  at line " + std::to_string(atLine + 1) + " col " + std::to_string(atCol + 1) + "\n";
-	for(int i = 0; i < fromLine.size(); i++) {
-		outputstr += "  " + es[i] + "\n";
-		outputstr += "    from line " + std::to_string(fromLine[i] + 1) + " col " + std::to_string(fromCol[i] + 1) + "\n";
+	if(show_stack) {
+		for(int i = 0; i < fromLine.size(); i++) {
+			outputstr += "  " + es[i] + "\n";
+			outputstr += "    from line " + std::to_string(fromLine[i] + 1) + " col " + std::to_string(fromCol[i] + 1) + "\n";
+		}
 	}
 	// generate pretty output
   return outputstr;
@@ -119,32 +169,41 @@ std::string prettyPrintException(State &s) {
 // combinators ----------------------------------------------------------------
 
 std::string stringMatch(State &s, std::string str) {
-	for (int j = 0; j < str.size(); j++) {
-		int ii = s.i + j;
-		if (ii >= (*s.source).size() || (*s.source).at(ii) != str.at(j)) {
-			int init = s.i;
-			s.i += j;
-			throw ParseException(init, s.i, "stringMatch", str);
+	int init = s.i;
+	try {
+		for (int j = 0; j < str.size(); j++) {
+			if ((*s.source).at(s.i + j) != str.at(j)) {
+				s.i += j;
+				throw ParseException(init, s.i, "stringMatch", str);
+			}
 		}
+		s.i += str.size();
+		return str;
+	} catch(std::out_of_range &e) {
+		s.i = (*s.source).size();
+		throw ParseException(init, s.i, "stringMatch", str);
 	}
-	s.i += str.size();
-	return str;
 }
 
 char charPredicate(State &s, bool (*pred)(char), std::string errorName) {
-	char c = (*s.source).at(s.i);
-	if (pred(c)) {
-		s.i += 1;
-	} else {
+	try {
+		char c = (*s.source).at(s.i);
+		if (pred(c)) {
+			s.i += 1;
+		} else {
+			throw ParseException(s.i, s.i, "charPredicate", errorName);
+		}
+		return c;
+	} catch (std::out_of_range &e) {
+		s.i = (*s.source).size();
 		throw ParseException(s.i, s.i, "charPredicate", errorName);
 	}
-	return c;
 }
 
 std::string stringPredicate(State &s, bool (*pred)(char), std::string errorName) {
 	std::vector<char> cs;
 	State so(s);
-	while(s.i < (*s.source).size()) {
+	while(true) {
 		try {
 			cs.push_back(charPredicate(s, pred, errorName));
 			so.assign(s);
@@ -162,23 +221,23 @@ std::string whitespace(State &s) {
 }
 
 std::string upper(State &s) {
-	return stringPredicate(s, &upperPred, "whitespace");
+	return stringPredicate(s, &upperPred, "upper");
 }
 
 std::string lower(State &s) {
-	return stringPredicate(s, &lowerPred, "whitespace");
+	return stringPredicate(s, &lowerPred, "lower");
 }
 
 std::string alpha(State &s) {
-	return stringPredicate(s, &alphaPred, "whitespace");
+	return stringPredicate(s, &alphaPred, "alpha");
 }
 
 std::string digit(State &s) {
-	return stringPredicate(s, &digitPred, "whitespace");
+	return stringPredicate(s, &digitPred, "digit");
 }
 
 std::string alphaNum(State &s) {
-	return stringPredicate(s, &alphanumPred, "whitespace");
+	return stringPredicate(s, &alphanumPred, "alphaNum");
 }
 
 // predicates -----------------------------------------------------------------
