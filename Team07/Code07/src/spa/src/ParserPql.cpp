@@ -14,6 +14,22 @@ std::string wildcard(State &state) {
   }
 }
 
+std::string double_quote_ident(State &state) {
+  State so(state);
+  try {
+    stringMatch(state, "\"");
+    whitespace(state);
+    std::string val = ident(state);
+    whitespace(state);
+    stringMatch(state, "\"");
+
+    so.assign(state);
+    return "\"" + val + "\"";
+  } catch (ParseException &e) {
+    throw ParseException(so.i, state.i, "wildcard", "");
+  }
+}
+
 // stmtRef: synonym | ‘_’ | INTEGER
 std::string stmt_ref(State &state) {
   State so(state);
@@ -47,10 +63,7 @@ std::string ent_ref(State &state) {
     } catch (ParseException &e) {
       state.assign(so);
       try {
-        stringMatch(state, "\"");
-        std::string val = ident(state);
-        stringMatch(state, "\"");
-        return val;
+        return double_quote_ident(state);
       } catch (ParseException &e) {
         state.assign(so);
         throw ParseException(so.i, state.i, "ent_ref", "");
