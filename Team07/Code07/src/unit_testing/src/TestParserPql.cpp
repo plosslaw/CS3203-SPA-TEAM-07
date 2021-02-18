@@ -390,7 +390,7 @@ TEST_CASE("one such that Modifies") {
   // TODO(zs)
   SECTION("synonym and wildcard") {}
 
-  SECTION("synonym and \"idnet\" ") {
+  SECTION("synonym and \"idnet\"") {
     std::string query = "stmt s1; Select s1 such that Modifies(s1, \"x\")";
     QueryMap expectedQueryMap;
     expectedQueryMap.addItem(
@@ -471,6 +471,53 @@ TEST_CASE("one such that Uses") {
 }
 
 // TODO(zs)
-TEST_CASE("QueryMap with one pattern") {}
+TEST_CASE("one pattern syn_assign, ent_ref and expr_spec ") {
+  SECTION("synonym and _factor_") {
+    std::string query = "stmt s; assign a; Select a pattern a(s, _var_)";
+    QueryMap expectedQueryMap;
+    expectedQueryMap.addItem(
+        DECLARATION, PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s"}));
+    expectedQueryMap.addItem(
+        DECLARATION, PayLoad(SINGLE, ASSIGN, std::vector<std::string>{"a"}));
+    expectedQueryMap.addItem(
+        SELECT, PayLoad(SINGLE, SYNONYM, std::vector<std::string>{"a"}));
+    expectedQueryMap.addItem(
+        PATTERN, PayLoad(TRIPLE, SYN_ASSIGN,
+                         std::vector<std::string>{"a", "s", "_var_"}));
+
+    QueryMap actualQueryMap = pqlParse(query);
+    REQUIRE(expectedQueryMap == actualQueryMap);
+  }
+
+  SECTION("synonym and _") {
+    std::string query = "stmt s; assign a; Select a pattern a(s, _)";
+    QueryMap expectedQueryMap;
+    expectedQueryMap.addItem(
+        DECLARATION, PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s"}));
+    expectedQueryMap.addItem(
+        DECLARATION, PayLoad(SINGLE, ASSIGN, std::vector<std::string>{"a"}));
+    expectedQueryMap.addItem(
+        SELECT, PayLoad(SINGLE, SYNONYM, std::vector<std::string>{"a"}));
+    expectedQueryMap.addItem(
+        PATTERN,
+        PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "s", "_"}));
+
+    QueryMap actualQueryMap = pqlParse(query);
+    REQUIRE(expectedQueryMap == actualQueryMap);
+  }
+
+  // TODO(zs)
+  SECTION("_ and _factor_") {}
+
+  // TODO(zs)
+  SECTION("_ and _") {}
+
+  // TODO(zs)
+  SECTION("ident and _factor_") {}
+
+  // TODO(zs)
+  SECTION("ident and _") {}
+}
+
 // TODO(zs)
 TEST_CASE("QueryMap with one such that and one pattern") {}

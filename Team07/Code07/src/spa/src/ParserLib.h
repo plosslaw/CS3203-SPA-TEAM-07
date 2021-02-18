@@ -53,6 +53,10 @@ bool digitPred(char c);
 std::string digit(State &s);
 bool alphanumPred(char c);
 std::string alphaNum(State &s);
+bool double_quotes_pred(char c);
+std::string double_quotes(State &s);
+// bool wildcard_pred(char c);
+// std::string wildcard(State &s);
 
 std::string name(State &s);
 std::string ident(State &s);
