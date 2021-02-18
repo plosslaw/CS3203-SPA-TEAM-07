@@ -7,7 +7,7 @@
 
 using namespace std;
 
-string name(State &s);
+// string name(State &s);
 TNode program(State &s);
 TNode procedure(State &s);
 TNode stmtLst(State &s);

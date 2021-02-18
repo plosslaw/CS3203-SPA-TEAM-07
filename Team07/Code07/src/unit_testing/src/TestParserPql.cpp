@@ -1,4 +1,5 @@
 #include "../../../lib/catch.hpp"
+#include "../../spa/src/ParserLib.h"
 #include "../../spa/src/ParserPql.h"
 #include <iostream>
 #include <vector>

@@ -3,19 +3,6 @@
 #include <iostream>
 #include <vector>
 
-std::string ident(State &state) {
-  int init = state.i;
-  try {
-    char r1 = charPredicate(state, &alphaPred, "letter"); // letter
-    std::string r2 = alphaNum(state); // (letter | digit)*
-    r2.insert(r2.begin(), r1);
-    return r2;
-  } catch (ParseException &e) {
-    state.excps.push_back(e);
-    throw ParseException(init, state.i, "ident", "");
-  }
-}
-
 PayLoad declaration(State &state, std::string design_entity, Single load_type) {
   State so(state);
   try {
@@ -23,8 +10,7 @@ PayLoad declaration(State &state, std::string design_entity, Single load_type) {
     whitespace(state);
 
     std::vector<std::string> values;
-    std::string synonym = ident(state);
-    values.push_back(synonym);
+    values.push_back(synonym(state));
     whitespace(state);
 
     so.assign(state);
@@ -164,8 +150,7 @@ PayLoad select(State &state, Single load_type) {
     whitespace(state);
 
     std::vector<std::string> values;
-    std::string synonym = ident(state);
-    values.push_back(synonym);
+    values.push_back(synonym(state));
     whitespace(state);
 
     so.assign(state);
@@ -189,7 +174,6 @@ std::vector<PayLoad> select_cl(State &state) {
     throw ParseException(so.i, state.i, "select_cl", "");
   }
 }
-// TODO(zs)
 std::vector<PayLoad> suchthat_cl(State &state) {
   // suchthat-cl : ‘such that’ relRef
   // relRef : Follows | FollowsT | Parent | ParentT | UsesS | UsesP | ModifiesS
@@ -199,8 +183,6 @@ std::vector<PayLoad> suchthat_cl(State &state) {
   try {
     stringMatch(state, "such that");
     whitespace(state);
-
-    // suchthat_cl
 
     return suchthats;
   } catch (ParseException &e) {

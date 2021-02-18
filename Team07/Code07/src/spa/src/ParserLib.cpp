@@ -1,208 +1,245 @@
+#include "ParserLib.h"
+#include <cctype>
 #include <limits>
 #include <string>
 #include <vector>
-#include <cctype>
-#include "ParserLib.h"
 
 // class definitions ----------------------------------------------------------
 
 State::State(std::string *str) {
-	i = 0;
-	source = str;
-	curStmtNum = 1;
-	excps.clear();
+  i = 0;
+  source = str;
+  curStmtNum = 1;
+  excps.clear();
 }
 State::State(State &s) {
-	i = s.i;
-	source = s.source;
-	curStmtNum = s.curStmtNum;
-	excps = s.excps;
+  i = s.i;
+  source = s.source;
+  curStmtNum = s.curStmtNum;
+  excps = s.excps;
 }
-int State::advCurStmtNum() {
-	return curStmtNum++;
-}
-std::string State::toString() {
-	return "{ i: " + std::to_string(i) + " }";
-}
+int State::advCurStmtNum() { return curStmtNum++; }
+std::string State::toString() { return "{ i: " + std::to_string(i) + " }"; }
 void State::assign(State &s) {
-	i = s.i;
-	source = s.source;
-	curStmtNum = s.curStmtNum;
-	excps = s.excps;
+  i = s.i;
+  source = s.source;
+  curStmtNum = s.curStmtNum;
+  excps = s.excps;
 }
 
 ParseException::ParseException(int f, int a, std::string s, std::string ar) {
-	from = f;
-	at = a;
-	subparser = s;
-	args = ar;
+  from = f;
+  at = a;
+  subparser = s;
+  args = ar;
 }
 
 std::string ParseException::errorMessage() {
-	return subparser + "(" + args + ") : ";
+  return subparser + "(" + args + ") : ";
 }
-const char* ParseException::what() const throw()
-{
-	static std::string str("ParseException : " + subparser);
-	return str.c_str();
+const char *ParseException::what() const throw() {
+  static std::string str("ParseException : " + subparser);
+  return str.c_str();
 }
 
 std::string prettyPrintException(State &s) {
-	std::string *str = s.source;
-	std::vector<ParseException> e = s.excps;
-	int at = e[0].at;
+  std::string *str = s.source;
+  std::vector<ParseException> e = s.excps;
+  int at = e[0].at;
 
-	std::vector<int> fs;
-	std::vector<std::string> es;
-	for(int i = 0; i < e.size(); i++) {
-		fs.push_back(e[i].from);
-		es.push_back(e[i].errorMessage());
-	}
-	std::vector<int> fromLine(fs.size());
-	std::vector<int> fromCol(fs.size());
+  std::vector<int> fs;
+  std::vector<std::string> es;
+  for (int i = 0; i < e.size(); i++) {
+    fs.push_back(e[i].from);
+    es.push_back(e[i].errorMessage());
+  }
+  std::vector<int> fromLine(fs.size());
+  std::vector<int> fromCol(fs.size());
 
-	std::vector<int> linelengths;
-	std::vector<std::string> linestr;
-	std::vector<char> linebuilder;
-	
-	int curLineLength = 0;
-	int prevLineLength = 0;
-	int curLine = 0;
-	int atLine = 0;
-	int atCol = 0;
+  std::vector<int> linelengths;
+  std::vector<std::string> linestr;
+  std::vector<char> linebuilder;
 
-	std::string strv = *str;
-	for(int i = 0 ; i < strv.length(); i++) {
-		char c = strv.at(i);
-		curLineLength++;
-		if(c == '\n') {
-			linelengths.push_back(curLineLength);
-			std::string linestrvalue(linebuilder.begin(), linebuilder.end());
-			linestr.push_back(linestrvalue);
-			linebuilder.clear();
-			curLine++;
-			prevLineLength = curLineLength;
-		} else {
-			linebuilder.push_back(c);
-		}
-		if(i == at) {
-			atLine = curLine;
-			atCol = curLineLength - prevLineLength - 1;
-		}
-		for(int j = 0; j < fs.size(); j++) {
-			if(i == fs[j]) {
-				fromLine[j] = curLine;
-				fromCol[j] = curLineLength - prevLineLength - 1;
-			}
-		}
-	}
-	linelengths.push_back(curLineLength);
-	std::string linestrvalue(linebuilder.begin(), linebuilder.end());
-	linestr.push_back(linestrvalue);
-	// calculate from line cols and line strings
+  int curLineLength = 0;
+  int prevLineLength = 0;
+  int curLine = 0;
+  int atLine = 0;
+  int atCol = 0;
 
-	std::string outputstr = "";
-	outputstr += "ParseException\n\n";
-	std::string preoutput = "  " + std::to_string(atLine + 1) + "|  " ;
-	outputstr += preoutput + linestr[atLine] + "\n";
-	std::string whitespaceprefix = std::string(preoutput.length() + atCol, ' ');
-	outputstr += whitespaceprefix + "^\n";
-	outputstr += "  at line " + std::to_string(atLine + 1) + " col " + std::to_string(atCol + 1) + "\n";
-	for(int i = 0; i < fromLine.size(); i++) {
-		outputstr += "  " + es[i] + "\n";
-		outputstr += "    from line " + std::to_string(fromLine[i] + 1) + " col " + std::to_string(fromCol[i] + 1) + "\n";
-	}
-	// generate pretty output
+  std::string strv = *str;
+  for (int i = 0; i < strv.length(); i++) {
+    char c = strv.at(i);
+    curLineLength++;
+    if (c == '\n') {
+      linelengths.push_back(curLineLength);
+      std::string linestrvalue(linebuilder.begin(), linebuilder.end());
+      linestr.push_back(linestrvalue);
+      linebuilder.clear();
+      curLine++;
+      prevLineLength = curLineLength;
+    } else {
+      linebuilder.push_back(c);
+    }
+    if (i == at) {
+      atLine = curLine;
+      atCol = curLineLength - prevLineLength - 1;
+    }
+    for (int j = 0; j < fs.size(); j++) {
+      if (i == fs[j]) {
+        fromLine[j] = curLine;
+        fromCol[j] = curLineLength - prevLineLength - 1;
+      }
+    }
+  }
+  linelengths.push_back(curLineLength);
+  std::string linestrvalue(linebuilder.begin(), linebuilder.end());
+  linestr.push_back(linestrvalue);
+  // calculate from line cols and line strings
+
+  std::string outputstr = "";
+  outputstr += "ParseException\n\n";
+  std::string preoutput = "  " + std::to_string(atLine + 1) + "|  ";
+  outputstr += preoutput + linestr[atLine] + "\n";
+  std::string whitespaceprefix = std::string(preoutput.length() + atCol, ' ');
+  outputstr += whitespaceprefix + "^\n";
+  outputstr += "  at line " + std::to_string(atLine + 1) + " col " +
+               std::to_string(atCol + 1) + "\n";
+  for (int i = 0; i < fromLine.size(); i++) {
+    outputstr += "  " + es[i] + "\n";
+    outputstr += "    from line " + std::to_string(fromLine[i] + 1) + " col " +
+                 std::to_string(fromCol[i] + 1) + "\n";
+  }
+  // generate pretty output
   return outputstr;
 }
 
 // combinators ----------------------------------------------------------------
 
 std::string stringMatch(State &s, std::string str) {
-	for (int j = 0; j < str.size(); j++) {
-		int ii = s.i + j;
-		if (ii >= (*s.source).size() || (*s.source).at(ii) != str.at(j)) {
-			int init = s.i;
-			s.i += j;
-			throw ParseException(init, s.i, "stringMatch", str);
-		}
-	}
-	s.i += str.size();
-	return str;
+  for (int j = 0; j < str.size(); j++) {
+    int ii = s.i + j;
+    if (ii >= (*s.source).size() || (*s.source).at(ii) != str.at(j)) {
+      int init = s.i;
+      s.i += j;
+      throw ParseException(init, s.i, "stringMatch", str);
+    }
+  }
+  s.i += str.size();
+  return str;
 }
 
 char charPredicate(State &s, bool (*pred)(char), std::string errorName) {
-	char c = (*s.source).at(s.i);
-	if (pred(c)) {
-		s.i += 1;
-	} else {
-		throw ParseException(s.i, s.i, "charPredicate", errorName);
-	}
-	return c;
+  char c = (*s.source).at(s.i);
+  if (pred(c)) {
+    s.i += 1;
+  } else {
+    throw ParseException(s.i, s.i, "charPredicate", errorName);
+  }
+  return c;
 }
 
-std::string stringPredicate(State &s, bool (*pred)(char), std::string errorName) {
-	std::vector<char> cs;
-	State so(s);
-	while(s.i < (*s.source).size()) {
-		try {
-			cs.push_back(charPredicate(s, pred, errorName));
-			so.assign(s);
-		} catch(ParseException &e) {
-			s.assign(so);
-			break;
-		}
-	}
-	std::string str(cs.begin(), cs.end());
-	return str;
+std::string stringPredicate(State &s, bool (*pred)(char),
+                            std::string errorName) {
+  std::vector<char> cs;
+  State so(s);
+  while (s.i < (*s.source).size()) {
+    try {
+      cs.push_back(charPredicate(s, pred, errorName));
+      so.assign(s);
+    } catch (ParseException &e) {
+      s.assign(so);
+      break;
+    }
+  }
+  std::string str(cs.begin(), cs.end());
+  return str;
 }
 
 std::string whitespace(State &s) {
-	return stringPredicate(s, &whitespacePred, "whitespace");
+  return stringPredicate(s, &whitespacePred, "whitespace");
 }
 
 std::string upper(State &s) {
-	return stringPredicate(s, &upperPred, "whitespace");
+  return stringPredicate(s, &upperPred, "whitespace");
 }
 
 std::string lower(State &s) {
-	return stringPredicate(s, &lowerPred, "whitespace");
+  return stringPredicate(s, &lowerPred, "whitespace");
 }
 
 std::string alpha(State &s) {
-	return stringPredicate(s, &alphaPred, "whitespace");
+  return stringPredicate(s, &alphaPred, "whitespace");
 }
 
 std::string digit(State &s) {
-	return stringPredicate(s, &digitPred, "whitespace");
+  return stringPredicate(s, &digitPred, "whitespace");
 }
 
 std::string alphaNum(State &s) {
-	return stringPredicate(s, &alphanumPred, "whitespace");
+  return stringPredicate(s, &alphanumPred, "whitespace");
 }
 
 // predicates -----------------------------------------------------------------
 
-bool whitespacePred(char c) {
-	return std::isspace(c);	
+bool whitespacePred(char c) { return std::isspace(c); }
+
+bool upperPred(char c) { return std::isupper(c); }
+
+bool lowerPred(char c) { return std::islower(c); }
+
+bool alphaPred(char c) { return std::isalpha(c); }
+
+bool digitPred(char c) { return std::isdigit(c); }
+
+bool alphanumPred(char c) { return std::isalnum(c); }
+
+// Low level abstractions
+// -----------------------------------------------------------------
+/** name :- letter (letter | digit)* */
+std::string name(State &s) {
+  int init = s.i;
+  try {
+    char r1 = charPredicate(s, &alphaPred, "letter");
+    // :- letter
+    std::string r2 = alphaNum(s);
+    // :- (letter | digit)*
+    r2.insert(r2.begin(), r1);
+    return r2;
+  } catch (ParseException &e) {
+    s.excps.push_back(e);
+    throw ParseException(init, s.i, "name", "");
+  }
 }
 
-bool upperPred(char c) {
-	return std::isupper(c);
+// IDENT: LETTER (LETTER | DIGIT)*
+std::string ident(State &state) {
+  int init = state.i;
+  try {
+    char r1 = charPredicate(state, &alphaPred, "letter"); // letter
+    std::string r2 = alphaNum(state);                     // (letter | digit)*
+    r2.insert(r2.begin(), r1);
+    return r2;
+  } catch (ParseException &e) {
+    state.excps.push_back(e);
+    throw ParseException(init, state.i, "ident", "");
+  }
 }
 
-bool lowerPred(char c) {
-	return std::islower(c);
+/** integer :- digit digit* */
+std::string integer(State &s) {
+  int init = s.i;
+  try {
+    char r1 = charPredicate(s, &digitPred, "digit");
+    // :- digit
+    std::string r2 = digit(s);
+    // :- digit*
+    r2.insert(r2.begin(), r1);
+    return r2;
+  } catch (ParseException &e) {
+    s.excps.push_back(e);
+    throw ParseException(init, s.i, "integer", "");
+  }
 }
 
-bool alphaPred(char c) {
-	return std::isalpha(c);
-}
-
-bool digitPred(char c) {
-	return std::isdigit(c);
-}
-
-bool alphanumPred(char c) {
-	return std::isalnum(c);
-}
+// synonym: IDENT
+std::string synonym(State &state) { return ident(state); }
