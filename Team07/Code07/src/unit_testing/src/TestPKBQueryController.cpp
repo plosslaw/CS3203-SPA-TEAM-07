@@ -29,7 +29,8 @@ TEST_CASE("One") {
     std::unordered_set<var_ref> uses1;
     std::unordered_set<var_ref> modifies1;
     proc_ref reference1 = "gcd";
-    procedure one = {reference1, children1, uses1, modifies1};
+    TNode ast1;
+    procedure one = {reference1, ast1, children1, uses1, modifies1};
     procedures.insert(std::make_pair(reference1, one));
 
     //line 2
