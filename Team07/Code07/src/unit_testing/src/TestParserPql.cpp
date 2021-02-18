@@ -150,9 +150,8 @@ TEST_CASE("QueryMap repeated declaration with no such that and no pattern") {
   }
 }
 
-// TODO(zs)
-TEST_CASE("QueryMap with one such that") {
-  SECTION("Parent") {
+TEST_CASE("one such that Parent") {
+  SECTION("synonym and synonym") {
     std::string query = "stmt s1, s2; Select s1 such that Parent(s1, s2)";
     QueryMap expectedQueryMap;
     expectedQueryMap.addItem(
@@ -170,7 +169,70 @@ TEST_CASE("QueryMap with one such that") {
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
-  SECTION("Parent*") {
+  SECTION("synonym and wildcard") {
+    std::string query = "stmt s1; Select s1 such that Parent(s1, _)";
+    QueryMap expectedQueryMap;
+    expectedQueryMap.addItem(
+        DECLARATION,
+        PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        SELECT, PayLoad(SINGLE, SYNONYM, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        SUCHTHAT, PayLoad(PAIR, PARENT, std::vector<std::string>{"s1", "_"}));
+
+    QueryMap actualQueryMap = pqlParse(query);
+    REQUIRE(expectedQueryMap == actualQueryMap);
+  }
+
+  SECTION("synonym and integer") {
+    std::string query = "stmt s1; Select s1 such that Parent(s1, 1)";
+    QueryMap expectedQueryMap;
+    expectedQueryMap.addItem(
+        DECLARATION,
+        PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        SELECT, PayLoad(SINGLE, SYNONYM, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        SUCHTHAT, PayLoad(PAIR, PARENT, std::vector<std::string>{"s1", "1"}));
+
+    QueryMap actualQueryMap = pqlParse(query);
+    REQUIRE(expectedQueryMap == actualQueryMap);
+  }
+
+  // TODO(zs)
+  SECTION("wildcard and synonym") {}
+
+  // TODO(zs)
+  SECTION("wildcard and wildcard") {}
+
+  // TODO(zs)
+  SECTION("wildcard and integer") {}
+
+  SECTION("integer and synonym") {
+    std::string query = "stmt s1; Select s1 such that Parent(1, s1)";
+    QueryMap expectedQueryMap;
+    expectedQueryMap.addItem(
+        DECLARATION,
+        PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        SELECT, PayLoad(SINGLE, SYNONYM, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        SUCHTHAT, PayLoad(PAIR, PARENT, std::vector<std::string>{"1", "s1"}));
+
+    QueryMap actualQueryMap = pqlParse(query);
+    REQUIRE(expectedQueryMap == actualQueryMap);
+  }
+
+  // TODO(zs)
+  SECTION("integer and wildcard") {}
+
+  // TODO(zs)
+  SECTION("integer and integer") {}
+}
+
+TEST_CASE("one such that Parent*") {
+
+  SECTION("synonym and synonym") {
     std::string query = "stmt s1, s2; Select s1 such that Parent*(s1, s2)";
     QueryMap expectedQueryMap;
     expectedQueryMap.addItem(
@@ -188,7 +250,34 @@ TEST_CASE("QueryMap with one such that") {
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
-  SECTION("Follows") {
+  // TODO(zs)
+  SECTION("synonym and wildcard") {}
+
+  // TODO(zs)
+  SECTION("synonym and integer") {}
+
+  // TODO(zs)
+  SECTION("wildcard and synonym") {}
+
+  // TODO(zs)
+  SECTION("wildcard and wildcard") {}
+
+  // TODO(zs)
+  SECTION("wildcard and integer") {}
+
+  // TODO(zs)
+  SECTION("integer and synonym") {}
+
+  // TODO(zs)
+  SECTION("integer and wildcard") {}
+
+  // TODO(zs)
+  SECTION("integer and integer") {}
+}
+
+TEST_CASE("one such that Follows") {
+
+  SECTION("synonym and synonym") {
     std::string query = "stmt s1, s2; Select s1 such that Follows(s1, s2)";
     QueryMap expectedQueryMap;
     expectedQueryMap.addItem(
@@ -206,7 +295,34 @@ TEST_CASE("QueryMap with one such that") {
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
-  SECTION("Follows*") {
+  // TODO(zs)
+  SECTION("synonym and wildcard") {}
+
+  // TODO(zs)
+  SECTION("synonym and integer") {}
+
+  // TODO(zs)
+  SECTION("wildcard and synonym") {}
+
+  // TODO(zs)
+  SECTION("wildcard and wildcard") {}
+
+  // TODO(zs)
+  SECTION("wildcard and integer") {}
+
+  // TODO(zs)
+  SECTION("integer and synonym") {}
+
+  // TODO(zs)
+  SECTION("integer and wildcard") {}
+
+  // TODO(zs)
+  SECTION("integer and integer") {}
+}
+
+TEST_CASE("one such that Follows*") {
+
+  SECTION("synonym and synonym") {
     std::string query = "stmt s1, s2; Select s1 such that Follows*(s1, s2)";
     QueryMap expectedQueryMap;
     expectedQueryMap.addItem(
@@ -225,7 +341,34 @@ TEST_CASE("QueryMap with one such that") {
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
-  SECTION("Modifies") {
+  // TODO(zs)
+  SECTION("synonym and wildcard") {}
+
+  // TODO(zs)
+  SECTION("synonym and integer") {}
+
+  // TODO(zs)
+  SECTION("wildcard and synonym") {}
+
+  // TODO(zs)
+  SECTION("wildcard and wildcard") {}
+
+  // TODO(zs)
+  SECTION("wildcard and integer") {}
+
+  // TODO(zs)
+  SECTION("integer and synonym") {}
+
+  // TODO(zs)
+  SECTION("integer and wildcard") {}
+
+  // TODO(zs)
+  SECTION("integer and integer") {}
+}
+
+TEST_CASE("one such that Modifies") {
+
+  SECTION("synonym and synonym") {
     std::string query = "stmt s1, s2; Select s1 such that Modifies(s1, s2)";
     QueryMap expectedQueryMap;
     expectedQueryMap.addItem(
@@ -244,7 +387,49 @@ TEST_CASE("QueryMap with one such that") {
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
-  SECTION("Uses") {
+  // TODO(zs)
+  SECTION("synonym and wildcard") {}
+
+  SECTION("synonym and \"idnet\" ") {
+    std::string query = "stmt s1; Select s1 such that Modifies(s1, \"x\")";
+    QueryMap expectedQueryMap;
+    expectedQueryMap.addItem(
+        DECLARATION,
+        PayLoad(SINGLE, STATEMENT, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        SELECT, PayLoad(SINGLE, SYNONYM, std::vector<std::string>{"s1"}));
+    expectedQueryMap.addItem(
+        SUCHTHAT,
+        PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s1", "\"x\""}));
+
+    QueryMap actualQueryMap = pqlParse(query);
+    std::cout << actualQueryMap.getList(SUCHTHAT)[0].getValue()[1] << std::endl;
+
+    REQUIRE(expectedQueryMap == actualQueryMap);
+  }
+
+  // TODO(zs)
+  SECTION("wildcard and synonym") {}
+
+  // TODO(zs)
+  SECTION("wildcard and wildcard") {}
+
+  // TODO(zs)
+  SECTION("wildcard and \"idnet\"") {}
+
+  // TODO(zs)
+  SECTION("\"idnet\" and synonym") {}
+
+  // TODO(zs)
+  SECTION("\"idnet\" and wildcard") {}
+
+  // TODO(zs)
+  SECTION("\"idnet\" and \"idnet\"") {}
+}
+
+TEST_CASE("one such that Uses") {
+
+  SECTION("synonym and synonym") {
     std::string query = "stmt s1, s2; Select s1 such that Uses(s1, s2)";
     QueryMap expectedQueryMap;
     expectedQueryMap.addItem(
@@ -256,13 +441,37 @@ TEST_CASE("QueryMap with one such that") {
     expectedQueryMap.addItem(
         SELECT, PayLoad(SINGLE, SYNONYM, std::vector<std::string>{"s1"}));
     expectedQueryMap.addItem(
-        SUCHTHAT,
-        PayLoad(PAIR, USES, std::vector<std::string>{"s1", "s2"}));
+        SUCHTHAT, PayLoad(PAIR, USES, std::vector<std::string>{"s1", "s2"}));
 
     QueryMap actualQueryMap = pqlParse(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
+
+  // TODO(zs)
+  SECTION("synonym and wildcard") {}
+
+  // TODO(zs)
+  SECTION("synonym and integer") {}
+
+  // TODO(zs)
+  SECTION("wildcard and synonym") {}
+
+  // TODO(zs)
+  SECTION("wildcard and wildcard") {}
+
+  // TODO(zs)
+  SECTION("wildcard and integer") {}
+
+  // TODO(zs)
+  SECTION("integer and synonym") {}
+
+  // TODO(zs)
+  SECTION("integer and wildcard") {}
+
+  // TODO(zs)
+  SECTION("integer and integer") {}
 }
+
 // TODO(zs)
 TEST_CASE("QueryMap with one pattern") {}
 // TODO(zs)
