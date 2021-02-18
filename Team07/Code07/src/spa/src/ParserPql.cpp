@@ -189,71 +189,72 @@ std::vector<PayLoad> declaration_cl(State &state) {
   State so(state);
   std::vector<PayLoad> declarations;
   try {
-    std::vector<PayLoad> while_decl = repeat_declaration(state, "while", WHILE);
+    std::vector<PayLoad> while_decl =
+        repeat_declaration(state, "while", Single::WHILE);
     declarations.insert(declarations.end(), while_decl.begin(),
                         while_decl.end());
   } catch (ParseException &e) {
     state.assign(so);
     try {
       std::vector<PayLoad> stmt_decl =
-          repeat_declaration(state, "stmt", STATEMENT);
+          repeat_declaration(state, "stmt", Single::STATEMENT);
       declarations.insert(declarations.end(), stmt_decl.begin(),
                           stmt_decl.end());
     } catch (ParseException &e) {
       state.assign(so);
       try {
         std::vector<PayLoad> read_decl =
-            repeat_declaration(state, "read", READ);
+            repeat_declaration(state, "read", Single::READ);
         declarations.insert(declarations.end(), read_decl.begin(),
                             read_decl.end());
       } catch (ParseException &e) {
         state.assign(so);
         try {
           std::vector<PayLoad> print_decl =
-              repeat_declaration(state, "print", PRINT);
+              repeat_declaration(state, "print", Single::PRINT);
           declarations.insert(declarations.end(), print_decl.begin(),
                               print_decl.end());
         } catch (ParseException &e) {
           state.assign(so);
           try {
             std::vector<PayLoad> call_decl =
-                repeat_declaration(state, "call", CALL);
+                repeat_declaration(state, "call", Single::CALL);
             declarations.insert(declarations.end(), call_decl.begin(),
                                 call_decl.end());
           } catch (ParseException &e) {
             state.assign(so);
             try {
               std::vector<PayLoad> if_decl =
-                  repeat_declaration(state, "if", IF);
+                  repeat_declaration(state, "if", Single::IF);
               declarations.insert(declarations.end(), if_decl.begin(),
                                   if_decl.end());
             } catch (ParseException &e) {
               state.assign(so);
               try {
                 std::vector<PayLoad> assign_decl =
-                    repeat_declaration(state, "assign", ASSIGN);
+                    repeat_declaration(state, "assign", Single::ASSIGN);
                 declarations.insert(declarations.end(), assign_decl.begin(),
                                     assign_decl.end());
               } catch (ParseException &e) {
                 state.assign(so);
                 try {
                   std::vector<PayLoad> variable_decl =
-                      repeat_declaration(state, "variable", VARIABLE);
+                      repeat_declaration(state, "variable", Single::VARIABLE);
                   declarations.insert(declarations.end(), variable_decl.begin(),
                                       variable_decl.end());
                 } catch (ParseException &e) {
                   state.assign(so);
                   try {
                     std::vector<PayLoad> constant_decl =
-                        repeat_declaration(state, "constant", CONSTANT);
+                        repeat_declaration(state, "constant", Single::CONSTANT);
                     declarations.insert(declarations.end(),
                                         constant_decl.begin(),
                                         constant_decl.end());
                   } catch (ParseException &e) {
                     state.assign(so);
                     try {
-                      std::vector<PayLoad> procedure_decl =
-                          repeat_declaration(state, "procedure", PROCEDURE);
+                      std::vector<PayLoad> procedure_decl = repeat_declaration(
+                          state, "procedure", Single::PROCEDURE);
                       declarations.insert(declarations.end(),
                                           procedure_decl.begin(),
                                           procedure_decl.end());
@@ -283,7 +284,7 @@ PayLoad select(State &state, Single load_type) {
     whitespace(state);
 
     so.assign(state);
-    return PayLoad(SINGLE, SYNONYM, values);
+    return PayLoad(SINGLE, load_type, values);
   } catch (ParseException &e) {
     State so1(state);
     state.assign(so);
@@ -296,7 +297,7 @@ std::vector<PayLoad> select_cl(State &state) {
   std::vector<PayLoad> selects;
   State so(state);
   try {
-    selects.push_back(select(state, SYNONYM));
+    selects.push_back(select(state, Single::SYNONYM));
     return selects;
   } catch (ParseException &e) {
     state.assign(so);

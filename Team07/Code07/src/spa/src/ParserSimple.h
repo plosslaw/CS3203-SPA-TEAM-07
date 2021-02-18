@@ -1,13 +1,13 @@
 #pragma once
 #include <exception>
 #include <string>
-#include <vector>
+#include <unordered_set>
 #include "ParserLib.h"
 #include "TNode.h"
 
-using namespace std;
+void validateUniqueProcedureNames(TNode &root, std::unordered_set<std::string> &procs);
+void validateCallProcedureExists(TNode &root, std::unordered_set<std::string> &procs);
 
-// string name(State &s);
 TNode program(State &s);
 TNode procedure(State &s);
 TNode stmtLst(State &s);

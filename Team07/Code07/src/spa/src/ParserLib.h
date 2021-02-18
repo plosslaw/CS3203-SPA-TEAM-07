@@ -35,7 +35,8 @@ public:
   void assign(State &s);
 };
 
-std::string prettyPrintException(State &s);
+std::string prettyPrintValidation(std::string *str, int pos, std::string msg);
+std::string prettyPrintException(State &s, bool show_stack = true);
 
 std::string stringMatch(State &s, std::string str);
 char charPredicate(State &s, bool (*pred)(char), std::string errorName);

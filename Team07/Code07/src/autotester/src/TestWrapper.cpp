@@ -1,6 +1,8 @@
 #include "TestWrapper.h"
-#include "Parser.h"
-#include "ParserPql.h"
+#include "../../spa/src/Parser.h"
+#include "../../spa/src/ParserPql.h"
+#include "../../spa/src/TNode.h"
+#include <iostream>
 
 // implementation code of WrapperFactory - do NOT modify the next 5 lines
 AbstractWrapper *WrapperFactory::wrapper = 0;
@@ -22,7 +24,14 @@ TestWrapper::TestWrapper() {
 void TestWrapper::parse(std::string filename) {
   // call your parser to do the parsing
   // ...rest of your code...
-  Parse(filename);
+  try {
+    TNode ast = Parse(filename);
+    // parse
+    std::cout << ast.toSexp() << "\n";
+    // pass to pkb (placeholder)
+  } catch(std::string &e) {
+    std::cerr << e << "\n";
+  }
 }
 
 // method to evaluating a query

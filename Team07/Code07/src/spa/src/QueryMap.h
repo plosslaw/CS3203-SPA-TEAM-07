@@ -1,10 +1,11 @@
+#pragma once
 #include <string>
 #include <unordered_map>
 #include <vector>
 
-enum ClauseType { SELECT, DECLARATION, SUCHTHAT, PATTERN };
+enum class ClauseType { SELECT, DECLARATION, SUCHTHAT, PATTERN };
 
-enum Single {
+enum class Single {
   STATEMENT,
   READ,
   PRINT,
