@@ -581,9 +581,9 @@ QueryMap pqlParse(std::string query) {
   // declaration*
   try {
     while (true) {
-      std::vector<PayLoad> single_grp_declarations = declaration_cl(state);
-      declarations.insert(declarations.end(), single_grp_declarations.begin(),
-                          single_grp_declarations.end());
+      std::vector<PayLoad> single_ent_declarations = declaration_cl(state);
+      declarations.insert(declarations.end(), single_ent_declarations.begin(),
+                          single_ent_declarations.end());
       so.assign(state);
     }
   } catch (ParseException &e) {
