@@ -677,7 +677,40 @@ TEST_CASE("one such that and one pattern") {
 }
 
 TEST_CASE("Validation of declaration clause") {
-  SECTION("") {
+  SECTION("Unique synonym name") {
+    std::string query = "while w1; stmt s1; Select s1";
+    QueryMap input_query_map;
+    input_query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::WHILE, std::vector<std::string>{"w1"}));
+    input_query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s1"}));
+    input_query_map.addItem(
+        ClauseType::SELECT,
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}));
+
+    QueryMap output_query_map = pql_validate(input_query_map);
+    REQUIRE(input_query_map == output_query_map);
+  }
+
+  SECTION("Duplicate synonym name") {
+    std::string query = "while w1; stmt w1;";
+    QueryMap input_query_map;
+    input_query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::WHILE, std::vector<std::string>{"w1"}));
+    input_query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"w1"}));
+
+    QueryMap output_query_map = pql_validate(input_query_map);
+    REQUIRE_FALSE(input_query_map == output_query_map);
+  }
+}
+
+TEST_CASE("Validation of select clause") {
+  SECTION("Missing Select clause") {
     std::string query = "while w1; stmt s1;";
     QueryMap input_query_map;
     input_query_map.addItem(
@@ -688,17 +721,94 @@ TEST_CASE("Validation of declaration clause") {
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s1"}));
 
     QueryMap output_query_map = pql_validate(input_query_map);
-    REQUIRE(input_query_map == output_query_map);
+    REQUIRE_FALSE(input_query_map == output_query_map);
   }
-  SECTION("duplicate synonym name") {
-    std::string query = "while w1; stmt w1;";
+
+  SECTION("Select synonym declared") {
+    std::string query = "while w; stmt s; Select s";
     QueryMap input_query_map;
     input_query_map.addItem(
         ClauseType::DECLARATION,
-        PayLoad(SINGLE, Single::WHILE, std::vector<std::string>{"w1"}));
+        PayLoad(SINGLE, Single::WHILE, std::vector<std::string>{"w"}));
     input_query_map.addItem(
         ClauseType::DECLARATION,
-        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"w1"}));
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    input_query_map.addItem(
+        ClauseType::SELECT,
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s"}));
+
+    QueryMap output_query_map = pql_validate(input_query_map);
+    REQUIRE(input_query_map == output_query_map);
+  }
+
+  SECTION("Select synonym not declared") {
+    std::string query = "while w; stmt s; Select s1";
+    QueryMap input_query_map;
+    input_query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::WHILE, std::vector<std::string>{"w"}));
+    input_query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    input_query_map.addItem(
+        ClauseType::SELECT,
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}));
+
+    QueryMap output_query_map = pql_validate(input_query_map);
+    REQUIRE_FALSE(input_query_map == output_query_map);
+  }
+}
+
+TEST_CASE("Validation of such that clause") {
+  // TODO(zs):
+  SECTION("Such that synonyms declared") {}
+
+  // TODO(zs):
+  SECTION("First argument of modifies is wildcard") {}
+
+  // TODO(zs):
+  SECTION("First argument of uses is wildcard") {}
+}
+
+TEST_CASE("Validation of pattern clause") {
+  // TODO(zs):
+  SECTION("Pattern synonyms declared") {}
+
+  SECTION("syn-assign is of type assign") {
+    std::string query = "assign a; stmt s; Select a pattern a(s, _)";
+    QueryMap input_query_map;
+    input_query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
+    input_query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    input_query_map.addItem(
+        ClauseType::SELECT,
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}));
+    input_query_map.addItem(
+        ClauseType::PATTERN,
+        PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "s", "_"}));
+
+    QueryMap output_query_map = pql_validate(input_query_map);
+    REQUIRE(input_query_map == output_query_map);
+  }
+
+  SECTION("syn-assign is not of type assign") {
+    std::string query = "assign s; stmt a; Select a pattern a(s, _)";
+    QueryMap input_query_map;
+    input_query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"s"}));
+    input_query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"a"}));
+    input_query_map.addItem(
+        ClauseType::SELECT,
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}));
+    input_query_map.addItem(
+        ClauseType::PATTERN,
+        PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "s", "_"}));
 
     QueryMap output_query_map = pql_validate(input_query_map);
     REQUIRE_FALSE(input_query_map == output_query_map);
