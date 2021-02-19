@@ -654,8 +654,17 @@ bool is_synonym_declared(std::vector<PayLoad> declarations, PayLoad target) {
   return true;
 }
 
-// TODO(zs):
-bool is_synonym_of_type() { return true; }
+// Returns true if target is in list.
+bool is_payload_in(std::vector<PayLoad> list, PayLoad target) {
+  for (auto it_dcl = list.begin(); it_dcl != list.end();
+       ++it_dcl) {
+    PayLoad current = (*it_dcl);
+    if (current == target) {
+      return true;
+    }
+  }
+  return false;
+}
 
 // Returns true if synonyms are unique
 bool is_declaration_clause_valid(QueryMap table) {
@@ -676,23 +685,50 @@ bool is_select_clause_valid(QueryMap table) {
   return is_synonym_declared(declarations, target_synonym);
 }
 
-// TODO(zs):
 // synonyms declared
 // wildcard does not exist as first argument of Uses/ Modifies
 bool is_suchthat_clause_valid(QueryMap table) {
-  // std::vector<PayLoad> declarations = table.getList(ClauseType::DECLARATION);
-  // std::vector<PayLoad> suchthats = table.getList(ClauseType::SUCHTHAT);
-  // PayLoad target = suchthats[0];
-  // if (!is_synonym_declared(declarations, target)) {
-  //   return false;
-  // }
+  std::vector<PayLoad> declarations = table.getList(ClauseType::DECLARATION);
+  std::vector<PayLoad> suchthats = table.getList(ClauseType::SUCHTHAT);
+
+  if (suchthats.size() == 0) {
+    return true;
+  }
+
+  // TODO(zs): check all synonyms are declared
+
   return true;
 }
 
-// TODO(zs):
 // synonyms declared
 // syn_assign synonym is of assign design entity
-bool is_pattern_clause_valid() { return true; }
+bool is_pattern_clause_valid(QueryMap table) {
+  std::vector<PayLoad> declarations = table.getList(ClauseType::DECLARATION);
+  std::vector<PayLoad> patterns = table.getList(ClauseType::PATTERN);
+
+  if (patterns.size() == 0) {
+    return true;
+  }
+
+  // TODO(zs): check all synonyms are declared
+
+  for (auto it = patterns.begin(); it != patterns.end(); ++it) {
+    PayLoad current_pattern = (*it);
+    std::string current_synonym = current_pattern.getValue()[0];
+    PayLoad target(SINGLE, Single::STATEMENT,
+                   std::vector<std::string>{""}); // placeholder
+
+    if (current_pattern.getType().triple == SYN_ASSIGN) {
+      target = PayLoad(SINGLE, Single::ASSIGN,
+                       std::vector<std::string>{current_synonym});
+    }
+
+    if (!is_payload_in(declarations, target)) {
+      return false;
+    }
+  }
+  return true;
+}
 
 QueryMap pql_validate(QueryMap query) {
   if (!is_declaration_clause_valid(query)) {
@@ -704,7 +740,7 @@ QueryMap pql_validate(QueryMap query) {
   if (!is_suchthat_clause_valid(query)) {
     return QueryMap();
   }
-  if (!is_pattern_clause_valid()) {
+  if (!is_pattern_clause_valid(query)) {
     return QueryMap();
   }
 
