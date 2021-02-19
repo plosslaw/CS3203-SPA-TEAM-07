@@ -564,7 +564,9 @@ PayLoad syn_assign(State &state) {
 
   State so(state);
   try {
-    args.push_back(PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{synonym(state)}, std::vector<bool>{true}));
+    args.push_back(PayLoad(SINGLE, Single::SYNONYM,
+                           std::vector<std::string>{synonym(state)},
+                           std::vector<bool>{true}));
     whitespace(state);
 
     std::vector<PayLoad> pair = ent_and_expr_spec(state);
@@ -661,6 +663,31 @@ QueryMap pql_query(State &state) {
   return QueryMap(declarations, selects, suchthats, patterns);
 }
 
+// TODO(zs): Optimise comparison
+// Returns true if payload is in vector.
+bool is_payload_in(std::vector<PayLoad> payloads, PayLoad target) {
+  for (auto it_dcl = payloads.begin(); it_dcl != payloads.end(); ++it_dcl) {
+    PayLoad current = (*it_dcl);
+    if (current == target) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// TODO(zs): Optimise comparison
+// Returns true if string is in first item of payload's vector
+bool is_value_in_declarations(std::vector<PayLoad> payloads,
+                              std::string target) {
+  for (auto it = payloads.begin(); it != payloads.end(); ++it) {
+    std::string current = (*it).getValue()[0];
+    if (current == target) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool is_synonym_unique(std::vector<PayLoad> declarations) {
   std::vector<std::string> synonyms;
   for (auto it = declarations.begin(); it != declarations.end(); ++it) {
@@ -671,39 +698,22 @@ bool is_synonym_unique(std::vector<PayLoad> declarations) {
   return (it == synonyms.end());
 }
 
-// TODO(zs): Optimise comparison
 bool is_synonym_declared(std::vector<PayLoad> declarations, PayLoad target) {
   std::vector<std::string> values = target.getValue();
-  for (auto it = values.begin(); it != values.end(); ++it) {
-    // TODO(zs): check if values in target are of type synonym
+  std::vector<bool> flags = target.get_flag();
 
-    bool flag = false;
-    std::string target_val = (*it);
-    for (auto it_decl = declarations.begin(); it_decl != declarations.end();
-         ++it_decl) {
-      std::string current_val = (*it_decl).getValue()[0];
-      if (current_val == target_val) {
-        flag = true;
+  int idx = 0;
+  for (auto it = flags.begin(); it != flags.end(); ++it) {
+    bool is_synonym = (*it);
+    if (is_synonym) {
+
+      if (!is_value_in_declarations(declarations, values[idx])) {
+        return false;
       }
     }
-
-    if (flag == false) {
-      return flag;
-    }
+    idx++;
   }
-
   return true;
-}
-
-// Returns true if target is in list.
-bool is_payload_in(std::vector<PayLoad> list, PayLoad target) {
-  for (auto it_dcl = list.begin(); it_dcl != list.end(); ++it_dcl) {
-    PayLoad current = (*it_dcl);
-    if (current == target) {
-      return true;
-    }
-  }
-  return false;
 }
 
 // Returns true if synonyms are unique
