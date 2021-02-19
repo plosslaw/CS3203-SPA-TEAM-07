@@ -2,6 +2,7 @@
 #include<exception>
 #include<string>
 #include<vector>
+#include"ParserIndexMapper.h"
 
 class ParseException: public std::exception {
 	public:
@@ -35,8 +36,8 @@ class State {
 		void assign(State &s);
 };
 
-std::string prettyPrintValidation(std::string *str, int pos, std::string msg);
-std::string prettyPrintException(State &s, bool show_stack = true);
+std::string prettyPrintValidation(ParserMapper &map, int pos, std::string msg);
+std::string prettyPrintException(ParserMapper &map, State &s, bool show_stack = true);
 
 
 std::string stringMatch(State &s, std::string str);
