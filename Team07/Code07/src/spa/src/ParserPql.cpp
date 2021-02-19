@@ -641,9 +641,24 @@ bool is_declaration_clause_valid(QueryMap table) {
   return (it == synonyms.end());
 }
 
-// TODO(zs):
-// synonym declared
-bool is_select_clause_valid() { return true; }
+// Returns true if 1 synonym is selected and 
+// synonym is declared
+bool is_select_clause_valid(QueryMap table) {
+  std::vector<PayLoad> selections = table.getList(ClauseType::SELECT);
+  if (selections.size() == 0) {
+    return false;
+  }
+
+  std::string target_synonym = selections[0].getValue()[0];
+  std::vector<PayLoad> declarations = table.getList(ClauseType::DECLARATION);
+  for (auto it = declarations.begin(); it != declarations.end(); ++it) {
+    std::string current_synonym = (*it).getValue()[0];
+    if (current_synonym == target_synonym) {
+      return true;
+    }
+  }
+  return false;
+}
 
 // TODO(zs):
 // synonyms declared
@@ -659,7 +674,7 @@ QueryMap pql_validate(QueryMap query) {
   if (!is_declaration_clause_valid(query)) {
     return QueryMap();
   }
-  if (!is_select_clause_valid()) {
+  if (!is_select_clause_valid(query)) {
     return QueryMap();
   }
   if (!is_suchthat_clause_valid()) {
