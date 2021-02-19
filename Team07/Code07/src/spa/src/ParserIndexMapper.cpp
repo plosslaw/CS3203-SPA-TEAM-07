@@ -34,8 +34,7 @@ int ParserMapper::get_line(int i) {
       l = mid + 1;
     }
   }
-  int res = r >= 0 && line_start[r] < i ? r : l;
-  return res;
+  return r >= 0 && line_start[r] < i ? r : l;
 }
 
 int ParserMapper::get_col(int line, int i) {
