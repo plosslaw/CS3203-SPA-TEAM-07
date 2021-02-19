@@ -1,11 +1,13 @@
-#include <stdio.h>
-#include <string>
-#include <fstream>
-#include <streambuf>
-#include <unordered_set>
 #include "ParserLib.h"
+#include "ParserPql.h"
 #include "ParserSimple.h"
+#include "QueryMap.h"
 #include "TNode.h"
+#include <fstream>
+#include <stdio.h>
+#include <streambuf>
+#include <string>
+#include <unordered_set>
 
 // core functions -------------------------------------------------------------
 
@@ -33,4 +35,8 @@ TNode Parse (std::string file) {
 		s.excps.push_back(e);
 		throw prettyPrintException(s);
 	}
+}
+
+QueryMap parse_pql(std::string query) {
+  return pql_query(query);
 }
