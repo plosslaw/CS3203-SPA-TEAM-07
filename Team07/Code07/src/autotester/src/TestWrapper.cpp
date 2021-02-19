@@ -35,7 +35,7 @@ void TestWrapper::parse(std::string filename) {
     this -> evaluator = QueryEvaluator(controller);
   } catch (std::string &e) {
     std::cerr << e << "\n";
-    exit(1);
+    exit (EXIT_FAILURE);
   }
 
   return;

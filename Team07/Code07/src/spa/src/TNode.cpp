@@ -6,18 +6,21 @@ TNode::TNode() {
   statementNum = NULL_STMT_REF;
   value = "";
   type = STATEMENT;
+  pos = 0;
 }
 
 TNode::TNode(std::string val, stmt_type typ) {
   statementNum = NULL_STMT_REF;
   value = val;
   type = typ;
+  pos = 0;
 }
 
 TNode::TNode(int num, std::string val, stmt_type typ) {
   statementNum = num;
   value = val;
   type = typ;
+  pos = 0;
 }
 
 TNode::TNode(std::string val, stmt_type typ, int p) {
@@ -34,7 +37,7 @@ TNode::TNode(int num, std::string val, stmt_type typ, int p) {
   pos = p;
 }
 
-void TNode::addChild(TNode child) { children.push_back(child); }
+TNode& TNode::addChild(TNode child) { children.push_back(child); return *this; }
 
 int TNode::getStatementNum() { return statementNum; }
 
@@ -83,13 +86,31 @@ std::string TNode::toSexp(int sep) {
   return str;
 }
 
-bool TNode::eq(TNode &t) {
-  if(statementNum == t.getStatementNum() && value == t.getValue() && type == t.getType() && pos == t.getPos() && children.size() == t.getChildren().size()) {
-    for (int i = 0; i < children.size(); i++) {
-      bool res = children[i].eq(t.getChildren()[i]);
-      if(!res) return false;
-    }
-    return true;
+std::string TNode::toStub(int sep) {
+  std::string sepstr(sep, ' ');
+  std::string str(sepstr + "TNode(");
+  if(statementNum != NULL_STMT_REF) str += std::to_string(statementNum) + ", ";
+  str += "\"" + value + "\", " + typeToString(type) +", " + std::to_string(pos) +")";
+  for(int i = 0; i < children.size(); i++) {
+    str += ".addChild(\n";
+    str += children[i].toStub(sep + 2);
+    str += ")";
   }
-  return false;
+  return str;
+}
+
+bool TNode::eq(TNode rhs) {
+  if (
+    statementNum == rhs.statementNum &&
+    value == rhs.value &&
+    type == rhs.type &&
+    pos == rhs.pos &&
+    children.size() == rhs.children.size()) {
+      for(int i = 0; i < children.size(); i++) {
+        bool res = children[i].eq(rhs.children[i]);
+        if(!res) return false;
+      }
+      return true;
+    }
+    return false;
 }
