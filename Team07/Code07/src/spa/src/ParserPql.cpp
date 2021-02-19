@@ -623,8 +623,17 @@ QueryMap pql_query(State &state) {
 // TODO(zs):
 bool is_synonym_unique() { return true; }
 
-// TODO(zs):
-bool is_synonym_declared() { return true; }
+// TODO(zs): Optimise comparison
+bool is_synonym_declared(std::vector<PayLoad> declarations,
+                         PayLoad target_synonym) {
+  for (auto it = declarations.begin(); it != declarations.end(); ++it) {
+    PayLoad current_synonym = (*it);
+    if (current_synonym == target_synonym) {
+      return true;
+    }
+  }
+  return true;
+}
 
 // TODO(zs):
 bool is_synonym_of_type() { return true; }
@@ -641,23 +650,17 @@ bool is_declaration_clause_valid(QueryMap table) {
   return (it == synonyms.end());
 }
 
-// Returns true if 1 synonym is selected and 
-// synonym is declared
+// Returns true if 1 synonym is selected and
+// synonym declared
 bool is_select_clause_valid(QueryMap table) {
   std::vector<PayLoad> selections = table.getList(ClauseType::SELECT);
   if (selections.size() == 0) {
     return false;
   }
 
-  std::string target_synonym = selections[0].getValue()[0];
   std::vector<PayLoad> declarations = table.getList(ClauseType::DECLARATION);
-  for (auto it = declarations.begin(); it != declarations.end(); ++it) {
-    std::string current_synonym = (*it).getValue()[0];
-    if (current_synonym == target_synonym) {
-      return true;
-    }
-  }
-  return false;
+  PayLoad target_synonym = selections[0];
+  return is_synonym_declared(declarations, target_synonym);
 }
 
 // TODO(zs):
