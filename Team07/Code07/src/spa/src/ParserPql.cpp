@@ -510,7 +510,6 @@ PayLoad suchthat_cl(State &state) {
     PayLoad clause = suchthat(state);
     whitespace(state);
 
-    so.assign(state);
     return clause;
   } catch (ParseException &e) {
     state.excps.push_back(e);
@@ -560,7 +559,6 @@ PayLoad pattern_cl(State &state) {
     PayLoad clause = pattern(state);
     whitespace(state);
 
-    so.assign(state);
     return clause;
   } catch (ParseException &e) {
     state.excps.push_back(e);
@@ -577,7 +575,6 @@ QueryMap pql_query(std::string query) {
 
   State state(&query);
   State so(state);
-
   // declaration*
   try {
     while (true) {
