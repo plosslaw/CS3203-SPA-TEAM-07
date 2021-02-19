@@ -47,18 +47,18 @@ std::string factor(State &state) {
 }
 
 // stmtRef: synonym | ‘_’ | INTEGER
-std::string stmt_ref(State &state) {
+PayLoad stmt_ref(State &state) {
   State so(state);
   try {
-    return synonym(state);
+    return PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{synonym(state)});
   } catch (ParseException &e) {
     state.assign(so);
     try {
-      return integer(state);
+      return PayLoad(SINGLE, Single::INTEGER, std::vector<std::string>{integer(state)});
     } catch (ParseException &e) {
       state.assign(so);
       try {
-        return wildcard(state);
+        return PayLoad(SINGLE, Single::WILDCARD, std::vector<std::string>{wildcard(state)});
       } catch (ParseException &e) {
         state.excps.push_back(e);
         throw ParseException(so.i, state.i, "stmt_ref", "");
@@ -68,10 +68,10 @@ std::string stmt_ref(State &state) {
 }
 
 // entRef: synonym | ‘_’ | ‘"’ IDENT ‘"’
-std::string ent_ref(State &state) {
+PayLoad ent_ref(State &state) {
   State so(state);
   try {
-    return synonym(state);
+    return PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{synonym(state)});
   } catch (ParseException &e) {
     state.assign(so);
     try {
@@ -84,11 +84,11 @@ std::string ent_ref(State &state) {
       std::string dbl_quotes_2 = double_quotes(state);
       whitespace(state);
 
-      return dbl_quotes_1 + val + dbl_quotes_2;
+      return PayLoad(SINGLE, Single::DOUBLE_QUOTE_IDENT, std::vector<std::string>{dbl_quotes_1 + val + dbl_quotes_2});
     } catch (ParseException &e) {
       state.assign(so);
       try {
-        return wildcard(state);
+        return PayLoad(SINGLE, Single::WILDCARD, std::vector<std::string>{wildcard(state)});
       } catch (ParseException &e) {
         state.excps.push_back(e);
         throw ParseException(so.i, state.i, "ent_ref", "");
@@ -98,7 +98,7 @@ std::string ent_ref(State &state) {
 }
 
 // expression-spec: ‘_’ ‘"’ factor ‘"’ ‘_’ | ‘_’
-std::string expr_spec(State &state) {
+PayLoad expr_spec(State &state) {
   State so(state);
   try {
     std::string any_val_1 = wildcard(state);
@@ -116,11 +116,11 @@ std::string expr_spec(State &state) {
     std::string any_val_2 = wildcard(state);
     whitespace(state);
 
-    return any_val_1 + dbl_quotes_1 + value + dbl_quotes_2 + any_val_2;
+    return PayLoad(SINGLE, Single::U_DQ_FACTOR, std::vector<std::string>{any_val_1 + dbl_quotes_1 + value + dbl_quotes_2 + any_val_2});
   } catch (ParseException &e) {
     state.assign(so);
     try {
-      return wildcard(state);
+      return PayLoad(SINGLE, Single::WILDCARD, std::vector<std::string>{wildcard(state)});
     } catch (ParseException &e) {
       state.excps.push_back(e);
       throw ParseException(so.i, state.i, "expr_spec", "");
@@ -130,89 +130,88 @@ std::string expr_spec(State &state) {
 
 // TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent, ent
 // and expr ‘(’ stmtRef ‘,’ stmtRef ‘)’
-std::vector<std::string> stmt_and_stmt_ref(State &state) {
-  std::vector<std::string> values;
+std::vector<PayLoad> stmt_and_stmt_ref(State &state) {
+  std::vector<PayLoad> refs;
   State so(state);
   try {
     stringMatch(state, "(");
     whitespace(state);
 
-    values.push_back(stmt_ref(state));
+    refs.push_back(stmt_ref(state));
     whitespace(state);
 
     stringMatch(state, ",");
     whitespace(state);
 
-    values.push_back(stmt_ref(state));
+    refs.push_back(stmt_ref(state));
+    whitespace(state);
+
     whitespace(state);
 
     stringMatch(state, ")");
     whitespace(state);
 
-    return values;
+    return refs;
   } catch (ParseException &e) {
     state.excps.push_back(e);
     throw ParseException(so.i, state.i, "stmt_and_stmt_ref", "");
   }
-  return values;
 }
 
 // TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent, ent
 // and expr ‘(’ stmtRef ‘,’ entRef ‘)’
-std::vector<std::string> stmt_and_ent_ref(State &state) {
-  std::vector<std::string> values;
+std::vector<PayLoad> stmt_and_ent_ref(State &state) {
+  std::vector<PayLoad> refs;
   State so(state);
   try {
     stringMatch(state, "(");
     whitespace(state);
 
-    values.push_back(stmt_ref(state));
+    refs.push_back(stmt_ref(state));
     whitespace(state);
 
     stringMatch(state, ",");
     whitespace(state);
 
-    values.push_back(ent_ref(state));
+    refs.push_back(ent_ref(state));
     whitespace(state);
 
     stringMatch(state, ")");
     whitespace(state);
 
-    return values;
+    return refs;
   } catch (ParseException &e) {
     state.excps.push_back(e);
     throw ParseException(so.i, state.i, "stmt_and_ent_ref", "");
   }
-  return values;
 }
 
 // TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent, ent
 // and expr ‘(‘entRef ’,’ expression-spec ’)’
-std::vector<std::string> ent_and_expr_spec(State &state) {
-  std::vector<std::string> values;
+std::vector<PayLoad> ent_and_expr_spec(State &state) {
+  std::vector<PayLoad> refs;
   State so(state);
   try {
     stringMatch(state, "(");
     whitespace(state);
 
-    values.push_back(ent_ref(state));
+    refs.push_back(ent_ref(state));
     whitespace(state);
 
     stringMatch(state, ",");
     whitespace(state);
 
-    values.push_back(expr_spec(state));
+    refs.push_back(expr_spec(state));
     whitespace(state);
 
     stringMatch(state, ")");
     whitespace(state);
 
-    return values;
+    return refs;
   } catch (ParseException &e) {
     state.excps.push_back(e);
     throw ParseException(so.i, state.i, "ent_and_expr_spec", "");
   }
-  return values;
 }
 
 // -------------------- Declaration Clause -------------------- //
@@ -381,11 +380,34 @@ std::vector<PayLoad> select_cl(State &state) {
 }
 
 // -------------------- Such That Clause -------------------- //
+std::vector<std::string> payloads_to_values(std::vector<PayLoad> payloads) {
+  std::vector<std::string> values;
+  for (auto it = payloads.begin(); it != payloads.end(); ++it) {
+    std::string val = (*it).getValue()[0];
+    values.push_back(val);
+  }
+  return values;
+}
+
+std::vector<bool> payloads_to_flags(std::vector<PayLoad> payloads) {
+  std::vector<bool> flags;
+  for (auto it = payloads.begin(); it != payloads.end(); ++it) {
+    LoadType type = (*it).getType();
+    if (type.single == Single::SYNONYM) {
+      flags.push_back(true);
+    } else {
+      flags.push_back(false);
+    }
+  }
+  return flags;
+}
 
 // relRef : Follows | FollowsT | Parent | ParentT | UsesS | UsesP | ModifiesS
 // | ModifiesP
 PayLoad rel_ref(State &state, std::string design_relation, Pair load_type) {
   std::vector<std::string> values;
+  std::vector<bool> flags;
+
   State so(state);
   try {
     stringMatch(state, design_relation);
@@ -393,13 +415,17 @@ PayLoad rel_ref(State &state, std::string design_relation, Pair load_type) {
 
     if (load_type == PARENT || load_type == PARENTT || load_type == FOLLOWS ||
         load_type == FOLLOWST) {
-      values = stmt_and_stmt_ref(state);
+      std::vector<PayLoad> pair_1 = stmt_and_stmt_ref(state);
+      values = payloads_to_values(pair_1);
+      flags = payloads_to_flags(pair_1);
     }
     if (load_type == MODIFIES || load_type == USES) {
-      values = stmt_and_ent_ref(state);
+      std::vector<PayLoad> pair_2 = stmt_and_ent_ref(state);
+      values = payloads_to_values(pair_2);
+      flags = payloads_to_flags(pair_2);
     }
 
-    return PayLoad(PAIR, load_type, values);
+    return PayLoad(PAIR, load_type, values, flags);
   } catch (ParseException &e) {
     state.excps.push_back(e);
     throw ParseException(so.i, state.i, "stmt_and_stmt_ref", "");
@@ -523,17 +549,20 @@ PayLoad suchthat_cl(State &state) {
 
 PayLoad syn_assign(State &state) {
   std::vector<std::string> values;
+
   State so(state);
   try {
     std::string val = synonym(state);
     values.push_back(val);
     whitespace(state);
 
-    std::vector<std::string> vals = ent_and_expr_spec(state);
+    std::vector<PayLoad> pair = ent_and_expr_spec(state);
+    std::vector<std::string> vals = payloads_to_values(pair);
+    std::vector<bool> flags = payloads_to_flags(pair);
     values.insert(values.end(), vals.begin(), vals.end());
     whitespace(state);
 
-    return PayLoad(TRIPLE, SYN_ASSIGN, values);
+    return PayLoad(TRIPLE, SYN_ASSIGN, values, flags);
   } catch (ParseException &e) {
     state.excps.push_back(e);
     throw ParseException(so.i, state.i, "syn_assign", "");

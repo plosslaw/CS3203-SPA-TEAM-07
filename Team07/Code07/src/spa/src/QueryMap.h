@@ -17,6 +17,10 @@ enum class Single {
   VARIABLE,
   PROCEDURE,
   SYNONYM,
+  INTEGER,
+  WILDCARD,
+  DOUBLE_QUOTE_IDENT,
+  U_DQ_FACTOR, // underscore, double quote, factor 
 };
 
 enum Pair { FOLLOWS, FOLLOWST, PARENT, PARENTT, USES, MODIFIES };
@@ -36,11 +40,15 @@ private:
   Tag tag;
   LoadType type;
   std::vector<std::string> value;
+  std::vector<bool> flag;
 
 public:
   PayLoad(Tag loadTag, Single loadType, std::vector<std::string> loadVal);
   PayLoad(Tag loadTag, Pair loadType, std::vector<std::string> loadVal);
   PayLoad(Tag loadTag, Triple loadType, std::vector<std::string> loadVal);
+  PayLoad(Tag loadTag, Single loadType, std::vector<std::string> loadVal, std::vector<bool> load_flags);
+  PayLoad(Tag loadTag, Pair loadType, std::vector<std::string> loadVal, std::vector<bool> load_flags);
+  PayLoad(Tag loadTag, Triple loadType, std::vector<std::string> loadVal, std::vector<bool> load_flags);
 
   Tag getTag();
   LoadType getType();
