@@ -34,7 +34,7 @@ bool ActionsExecutor::satisfies_pattern(assign_ref a, pattern p) {
     return this->pkb_query_controller.satisfiesPattern(a, p);
 }
 
-vector<constant> ActionsExecutor::get_all_constants() {
+vector<const_value> ActionsExecutor::get_all_constants() {
     return this->pkb_query_controller.getAllConstants();
 }
 
@@ -42,7 +42,7 @@ vector<proc_ref> ActionsExecutor::get_all_procedures() {
     return this->pkb_query_controller.getAllProcedures();
 }
 
-vector<statement> ActionsExecutor::get_all_statements() {
+vector<stmt_ref> ActionsExecutor::get_all_statements() {
     return this->pkb_query_controller.getAllStatements();
 }
 

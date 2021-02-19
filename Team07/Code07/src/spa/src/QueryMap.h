@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <vector>
 
-enum ClauseType { SELECT, DECLARATION, SUCHTHAT, PATTERN };
+enum class ClauseType { SELECT, DECLARATION, SUCHTHAT, PATTERN };
 
 enum class Single {
   STATEMENT,
@@ -61,6 +61,11 @@ private:
 
 public:
   QueryMap();
+  QueryMap(std::vector<PayLoad> declaration_cl, std::vector<PayLoad> select_cl,
+           std::vector<PayLoad> suchthat_cl, std::vector<PayLoad> pattern_cl);
   std::vector<PayLoad> getList(ClauseType key);
   void addItem(ClauseType key, PayLoad item);
+  friend bool operator==(const QueryMap &l, const QueryMap &r) {
+    return (l.table == r.table);
+  }
 };
