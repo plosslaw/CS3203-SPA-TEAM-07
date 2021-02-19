@@ -620,8 +620,15 @@ QueryMap pql_query(State &state) {
   return QueryMap(declarations, selects, suchthats, patterns);
 }
 
-// TODO(zs):
-bool is_synonym_unique() { return true; }
+bool is_synonym_unique(std::vector<PayLoad> declarations) {
+  std::vector<std::string> synonyms;
+  for (auto it = declarations.begin(); it != declarations.end(); ++it) {
+    synonyms.push_back((*it).getValue()[0]);
+  }
+  sort(synonyms.begin(), synonyms.end());
+  auto it = std::unique(synonyms.begin(), synonyms.end());
+  return (it == synonyms.end());
+}
 
 // TODO(zs): Optimise comparison
 bool is_synonym_declared(std::vector<PayLoad> declarations,
@@ -641,13 +648,7 @@ bool is_synonym_of_type() { return true; }
 // Returns true if synonyms are unique
 bool is_declaration_clause_valid(QueryMap table) {
   std::vector<PayLoad> declarations = table.getList(ClauseType::DECLARATION);
-  std::vector<std::string> synonyms;
-  for (auto it = declarations.begin(); it != declarations.end(); ++it) {
-    synonyms.push_back((*it).getValue()[0]);
-  }
-  sort(synonyms.begin(), synonyms.end());
-  auto it = std::unique(synonyms.begin(), synonyms.end());
-  return (it == synonyms.end());
+  return is_synonym_unique(declarations);
 }
 
 // Returns true if 1 synonym is selected and
