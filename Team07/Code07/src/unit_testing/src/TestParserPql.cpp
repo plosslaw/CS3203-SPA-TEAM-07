@@ -878,9 +878,7 @@ TEST_CASE("Validation of such that clause") {
 
 TEST_CASE("Validation of pattern clause") {
   // TODO(zs):
-  SECTION("Pattern synonyms declared") {}
-
-  SECTION("syn-assign is of type assign") {
+  SECTION("Pattern synonyms declared") {
     std::string query = "assign a; stmt s; Select a pattern a(s, _)";
     QueryMap input_query_map;
     input_query_map.addItem(
@@ -893,12 +891,35 @@ TEST_CASE("Validation of pattern clause") {
                             PayLoad(SINGLE, Single::SYNONYM,
                                     std::vector<std::string>{"a"},
                                     std::vector<bool>{true}));
-    input_query_map.addItem(
-        ClauseType::PATTERN,
-        PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "s", "_"}));
+    input_query_map.addItem(ClauseType::PATTERN,
+                            PayLoad(TRIPLE, SYN_ASSIGN,
+                                    std::vector<std::string>{"a", "s", "_"},
+                                    std::vector<bool>{true, true, false}));
 
     QueryMap output_query_map = pql_validate(input_query_map);
     REQUIRE(input_query_map == output_query_map);
+  }
+
+  SECTION("Pattern second argument synonym not declared") {
+    std::string query = "assign a; stmt s; Select a pattern a(s1, _)";
+    QueryMap input_query_map;
+    input_query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
+    input_query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    input_query_map.addItem(ClauseType::SELECT,
+                            PayLoad(SINGLE, Single::SYNONYM,
+                                    std::vector<std::string>{"a"},
+                                    std::vector<bool>{true}));
+    input_query_map.addItem(ClauseType::PATTERN,
+                            PayLoad(TRIPLE, SYN_ASSIGN,
+                                    std::vector<std::string>{"a", "s1", "_"},
+                                    std::vector<bool>{true, true, false}));
+
+    QueryMap output_query_map = pql_validate(input_query_map);
+    REQUIRE_FALSE(input_query_map == output_query_map);
   }
 
   SECTION("syn-assign is not of type assign") {
@@ -914,9 +935,10 @@ TEST_CASE("Validation of pattern clause") {
                             PayLoad(SINGLE, Single::SYNONYM,
                                     std::vector<std::string>{"a"},
                                     std::vector<bool>{true}));
-    input_query_map.addItem(
-        ClauseType::PATTERN,
-        PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "s", "_"}));
+    input_query_map.addItem(ClauseType::PATTERN,
+                            PayLoad(TRIPLE, SYN_ASSIGN,
+                                    std::vector<std::string>{"a", "s", "_"},
+                                    std::vector<bool>{true, true, false}));
 
     QueryMap output_query_map = pql_validate(input_query_map);
     REQUIRE_FALSE(input_query_map == output_query_map);

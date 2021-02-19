@@ -706,7 +706,6 @@ bool is_synonym_declared(std::vector<PayLoad> declarations, PayLoad target) {
   for (auto it = flags.begin(); it != flags.end(); ++it) {
     bool is_synonym = (*it);
     if (is_synonym) {
-
       if (!is_value_in_declarations(declarations, values[idx])) {
         return false;
       }
@@ -761,27 +760,27 @@ bool is_pattern_clause_valid(QueryMap table) {
   std::vector<PayLoad> declarations = table.getList(ClauseType::DECLARATION);
   std::vector<PayLoad> patterns = table.getList(ClauseType::PATTERN);
 
+  // optional suchthat-cl absent
   if (patterns.size() == 0) {
     return true;
   }
 
-  // TODO(zs): check all synonyms are declared
-
   for (auto it = patterns.begin(); it != patterns.end(); ++it) {
-    PayLoad current_pattern = (*it);
-    std::string current_synonym = current_pattern.getValue()[0];
-    PayLoad target(SINGLE, Single::STATEMENT,
-                   std::vector<std::string>{""}); // placeholder
-
-    if (current_pattern.getType().triple == SYN_ASSIGN) {
-      target = PayLoad(SINGLE, Single::ASSIGN,
-                       std::vector<std::string>{current_synonym});
-    }
-
-    if (!is_payload_in(declarations, target)) {
+    PayLoad current_clause = (*it);
+    std::string current_synonym = current_clause.getValue()[0];
+    if (!is_synonym_declared(declarations, current_clause)) {
       return false;
     }
+
+    if (current_clause.getType().triple == SYN_ASSIGN) {
+      PayLoad target(SINGLE, Single::ASSIGN,
+                     std::vector<std::string>{current_synonym});
+      if (!is_payload_in(declarations, target)) {
+        return false;
+      }
+    }
   }
+
   return true;
 }
 
