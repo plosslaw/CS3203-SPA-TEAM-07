@@ -675,3 +675,32 @@ TEST_CASE("one such that and one pattern") {
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 }
+
+TEST_CASE("Validation of declaration clause") {
+  SECTION("") {
+    std::string query = "while w1; stmt s1;";
+    QueryMap input_query_map;
+    input_query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::WHILE, std::vector<std::string>{"w1"}));
+    input_query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s1"}));
+
+    QueryMap output_query_map = pql_validate(input_query_map);
+    REQUIRE(input_query_map == output_query_map);
+  }
+  SECTION("duplicate synonym name") {
+    std::string query = "while w1; stmt w1;";
+    QueryMap input_query_map;
+    input_query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::WHILE, std::vector<std::string>{"w1"}));
+    input_query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"w1"}));
+
+    QueryMap output_query_map = pql_validate(input_query_map);
+    REQUIRE_FALSE(input_query_map == output_query_map);
+  }
+}

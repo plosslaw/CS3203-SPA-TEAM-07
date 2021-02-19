@@ -1,5 +1,7 @@
 #include "ParserPql.h"
 #include "ParserLib.h"
+#include "QueryMap.h"
+#include <algorithm>
 #include <functional>
 #include <iostream>
 #include <vector>
@@ -616,4 +618,56 @@ QueryMap pql_query(State &state) {
   }
 
   return QueryMap(declarations, selects, suchthats, patterns);
+}
+
+// TODO(zs):
+bool is_synonym_unique() { return true; }
+
+// TODO(zs):
+bool is_synonym_declared() { return true; }
+
+// TODO(zs):
+bool is_synonym_of_type() { return true; }
+
+// Returns true if synonyms are unique
+bool is_declaration_clause_valid(QueryMap table) {
+  std::vector<PayLoad> declarations = table.getList(ClauseType::DECLARATION);
+  std::vector<std::string> synonyms;
+  for (auto it = declarations.begin(); it != declarations.end(); ++it) {
+    synonyms.push_back((*it).getValue()[0]);
+  }
+  sort(synonyms.begin(), synonyms.end());
+  auto it = std::unique(synonyms.begin(), synonyms.end());
+  return (it == synonyms.end());
+}
+
+// TODO(zs):
+// synonym declared
+bool is_select_clause_valid() { return true; }
+
+// TODO(zs):
+// synonyms declared
+// wildcard does not exist as first argument of Uses/ Modifies
+bool is_suchthat_clause_valid() { return true; }
+
+// TODO(zs):
+// synonyms declared
+// syn_assign synonym is of assign design entity
+bool is_pattern_clause_valid() { return true; }
+
+QueryMap pql_validate(QueryMap query) {
+  if (!is_declaration_clause_valid(query)) {
+    return QueryMap();
+  }
+  if (!is_select_clause_valid()) {
+    return QueryMap();
+  }
+  if (!is_suchthat_clause_valid()) {
+    return QueryMap();
+  }
+  if (!is_pattern_clause_valid()) {
+    return QueryMap();
+  }
+
+  return query;
 }

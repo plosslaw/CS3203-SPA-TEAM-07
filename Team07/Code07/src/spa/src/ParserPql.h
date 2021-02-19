@@ -3,6 +3,7 @@
 #include <string.h>
 
 QueryMap pql_query(State &query);
+QueryMap pql_validate(QueryMap query);
 
 /*
 // low level abstractions
