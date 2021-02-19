@@ -58,12 +58,12 @@ TEST_CASE("QueryMap ClauseType::declaration") {
 }
 
 TEST_CASE(
-    "QueryMap with no ClauseType::declaration, no such that, no pattern") {
+    "QueryMap with no declaration, no such that, no pattern") {
   std::string query = "Select w";
   QueryMap expectedQueryMap;
   expectedQueryMap.addItem(
       ClauseType::SELECT,
-      PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"w"}));
+      PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"w"}, std::vector<bool>{true}));
 
   State state(&query);
   QueryMap actualQueryMap = pql_query(state);
@@ -79,7 +79,7 @@ TEST_CASE("QueryMap with no such that and no pattern") {
         PayLoad(SINGLE, Single::WHILE, std::vector<std::string>{"w"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"w"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"w"}, std::vector<bool>{true}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -94,7 +94,7 @@ TEST_CASE("QueryMap with no such that and no pattern") {
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s"}, std::vector<bool>{true}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -109,7 +109,7 @@ TEST_CASE("QueryMap with no such that and no pattern") {
         PayLoad(SINGLE, Single::READ, std::vector<std::string>{"re"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"re"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"re"}, std::vector<bool>{true}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -132,7 +132,7 @@ TEST_CASE("QueryMap repeated declaration with no such that and no pattern") {
         PayLoad(SINGLE, Single::WHILE, std::vector<std::string>{"w3"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"w1"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"w1"}, std::vector<bool>{true}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -153,7 +153,7 @@ TEST_CASE("QueryMap repeated declaration with no such that and no pattern") {
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s3"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}, std::vector<bool>{true}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -174,7 +174,7 @@ TEST_CASE("QueryMap repeated declaration with no such that and no pattern") {
         PayLoad(SINGLE, Single::READ, std::vector<std::string>{"re3"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"re1"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"re1"}, std::vector<bool>{true}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -194,10 +194,10 @@ TEST_CASE("one such that Parent") {
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s2"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}, std::vector<bool>{true}));
     expectedQueryMap.addItem(
         ClauseType::SUCHTHAT,
-        PayLoad(PAIR, PARENT, std::vector<std::string>{"s1", "s2"}));
+        PayLoad(PAIR, PARENT, std::vector<std::string>{"s1", "s2"}, std::vector<bool>{true, true}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -212,10 +212,10 @@ TEST_CASE("one such that Parent") {
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s1"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}, std::vector<bool>{true}));
     expectedQueryMap.addItem(
         ClauseType::SUCHTHAT,
-        PayLoad(PAIR, PARENT, std::vector<std::string>{"s1", "_"}));
+        PayLoad(PAIR, PARENT, std::vector<std::string>{"s1", "_"}, std::vector<bool>{true, false}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -230,10 +230,10 @@ TEST_CASE("one such that Parent") {
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s1"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}, std::vector<bool>{true}));
     expectedQueryMap.addItem(
         ClauseType::SUCHTHAT,
-        PayLoad(PAIR, PARENT, std::vector<std::string>{"s1", "1"}));
+        PayLoad(PAIR, PARENT, std::vector<std::string>{"s1", "1"}, std::vector<bool>{true, false}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -257,10 +257,10 @@ TEST_CASE("one such that Parent") {
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s1"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}, std::vector<bool>{true}));
     expectedQueryMap.addItem(
         ClauseType::SUCHTHAT,
-        PayLoad(PAIR, PARENT, std::vector<std::string>{"1", "s1"}));
+        PayLoad(PAIR, PARENT, std::vector<std::string>{"1", "s1"}, std::vector<bool>{false, true}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -287,10 +287,10 @@ TEST_CASE("one such that Parent*") {
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s2"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}, std::vector<bool>{true}));
     expectedQueryMap.addItem(
         ClauseType::SUCHTHAT,
-        PayLoad(PAIR, PARENTT, std::vector<std::string>{"s1", "s2"}));
+        PayLoad(PAIR, PARENTT, std::vector<std::string>{"s1", "s2"}, std::vector<bool>{true, true}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -335,10 +335,10 @@ TEST_CASE("one such that Follows") {
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s2"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}, std::vector<bool>{true}));
     expectedQueryMap.addItem(
         ClauseType::SUCHTHAT,
-        PayLoad(PAIR, FOLLOWS, std::vector<std::string>{"s1", "s2"}));
+        PayLoad(PAIR, FOLLOWS, std::vector<std::string>{"s1", "s2"}, std::vector<bool>{true, true}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -383,10 +383,10 @@ TEST_CASE("one such that Follows*") {
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s2"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}, std::vector<bool>{true}));
     expectedQueryMap.addItem(
         ClauseType::SUCHTHAT,
-        PayLoad(PAIR, FOLLOWST, std::vector<std::string>{"s1", "s2"}));
+        PayLoad(PAIR, FOLLOWST, std::vector<std::string>{"s1", "s2"}, std::vector<bool>{true, true}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -431,10 +431,10 @@ TEST_CASE("one such that Modifies") {
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s2"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}, std::vector<bool>{true}));
     expectedQueryMap.addItem(
         ClauseType::SUCHTHAT,
-        PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s1", "s2"}));
+        PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s1", "s2"}, std::vector<bool>{true, true}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -452,10 +452,10 @@ TEST_CASE("one such that Modifies") {
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s1"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}, std::vector<bool>{true}));
     expectedQueryMap.addItem(
         ClauseType::SUCHTHAT,
-        PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s1", "\"x\""}));
+        PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s1", "\"x\""}, std::vector<bool>{true, false}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -494,10 +494,10 @@ TEST_CASE("one such that Uses") {
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s2"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}, std::vector<bool>{true}));
     expectedQueryMap.addItem(
         ClauseType::SUCHTHAT,
-        PayLoad(PAIR, USES, std::vector<std::string>{"s1", "s2"}));
+        PayLoad(PAIR, USES, std::vector<std::string>{"s1", "s2"}, std::vector<bool>{true, true}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -542,11 +542,11 @@ TEST_CASE("one pattern syn_assign, ent_ref and expr_spec ") {
         PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}, std::vector<bool>{true}));
     expectedQueryMap.addItem(
         ClauseType::PATTERN,
         PayLoad(TRIPLE, SYN_ASSIGN,
-                std::vector<std::string>{"a", "s", "_\"var\"_"}));
+                std::vector<std::string>{"a", "s", "_\"var\"_"}, std::vector<bool>{true, true, false}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -564,10 +564,10 @@ TEST_CASE("one pattern syn_assign, ent_ref and expr_spec ") {
         PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}, std::vector<bool>{true}));
     expectedQueryMap.addItem(
         ClauseType::PATTERN,
-        PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "s", "_"}));
+        PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "s", "_"}, std::vector<bool>{true, true, false}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -604,13 +604,13 @@ TEST_CASE("one such that and one pattern") {
         PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}, std::vector<bool>{true}));
     expectedQueryMap.addItem(
         ClauseType::SUCHTHAT,
-        PayLoad(PAIR, PARENT, std::vector<std::string>{"s1", "s2"}));
+        PayLoad(PAIR, PARENT, std::vector<std::string>{"s1", "s2"}, std::vector<bool>{true, true}));
     expectedQueryMap.addItem(
         ClauseType::PATTERN,
-        PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "s1", "_"}));
+        PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "s1", "_"}, std::vector<bool>{true, true, false}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -629,13 +629,13 @@ TEST_CASE("one such that and one pattern") {
         PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}, std::vector<bool>{true}));
     expectedQueryMap.addItem(
         ClauseType::SUCHTHAT,
-        PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s", "\"var\""}));
+        PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s", "\"var\""}, std::vector<bool>{true, false}));
     expectedQueryMap.addItem(
         ClauseType::PATTERN,
-        PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "s", "_"}));
+        PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "s", "_"}, std::vector<bool>{true, true, false}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -661,14 +661,14 @@ TEST_CASE("one such that and one pattern") {
         PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
     expectedQueryMap.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}, std::vector<bool>{true}));
     expectedQueryMap.addItem(
         ClauseType::SUCHTHAT,
-        PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s", "\"var\""}));
+        PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s", "\"var\""}, std::vector<bool>{true, false}));
     expectedQueryMap.addItem(
         ClauseType::PATTERN,
         PayLoad(TRIPLE, SYN_ASSIGN,
-                std::vector<std::string>{"a", "s", "_\"123\"_"}));
+                std::vector<std::string>{"a", "s", "_\"123\"_"}, std::vector<bool>{true, true, false}));
 
     State state(&query);
     QueryMap actualQueryMap = pql_query(state);
@@ -688,7 +688,7 @@ TEST_CASE("Validation of declaration clause") {
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s1"}));
     input_query_map.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}, std::vector<bool>{true}));
 
     QueryMap output_query_map = pql_validate(input_query_map);
     REQUIRE(input_query_map == output_query_map);
@@ -735,7 +735,7 @@ TEST_CASE("Validation of select clause") {
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
     input_query_map.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s"}, std::vector<bool>{true}));
 
     QueryMap output_query_map = pql_validate(input_query_map);
     REQUIRE(input_query_map == output_query_map);
@@ -752,7 +752,7 @@ TEST_CASE("Validation of select clause") {
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
     input_query_map.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}, std::vector<bool>{true}));
 
     QueryMap output_query_map = pql_validate(input_query_map);
     REQUIRE_FALSE(input_query_map == output_query_map);
@@ -785,7 +785,7 @@ TEST_CASE("Validation of pattern clause") {
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
     input_query_map.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}, std::vector<bool>{true}));
     input_query_map.addItem(
         ClauseType::PATTERN,
         PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "s", "_"}));
@@ -805,7 +805,7 @@ TEST_CASE("Validation of pattern clause") {
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"a"}));
     input_query_map.addItem(
         ClauseType::SELECT,
-        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}));
+        PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}, std::vector<bool>{true}));
     input_query_map.addItem(
         ClauseType::PATTERN,
         PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "s", "_"}));

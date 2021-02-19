@@ -50,15 +50,19 @@ std::string factor(State &state) {
 PayLoad stmt_ref(State &state) {
   State so(state);
   try {
-    return PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{synonym(state)});
+    return PayLoad(SINGLE, Single::SYNONYM,
+                   std::vector<std::string>{synonym(state)},
+                   std::vector<bool>{true});
   } catch (ParseException &e) {
     state.assign(so);
     try {
-      return PayLoad(SINGLE, Single::INTEGER, std::vector<std::string>{integer(state)});
+      return PayLoad(SINGLE, Single::INTEGER,
+                     std::vector<std::string>{integer(state)});
     } catch (ParseException &e) {
       state.assign(so);
       try {
-        return PayLoad(SINGLE, Single::WILDCARD, std::vector<std::string>{wildcard(state)});
+        return PayLoad(SINGLE, Single::WILDCARD,
+                       std::vector<std::string>{wildcard(state)});
       } catch (ParseException &e) {
         state.excps.push_back(e);
         throw ParseException(so.i, state.i, "stmt_ref", "");
@@ -71,7 +75,9 @@ PayLoad stmt_ref(State &state) {
 PayLoad ent_ref(State &state) {
   State so(state);
   try {
-    return PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{synonym(state)});
+    return PayLoad(SINGLE, Single::SYNONYM,
+                   std::vector<std::string>{synonym(state)},
+                   std::vector<bool>{true});
   } catch (ParseException &e) {
     state.assign(so);
     try {
@@ -84,11 +90,14 @@ PayLoad ent_ref(State &state) {
       std::string dbl_quotes_2 = double_quotes(state);
       whitespace(state);
 
-      return PayLoad(SINGLE, Single::DOUBLE_QUOTE_IDENT, std::vector<std::string>{dbl_quotes_1 + val + dbl_quotes_2});
+      return PayLoad(
+          SINGLE, Single::DOUBLE_QUOTE_IDENT,
+          std::vector<std::string>{dbl_quotes_1 + val + dbl_quotes_2});
     } catch (ParseException &e) {
       state.assign(so);
       try {
-        return PayLoad(SINGLE, Single::WILDCARD, std::vector<std::string>{wildcard(state)});
+        return PayLoad(SINGLE, Single::WILDCARD,
+                       std::vector<std::string>{wildcard(state)});
       } catch (ParseException &e) {
         state.excps.push_back(e);
         throw ParseException(so.i, state.i, "ent_ref", "");
@@ -116,11 +125,14 @@ PayLoad expr_spec(State &state) {
     std::string any_val_2 = wildcard(state);
     whitespace(state);
 
-    return PayLoad(SINGLE, Single::U_DQ_FACTOR, std::vector<std::string>{any_val_1 + dbl_quotes_1 + value + dbl_quotes_2 + any_val_2});
+    return PayLoad(SINGLE, Single::U_DQ_FACTOR,
+                   std::vector<std::string>{any_val_1 + dbl_quotes_1 + value +
+                                            dbl_quotes_2 + any_val_2});
   } catch (ParseException &e) {
     state.assign(so);
     try {
-      return PayLoad(SINGLE, Single::WILDCARD, std::vector<std::string>{wildcard(state)});
+      return PayLoad(SINGLE, Single::WILDCARD,
+                     std::vector<std::string>{wildcard(state)});
     } catch (ParseException &e) {
       state.excps.push_back(e);
       throw ParseException(so.i, state.i, "expr_spec", "");
@@ -359,7 +371,7 @@ PayLoad select(State &state, Single load_type) {
     values.push_back(synonym(state));
     whitespace(state);
 
-    return PayLoad(SINGLE, load_type, values);
+    return PayLoad(SINGLE, load_type, values, std::vector<bool>{true});
   } catch (ParseException &e) {
     state.excps.push_back(e);
     throw ParseException(so.i, state.i, "select", "");
@@ -548,18 +560,17 @@ PayLoad suchthat_cl(State &state) {
 // -------------------- Pattern Clause -------------------- //
 
 PayLoad syn_assign(State &state) {
-  std::vector<std::string> values;
+  std::vector<PayLoad> args;
 
   State so(state);
   try {
-    std::string val = synonym(state);
-    values.push_back(val);
+    args.push_back(PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{synonym(state)}, std::vector<bool>{true}));
     whitespace(state);
 
     std::vector<PayLoad> pair = ent_and_expr_spec(state);
-    std::vector<std::string> vals = payloads_to_values(pair);
-    std::vector<bool> flags = payloads_to_flags(pair);
-    values.insert(values.end(), vals.begin(), vals.end());
+    args.insert(args.end(), pair.begin(), pair.end());
+    std::vector<std::string> values = payloads_to_values(args);
+    std::vector<bool> flags = payloads_to_flags(args);
     whitespace(state);
 
     return PayLoad(TRIPLE, SYN_ASSIGN, values, flags);

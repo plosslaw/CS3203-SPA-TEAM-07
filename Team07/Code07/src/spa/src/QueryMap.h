@@ -53,13 +53,14 @@ public:
   Tag getTag();
   LoadType getType();
   std::vector<std::string> getValue();
+  std::vector<bool> get_flag();
   friend bool operator==(const PayLoad &l, const PayLoad &r) {
-    return (std::tie(l.tag, l.type.single, l.value) ==
-            std::tie(r.tag, r.type.single, r.value)) ||
-           (std::tie(l.tag, l.type.pair, l.value) ==
-            std::tie(r.tag, r.type.pair, r.value)) ||
-           (std::tie(l.tag, l.type.triple, l.value) ==
-            std::tie(r.tag, r.type.triple, r.value));
+    return (std::tie(l.tag, l.type.single, l.value, l.flag) ==
+            std::tie(r.tag, r.type.single, r.value, r.flag)) ||
+           (std::tie(l.tag, l.type.pair, l.value, l.flag) ==
+            std::tie(r.tag, r.type.pair, r.value, r.flag)) ||
+           (std::tie(l.tag, l.type.triple, l.value, l.flag) ==
+            std::tie(r.tag, r.type.triple, r.value, r.flag));
   }
 };
 

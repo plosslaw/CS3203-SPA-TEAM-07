@@ -48,6 +48,8 @@ LoadType PayLoad::getType() { return type; }
 
 std::vector<std::string> PayLoad::getValue() { return value; }
 
+std::vector<bool> PayLoad::get_flag() { return flag; };
+
 QueryMap::QueryMap() {
   table[ClauseType::SELECT] = std::vector<PayLoad>();
   table[ClauseType::DECLARATION] = std::vector<PayLoad>();
