@@ -578,6 +578,7 @@ QueryMap pql_query(State &state) {
   State so(state);
   // declaration*
   try {
+    whitespace(state);
     while (true) {
       std::vector<PayLoad> single_ent_declarations = declaration_cl(state);
       declarations.insert(declarations.end(), single_ent_declarations.begin(),
@@ -656,8 +657,7 @@ bool is_synonym_declared(std::vector<PayLoad> declarations, PayLoad target) {
 
 // Returns true if target is in list.
 bool is_payload_in(std::vector<PayLoad> list, PayLoad target) {
-  for (auto it_dcl = list.begin(); it_dcl != list.end();
-       ++it_dcl) {
+  for (auto it_dcl = list.begin(); it_dcl != list.end(); ++it_dcl) {
     PayLoad current = (*it_dcl);
     if (current == target) {
       return true;
