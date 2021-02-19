@@ -12,6 +12,7 @@
 
 class QueryEvaluator {
 public:
+    explicit QueryEvaluator();
     explicit QueryEvaluator(PKBQueryController pkbQueryController);
     std::vector<std::string> QERunQuery(QueryMap query_map);
 
