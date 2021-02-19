@@ -1,7 +1,5 @@
 #include "ActionsExecutor.h"
 
-#include<iostream>
-
 using namespace std;
 
 /**
@@ -71,12 +69,6 @@ vector<stmt_ref> ActionsExecutor::get_all_statements() {
 }
 
 vector<stmt_ref> ActionsExecutor::get_all_statements_of_type(stmt_type type) {
-
-    for (stmt_ref ele : this->stmts_assign) {
-        cout<<ele<<" ";
-    }
-    cout<<'\n';
-
     switch (type) {
     
     case stmt_type::ASSIGN:
