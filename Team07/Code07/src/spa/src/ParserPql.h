@@ -2,7 +2,7 @@
 #include "QueryMap.h"
 #include <string.h>
 
-QueryMap pql_query(std::string query);
+QueryMap pql_query(State &query);
 
 /*
 // low level abstractions

@@ -566,14 +566,13 @@ PayLoad pattern_cl(State &state) {
   }
 }
 
-QueryMap pql_query(std::string query) {
+QueryMap pql_query(State &state) {
   QueryMap queryMap;
   std::vector<PayLoad> declarations;
   std::vector<PayLoad> selects;
   std::vector<PayLoad> suchthats;
   std::vector<PayLoad> patterns;
 
-  State state(&query);
   State so(state);
   // declaration*
   try {
