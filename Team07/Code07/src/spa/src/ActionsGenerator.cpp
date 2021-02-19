@@ -1,14 +1,17 @@
 #include "ActionsGenerator.h"
 #include "StringUtil.h"
 #include "SuchThatEval.h"
+#include "PatternEval.h"
 #include "Types.hpp"
 #include <sstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <unordered_set>
 
 using namespace std;
 
+//constructor
 ActionsGenerator::ActionsGenerator() {}
 
 ActionsGenerator::ActionsGenerator(QueryMap mapQuery, ActionsExecutor executerActions) {
@@ -16,6 +19,7 @@ ActionsGenerator::ActionsGenerator(QueryMap mapQuery, ActionsExecutor executerAc
     queryMap = mapQuery;
 }
 
+//methods
 vector<string> ActionsGenerator::TraverseQueryMap() {
     
     // preprocessing - retrieval of queryMap clauses
@@ -92,12 +96,7 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
         } else {
             throw "Payload Single is not STATEMENT/READ/PRINT/CALL/WHILE/IF/ASSIGN.";
         }
-    }
-    stmtStorage["s"] = vector<string>{"1","2","3"};
-    stmtStorage["s1"] = vector<string>{"1","2","3"};
-    assignStorage["a"] = vector<string>{"1","2","3"};
-    constantStorage["const"] = vector<string>{"1"};
-    variableStorage["v"] = vector<string>{"x","y","z"}; 
+    } 
 
     //map all types of storage such as stmt, read etc into mapStorage
     mapStorage[Single::PROCEDURE] = procedureStorage;
@@ -141,15 +140,20 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
         if (such_that_second_arg == select_value) {
             is_select_val_in_suchthat.second = true;
         }
+        SuchThatEval such_that_eval(storeDeclaration, mapStorage, executer);
+
+        vector<string> return_result = such_that_eval.one_such_that_zero_pattern(such_that_pay_load, select_value, select_type, is_select_val_in_suchthat);
         if (is_select_val_in_suchthat.first || is_select_val_in_suchthat.second) {
-            return one_such_that_zero_pattern(such_that_pay_load, select_value, select_type, is_select_val_in_suchthat);
+            return return_result;    
         } else {
-            // such that clause does not have select values inside. similar to kiv #1
-            // kiv #1.a: return default clause first
-            return default_solution;
+            if (return_result.empty()) {
+                return vector<string> {"None"};
+            } else {
+                return default_solution;
+            }
         }
     } else if (is_such_that_empty && !is_pattern_empty) {
-        // there is pattern clause only and no such that
+        // there is only pattern clause and no such that
         PayLoad pattern_pay_load = patternList.at(0);
         string pattern_first_arg = pattern_pay_load.getValue()[0];
         string pattern_second_arg = pattern_pay_load.getValue()[1];
@@ -161,109 +165,94 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
         if (pattern_second_arg == select_value) {
             is_select_val_in_pattern.second = true;
         }
+        PatternEval pattern_eval(storeDeclaration, mapStorage, executer);
+
+        vector<string> return_result = pattern_eval.zero_such_that_one_pattern(pattern_pay_load, select_value, select_type, is_select_val_in_pattern);
         if (is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
             //select a pattern a(v,_) or select v pattern a(v,_)
-            return zero_such_that_one_pattern(pattern_pay_load, select_value, select_type, is_select_val_in_pattern);
+            return return_result;
         } else {
-            //pattern clause does not have same values as select value, Select pn pattern a(v,_)
-            //kiv #1.b - return default first
+            if (return_result.empty()) {
+                return vector<string> {"None"};
+            } else {
+                return default_solution;
+            }
+        }
+    } else {
+        // there is both such that and pattern.
+        //todo
+        PayLoad such_that_pay_load = suchThatList.at(0);
+        PayLoad pattern_pay_load = patternList.at(0);
+        string such_that_first_arg = such_that_pay_load.getValue()[0];
+        string such_that_second_arg = such_that_pay_load.getValue()[1];
+        string pattern_first_arg = pattern_pay_load.getValue()[0];
+        string pattern_second_arg = pattern_pay_load.getValue()[1];
+
+        pair<bool, bool> is_select_val_in_suchthat(false, false);  
+        if (such_that_first_arg == select_value) {
+            is_select_val_in_suchthat.first = true;
+        }
+        if (such_that_second_arg == select_value) {
+            is_select_val_in_suchthat.second = true;
+        }
+        pair<bool, bool> is_select_val_in_pattern(false, false);  
+        if (pattern_first_arg == select_value) {
+            is_select_val_in_pattern.first = true;
+        }
+        if (pattern_second_arg == select_value) {
+            is_select_val_in_pattern.second = true;
+        }
+        if (!is_select_val_in_suchthat.first && !is_select_val_in_suchthat.second && !is_select_val_in_pattern.first && !is_select_val_in_pattern.second) {
+            //select value is not present in both such that clause and pattern clause
             return default_solution;
         }
-    } //else {
-    //     // there is both such that and pattern.
-    //     //todo
-    //     PayLoad such_that_pay_load = suchThatList.at(0);
-    //     PayLoad pattern_pay_load = patternList.at(0);
-    //     string such_that_first_arg = such_that_pay_load.getValue()[0];
-    //     string such_that_second_arg = such_that_pay_load.getValue()[1];
-    //     string pattern_first_arg = pattern_pay_load.getValue()[0];
-    //     string pattern_second_arg = pattern_pay_load.getValue()[1];
-    //     bool st_first_p_first = such_that_first_arg == pattern_first_arg;
-    //     bool st_first_p_second = such_that_first_arg == pattern_second_arg; 
-    //     bool st_second_p_first = such_that_second_arg == pattern_first_arg;
-    //     bool st_second_p_second = such_that_second_arg == pattern_second_arg;
-    //     if (st_first_p_first && st_second_p_second) {
-    //         //two common synonyms - such that first, pattern first and such that second, pattern second
-
-    //     }
-    //     if(st_first_p_first ) {
-    //         // one common synonym
-            
-    //     }
-    //}
-}
-
-vector<string> ActionsGenerator::zero_such_that_one_pattern(PayLoad pattern_pay_load, string select_value, Single select_type, pair<bool,bool> arg_pairs) {
-    string first_arg = pattern_pay_load.getValue()[0];
-    string second_arg = pattern_pay_load.getValue()[1];
-    string third_arg = pattern_pay_load.getValue()[2];
-    if(arg_pairs.first && !arg_pairs.second) {
-        //select a pattern a(v,_) first arg is same as select value
-        pattern p; p.lvalue = "_"; p.rvalue = third_arg;
-        vector<stmt_ref> all_stmts_p_pkb;//kiv #4 = executer.get_all_stmts_pattern(p); //stmt_ref is int
-        vector<string> result;
-        for(auto i : all_stmts_p_pkb) {
-            result.push_back(to_string(i));
+        bool st_first_p_first = such_that_first_arg == pattern_first_arg;
+        bool st_first_p_second = such_that_first_arg == pattern_second_arg; 
+        bool st_second_p_first = such_that_second_arg == pattern_first_arg;
+        bool st_second_p_second = such_that_second_arg == pattern_second_arg;
+        if (st_first_p_first && st_second_p_second || st_first_p_second && st_second_p_first) {
+            //two common synonyms - such that first, pattern first and such that second, pattern second
+            return ActionsGenerator::two_common_synonyms(such_that_pay_load, pattern_pay_load, select_value, select_type);
         }
-        return result;
-    } else if (!arg_pairs.first && arg_pairs.second) {
-        //select v pattern a(v,_); second arg is same as select value
-        //kiv #3: check get_all_variables_pattern_assign parameters again
-        //return executer.get_all_variables_pattern_assign()
-        return (mapStorage[select_type])[select_value];
-    } else {
-        // pattern clause does not have select values. select s pattern a(v,_)
-        //kiv #1.b- return default first
-        return (mapStorage[select_type])[select_value];
+        if (!st_first_p_first && !st_first_p_first && !st_second_p_first &&!st_second_p_second) {
+            // no common synonym
+             return ActionsGenerator::zero_common_synonyms(such_that_pay_load, pattern_pay_load, select_value, select_type);
+        }
+        else {
+
+        }
     }
 }
 
-vector<string> ActionsGenerator::one_such_that_zero_pattern(PayLoad such_that_pay_load, string select_value, Single select_type, pair<bool,bool> arg_pairs) {
-    pair<bool, bool> bool_pairs_args = ActionsGenerator::check_if_args_are_variable(such_that_pay_load.getValue()[0], such_that_pay_load.getValue()[1]);
-    Pair such_that_type = such_that_pay_load.getType().pair;
-    string such_that_first_arg = such_that_pay_load.getValue()[0];
-    string such_that_second_arg = such_that_pay_load.getValue()[1];
+// vector<string> ActionsGenerator::zero_common_synonyms(PayLoad such_that_load, PayLoad pattern_load, string select_value, Single select_type) {
+//     string such_that_first_arg = such_that_load.getValue()[0];
+//     string such_that_second_arg = such_that_load.getValue()[1];
+//     //
+// }
+// vector<string> ActionsGenerator::two_common_synonyms(PayLoad such_that_load, PayLoad pattern_load, string select_value, Single select_type) {
+//     string such_that_first_arg = such_that_load.getValue()[0];
+//     string such_that_second_arg = such_that_load.getValue()[1];
+    
+//     //evaluate such that clause first then pass the evaluated such that result to pattern.
+//     vector<string> first_arg_lst = mapStorage[storeDeclaration[such_that_first_arg]][such_that_first_arg];
+//     vector<string> second_arg_lst = mapStorage[storeDeclaration[such_that_second_arg]][such_that_second_arg];
+//     vector<pair<string,string>> products = ActionsGenerator::crossproduct(first_arg_lst, second_arg_lst);
+//     map<string, vector<string>> output = SuchThatEval::such_that_eval_3(products, such_that_load.getType().pair, such_that_first_arg, such_that_second_arg,executer);
+    
+//     //evaluate pattern clause by passing results from suchthat clause to it
+//     map<string, vector<string>> output2 = ActionsGenerator::two_common_synonyms_pattern_val(pattern_load, output);
+//     return output2[select_value];
+// }
 
-    if (bool_pairs_args.first && bool_pairs_args.second) {
-        // this means both arguments are variables. might need to cross product
-        vector<string> first_arg_lst = mapStorage[storeDeclaration[such_that_first_arg]][such_that_first_arg];
-        vector<string> second_arg_lst = mapStorage[storeDeclaration[such_that_second_arg]][such_that_second_arg];
-        //kiv #2
-        vector<pair<string,string>> products = ActionsGenerator::crossproduct(first_arg_lst, second_arg_lst);
-        map<string, vector<string>> output = SuchThatEval::such_that_eval_3(products, such_that_type, such_that_pay_load.getValue()[0], such_that_pay_load.getValue()[1],executer);
-        return output[select_value];
-    } else if (bool_pairs_args.first && !bool_pairs_args.second) {
-        // means first is variable. second is not variable(constant string)
-        if(arg_pairs.first) {
-            // first argument is same declaration name as SELECT
-            vector<string> first_arg_lst = (mapStorage[select_type])[select_value];
-            return SuchThatEval::such_that_eval_1(first_arg_lst, such_that_second_arg, such_that_type, executer);
-        } else {
-            // first argument is not same declaration name as SELECT. need to evaluate if this such that returns true. if true return default soln.
-            //kiv #1
-            vector<string> default_solution = (mapStorage[select_type])[select_value];
-            return default_solution;
-        }
-
-    } else if (!bool_pairs_args.first && bool_pairs_args.second) {
-        // means first is not variable(constant string). second is variable.
-        if(arg_pairs.second) {   
-            //second argument is same declaration name as SELECT   
-            vector<string> second_arg_lst = (mapStorage[select_type])[select_value];
-            return SuchThatEval::such_that_eval_2(such_that_pay_load.getValue()[0], second_arg_lst, such_that_type, executer);
-        } else {
-        // second argument is not same declaration name as SELECT. need to evaluate if this such that returns true. if true return default soln.
-        //kiv #1
-        vector<string> default_solution = (mapStorage[select_type])[select_value];
-        return default_solution;
-        } 
-    } else {
-        // first and second args are not variables. (they are constants)
-        //kiv #1
-        vector<string> default_solution = (mapStorage[select_type])[select_value];
-        return default_solution;
-    }
-}
+// map<string,vector<string>> ActionsGenerator::two_common_synonyms_pattern_val(PayLoad pattern_load, map<string,vector<string>> eval_map) {
+//     string pattern_first_arg = pattern_load.getValue()[0];
+//     string pattern_second_arg = pattern_load.getValue()[1];
+//     string pattern_third_arg = pattern_load.getValue()[2];
+//     vector<string> first_arg_lst = eval_map[pattern_first_arg]; 
+//     vector<string> second_arg_lst = eval_map[pattern_second_arg];
+//     vector<pair<string,string>> products = ActionsGenerator::crossproduct(first_arg_lst, second_arg_lst);
+//     return PatternEval::pattern_eval_two_variables(products, pattern_first_arg, pattern_second_arg, pattern_third_arg, executer);
+// }    
    
 // utilities
 
@@ -293,3 +282,44 @@ vector<pair<string,string>> ActionsGenerator::crossproduct(vector<string> first_
     }
     return products;
 };
+
+vector<string> ActionsGenerator::inner_join_A(vector<string> lstA, vector<string> lstB) {
+    // add all elements of lst A that is present in lstB.
+    vector<string> result;
+    for(auto item : lstA) {
+        if(std::find(lstB.begin(), lstB.end(), item) != lstB.end()) {
+            result.push_back(item);
+        }
+    }
+    return result;
+}
+
+
+bool ActionsGenerator::is_element_inside_vectorA(string element, vector<string> vectorA) {
+    return std::find(vectorA.begin(), vectorA.end(), element) != vectorA.end();
+}
+stmt_type ActionsGenerator::convert_single_to_stmt_type(Single s) {
+    if (s == Single::STATEMENT) {
+        return stmt_type::STATEMENT;
+    } else if (s == Single::READ) {
+        return stmt_type::READ;
+    } else if (s == Single::PRINT) {
+        return stmt_type::PRINT;
+    } else if (s == Single::CALL) {
+        return stmt_type::CALL;
+    } else if (s == Single::WHILE) {
+        return stmt_type::WHILE;
+    } else if (s == Single::IF) {
+        return stmt_type::IF;
+    } else if (s == Single::ASSIGN) {
+        return stmt_type::ASSIGN;
+    } else if (s == Single::CONSTANT) {
+        return stmt_type::CONSTANT;
+    } else if (s == Single::VARIABLE) {
+        return stmt_type::VARIABLE;
+    } else if (s == Single::PROCEDURE) {
+        return stmt_type::PROCEDURE;
+    } else {
+        return stmt_type::STATEMENT;
+    }
+}
