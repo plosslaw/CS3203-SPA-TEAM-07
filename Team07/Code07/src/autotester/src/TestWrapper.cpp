@@ -31,6 +31,7 @@ void TestWrapper::parse(std::string filename) {
     // pass to pkb (placeholder)
   } catch (std::string &e) {
     std::cerr << e << "\n";
+    exit (EXIT_FAILURE);
   }
 }
 
