@@ -22,6 +22,10 @@ ActionsExecutor::ActionsExecutor(PKBQueryController pkb_query_controller) {
     this->stmts_read = pkb_query_controller.getStatementsOfType(stmt_type::READ);
     this->stmts_while = pkb_query_controller.getStatementsOfType(stmt_type::WHILE);
     this->vars = pkb_query_controller.getAllVariables();
+
+    for (stmt_ref assign_stmt : this->stmts_assign) {
+        this->unique_set_assign.insert(assign_stmt);
+    }
 }
 
 /**
@@ -72,7 +76,7 @@ vector<stmt_ref> ActionsExecutor::get_all_statements_of_type(stmt_type type) {
         cout<<ele<<" ";
     }
     cout<<'\n';
-    
+
     switch (type) {
     
     case stmt_type::ASSIGN:
@@ -1297,6 +1301,26 @@ std::vector<var_ref> ActionsExecutor::get_all_variables_pattern_assign(std::stri
         }
     }
     
+    return results;
+}
+
+std::vector<var_ref> ActionsExecutor::get_variable_pattern_assign(stmt_ref assign_stmt, std::string pattern_string) {
+    vector<var_ref> results;
+
+    if (this->unique_set_assign.find(assign_stmt) == this->unique_set_assign.end()) {
+        // assign_stmt passed is not found in list of assignments
+        return results;
+    }
+
+    pattern trial_pattern;
+    trial_pattern.rvalue = pattern_string;
+    for (var_ref var : this->vars) {
+        trial_pattern.lvalue = var;
+        if (pkb_query_controller.satisfiesPattern(assign_stmt, trial_pattern)) {
+            results.push_back(var);
+            break;
+        }
+    }
     return results;
 }
 

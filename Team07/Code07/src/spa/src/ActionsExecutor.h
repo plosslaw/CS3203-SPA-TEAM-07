@@ -93,6 +93,7 @@ public:
     // variable position assumed to be on left side
     std::vector<var_ref> get_all_variables_pattern_assign(); // wildcard operation
     std::vector<var_ref> get_all_variables_pattern_assign(std::string pattern_string);
+    std::vector<var_ref> get_variable_pattern_assign(stmt_ref assign_stmt, std::string pattern_string);
 
 private:
     PKBQueryController pkb_query_controller;
@@ -106,6 +107,8 @@ private:
     std::vector<stmt_ref> stmts_read;
     std::vector<stmt_ref> stmts_while;
     std::vector<var_ref> vars;
+
+    std::unordered_set<stmt_ref> unique_set_assign;
 
 };
 

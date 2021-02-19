@@ -157,11 +157,11 @@ TEST_CASE("single_such_that_clause") {
     vector<stmt_ref> ans_vector_modifies_assign {4,6,7,8,10};
     vector<stmt_ref> ans_vector_modifies_while {3,9};
     vector<stmt_ref> ans_vector_modifies_stmt_x {3,7};
-    vector<proc_ref> ans_vector_proc_modifies {"main"};
-    vector<proc_ref> ans_vector_proc_modifies_x {"main"};
-    vector<proc_ref> ans_vector_proc_modifies_j {};
+    // vector<proc_ref> ans_vector_proc_modifies {"main"};
+    // vector<proc_ref> ans_vector_proc_modifies_x {"main"};
+    // vector<proc_ref> ans_vector_proc_modifies_j {};
     vector<var_ref> ans_vector_var_modifies {"a", "v", "w", "x", "y"};
-    vector<var_ref> ans_vector_var_modifies_proc_main {"a", "v", "w", "x", "y"};
+    // vector<var_ref> ans_vector_var_modifies_proc_main {"a", "v", "w", "x", "y"};
     vector<var_ref> ans_vector_var_modifies_stmt_5 {"v", "w", "x", "y"};
     vector<var_ref> ans_vector_var_modifies_while {"v", "x"};
 
@@ -171,11 +171,11 @@ TEST_CASE("single_such_that_clause") {
     vector<stmt_ref> ans_vector_uses_assign_y {6};
     vector<stmt_ref> ans_vector_uses_while {3,9};
     vector<stmt_ref> ans_vector_uses_stmt_x {3,4,5,11};
-    vector<proc_ref> ans_vector_proc_uses {"main"};
-    vector<proc_ref> ans_vector_proc_uses_x {"main"};
-    vector<proc_ref> ans_vector_proc_uses_j {};
+    // vector<proc_ref> ans_vector_proc_uses {"main"};
+    // vector<proc_ref> ans_vector_proc_uses_x {"main"};
+    // vector<proc_ref> ans_vector_proc_uses_j {};
     vector<var_ref> ans_vector_var_uses {"b", "v", "x", "y", "z"};
-    vector<var_ref> ans_vector_var_uses_proc_main {"b", "v", "x", "y", "z"};
+    // vector<var_ref> ans_vector_var_uses_proc_main {"b", "v", "x", "y", "z"};
     vector<var_ref> ans_vector_var_uses_stmt_5 {"v", "x", "y", "z"};
     vector<var_ref> ans_vector_var_uses_while {"v", "x", "y"};
 
@@ -233,25 +233,25 @@ TEST_CASE("single_such_that_clause") {
             executor.get_all_stmts_modifies(stmt_type::STATEMENT, "x"),
             ans_vector_modifies_stmt_x));
 
-        REQUIRE(verify_proc_vector(
-            executor.get_all_procedures_modifies(),
-            ans_vector_proc_modifies));
+        // REQUIRE(verify_proc_vector(
+        //     executor.get_all_procedures_modifies(),
+        //     ans_vector_proc_modifies));
 
-        REQUIRE(verify_proc_vector(
-            executor.get_all_procedures_modifies("x"),
-            ans_vector_proc_modifies_x));
+        // REQUIRE(verify_proc_vector(
+        //     executor.get_all_procedures_modifies("x"),
+        //     ans_vector_proc_modifies_x));
 
-        REQUIRE(verify_proc_vector(
-            executor.get_all_procedures_modifies("j"),
-            ans_vector_proc_modifies_j));
+        // REQUIRE(verify_proc_vector(
+        //     executor.get_all_procedures_modifies("j"),
+        //     ans_vector_proc_modifies_j));
         
         REQUIRE(verify_var_vector(
             executor.get_all_variables_modifies(),
             ans_vector_var_modifies));
         
-        REQUIRE(verify_var_vector(
-            executor.get_all_variables_modifies("main"),
-            ans_vector_var_modifies_proc_main));
+        // REQUIRE(verify_var_vector(
+        //     executor.get_all_variables_modifies("main"),
+        //     ans_vector_var_modifies_proc_main));
         
         REQUIRE(verify_var_vector(
             executor.get_all_variables_modifies(5),
@@ -280,25 +280,25 @@ TEST_CASE("single_such_that_clause") {
             executor.get_all_stmts_uses(stmt_type::STATEMENT, "x"),
             ans_vector_uses_stmt_x));
         
-        REQUIRE(verify_proc_vector(
-            executor.get_all_procedures_uses(),
-            ans_vector_proc_uses));
+        // REQUIRE(verify_proc_vector(
+        //     executor.get_all_procedures_uses(),
+        //     ans_vector_proc_uses));
 
-        REQUIRE(verify_proc_vector(
-            executor.get_all_procedures_uses("x"),
-            ans_vector_proc_uses_x));
+        // REQUIRE(verify_proc_vector(
+        //     executor.get_all_procedures_uses("x"),
+        //     ans_vector_proc_uses_x));
 
-        REQUIRE(verify_proc_vector(
-            executor.get_all_procedures_uses("j"),
-            ans_vector_proc_uses_j));
+        // REQUIRE(verify_proc_vector(
+        //     executor.get_all_procedures_uses("j"),
+        //     ans_vector_proc_uses_j));
         
         REQUIRE(verify_var_vector(
             executor.get_all_variables_uses(),
             ans_vector_var_uses));
         
-        REQUIRE(verify_var_vector(
-            executor.get_all_variables_uses("main"),
-            ans_vector_var_uses_proc_main));
+        // REQUIRE(verify_var_vector(
+        //     executor.get_all_variables_uses("main"),
+        //     ans_vector_var_uses_proc_main));
         
         REQUIRE(verify_var_vector(
             executor.get_all_variables_uses(5),
