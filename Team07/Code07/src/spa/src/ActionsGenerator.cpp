@@ -110,7 +110,11 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
     mapStorage[Single::VARIABLE] = variableStorage;
     
     //SELECT
+    if(selectList.empty()) {
+        return vector<string>{"Invalid"};
+    }
     PayLoad select_payload = selectList.at(0);
+    
     if (select_payload.getType().single != Single::SYNONYM) {
         throw "SELECT payload is not a synonym. Synonym type is required.";
     }
@@ -206,22 +210,24 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
             //select value is not present in both such that clause and pattern clause
             return default_solution;
         }
-        bool st_first_p_first = such_that_first_arg == pattern_first_arg;
-        bool st_first_p_second = such_that_first_arg == pattern_second_arg; 
-        bool st_second_p_first = such_that_second_arg == pattern_first_arg;
-        bool st_second_p_second = such_that_second_arg == pattern_second_arg;
-        if (st_first_p_first && st_second_p_second || st_first_p_second && st_second_p_first) {
-            //two common synonyms - such that first, pattern first and such that second, pattern second
-            return ActionsGenerator::two_common_synonyms(such_that_pay_load, pattern_pay_load, select_value, select_type);
-        }
-        if (!st_first_p_first && !st_first_p_first && !st_second_p_first &&!st_second_p_second) {
-            // no common synonym
-             return ActionsGenerator::zero_common_synonyms(such_that_pay_load, pattern_pay_load, select_value, select_type);
-        }
-        else {
+        return default_solution;
+        // bool st_first_p_first = such_that_first_arg == pattern_first_arg;
+        // bool st_first_p_second = such_that_first_arg == pattern_second_arg; 
+        // bool st_second_p_first = such_that_second_arg == pattern_first_arg;
+        // bool st_second_p_second = such_that_second_arg == pattern_second_arg;
+        // if (st_first_p_first && st_second_p_second || st_first_p_second && st_second_p_first) {
+        //     //two common synonyms - such that first, pattern first and such that second, pattern second
+        //     return ActionsGenerator::two_common_synonyms(such_that_pay_load, pattern_pay_load, select_value, select_type);
+        // }
+        // if (!st_first_p_first && !st_first_p_first && !st_second_p_first &&!st_second_p_second) {
+        //     // no common synonym
+        //      return ActionsGenerator::zero_common_synonyms(such_that_pay_load, pattern_pay_load, select_value, select_type);
+        // }
+        // else {
 
-        }
+        // }
     }
+    return default_solution;
 }
 
 // vector<string> ActionsGenerator::zero_common_synonyms(PayLoad such_that_load, PayLoad pattern_load, string select_value, Single select_type) {

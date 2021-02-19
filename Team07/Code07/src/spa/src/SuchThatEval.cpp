@@ -452,6 +452,8 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
                 }
             }
         }     
+    } else {
+        return vector<string> {"None"};
     }
 }       
 
