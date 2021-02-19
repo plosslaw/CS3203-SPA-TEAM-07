@@ -1,5 +1,7 @@
 #include "ActionsExecutor.h"
 
+#include<iostream>
+
 using namespace std;
 
 /**
@@ -65,6 +67,12 @@ vector<stmt_ref> ActionsExecutor::get_all_statements() {
 }
 
 vector<stmt_ref> ActionsExecutor::get_all_statements_of_type(stmt_type type) {
+
+    for (stmt_ref ele : this->stmts_assign) {
+        cout<<ele<<" ";
+    }
+    cout<<'\n';
+    
     switch (type) {
     
     case stmt_type::ASSIGN:
@@ -114,24 +122,31 @@ std::vector<stmt_ref> ActionsExecutor::get_all_stmts_follows(stmt_type type, arg
     
     case stmt_type::ASSIGN:
         stmts = this->stmts_assign;
+        break;
 
     case stmt_type::CALL:
         stmts = this->stmts_call;
-    
+        break;
+
     case stmt_type::IF:
         stmts = this->stmts_if;
+        break;
 
     case stmt_type::PRINT:
         stmts = this->stmts_print;
+        break;
 
     case stmt_type::READ:
         stmts = this->stmts_read;
+        break;
 
     case stmt_type::WHILE:
         stmts = this->stmts_while;
+        break;
 
     case stmt_type::STATEMENT:
         stmts = this->stmts;
+        break;
 
     default:
         throw "Invalid statement type passed"; 
@@ -199,24 +214,31 @@ std::vector<stmt_ref> ActionsExecutor::get_all_stmts_follows(stmt_type type, arg
     
     case stmt_type::ASSIGN:
         stmts = this->stmts_assign;
+        break;
 
     case stmt_type::CALL:
         stmts = this->stmts_call;
-    
+        break;
+
     case stmt_type::IF:
         stmts = this->stmts_if;
+        break;
 
     case stmt_type::PRINT:
         stmts = this->stmts_print;
+        break;
 
     case stmt_type::READ:
         stmts = this->stmts_read;
+        break;
 
     case stmt_type::WHILE:
         stmts = this->stmts_while;
+        break;
 
     case stmt_type::STATEMENT:
         stmts = this->stmts;
+        break;
 
     default:
         throw "Invalid statement type passed"; 
@@ -277,24 +299,31 @@ std::vector<stmt_ref> ActionsExecutor::get_all_stmts_follows(stmt_type type, arg
     
     case stmt_type::ASSIGN:
         stmts = this->stmts_assign;
+        break;
 
     case stmt_type::CALL:
         stmts = this->stmts_call;
-    
+        break;
+
     case stmt_type::IF:
         stmts = this->stmts_if;
+        break;
 
     case stmt_type::PRINT:
         stmts = this->stmts_print;
+        break;
 
     case stmt_type::READ:
         stmts = this->stmts_read;
+        break;
 
     case stmt_type::WHILE:
         stmts = this->stmts_while;
+        break;
 
     case stmt_type::STATEMENT:
         stmts = this->stmts;
+        break;
 
     default:
         throw "Invalid statement type passed"; 
@@ -363,24 +392,31 @@ std::vector<stmt_ref> ActionsExecutor::get_all_stmts_parent(stmt_type type, arg_
     
     case stmt_type::ASSIGN:
         stmts = this->stmts_assign;
+        break;
 
     case stmt_type::CALL:
         stmts = this->stmts_call;
-    
+        break;
+
     case stmt_type::IF:
         stmts = this->stmts_if;
+        break;
 
     case stmt_type::PRINT:
         stmts = this->stmts_print;
+        break;
 
     case stmt_type::READ:
         stmts = this->stmts_read;
+        break;
 
     case stmt_type::WHILE:
         stmts = this->stmts_while;
+        break;
 
     case stmt_type::STATEMENT:
         stmts = this->stmts;
+        break;
 
     default:
         throw "Invalid statement type passed"; 
@@ -448,24 +484,31 @@ std::vector<stmt_ref> ActionsExecutor::get_all_stmts_parent(stmt_type type, arg_
     
     case stmt_type::ASSIGN:
         stmts = this->stmts_assign;
+        break;
 
     case stmt_type::CALL:
         stmts = this->stmts_call;
-    
+        break;
+
     case stmt_type::IF:
         stmts = this->stmts_if;
+        break;
 
     case stmt_type::PRINT:
         stmts = this->stmts_print;
+        break;
 
     case stmt_type::READ:
         stmts = this->stmts_read;
+        break;
 
     case stmt_type::WHILE:
         stmts = this->stmts_while;
+        break;
 
     case stmt_type::STATEMENT:
         stmts = this->stmts;
+        break;
 
     default:
         throw "Invalid statement type passed"; 
@@ -526,24 +569,31 @@ std::vector<stmt_ref> ActionsExecutor::get_all_stmts_parent(stmt_type type, arg_
     
     case stmt_type::ASSIGN:
         stmts = this->stmts_assign;
+        break;
 
     case stmt_type::CALL:
         stmts = this->stmts_call;
-    
+        break;
+
     case stmt_type::IF:
         stmts = this->stmts_if;
+        break;
 
     case stmt_type::PRINT:
         stmts = this->stmts_print;
+        break;
 
     case stmt_type::READ:
         stmts = this->stmts_read;
+        break;
 
     case stmt_type::WHILE:
         stmts = this->stmts_while;
+        break;
 
     case stmt_type::STATEMENT:
         stmts = this->stmts;
+        break;
 
     default:
         throw "Invalid statement type passed"; 
@@ -612,24 +662,31 @@ std::vector<stmt_ref> ActionsExecutor::get_all_stmts_modifies(stmt_type type) {
     
     case stmt_type::ASSIGN:
         stmts = this->stmts_assign;
+        break;
 
     case stmt_type::CALL:
         stmts = this->stmts_call;
-    
+        break;
+
     case stmt_type::IF:
         stmts = this->stmts_if;
+        break;
 
     case stmt_type::PRINT:
         stmts = this->stmts_print;
+        break;
 
     case stmt_type::READ:
         stmts = this->stmts_read;
+        break;
 
     case stmt_type::WHILE:
         stmts = this->stmts_while;
+        break;
 
     case stmt_type::STATEMENT:
         stmts = this->stmts;
+        break;
 
     default:
         throw "Invalid statement type passed"; 
@@ -660,24 +717,31 @@ std::vector<stmt_ref> ActionsExecutor::get_all_stmts_modifies(stmt_type type, va
     
     case stmt_type::ASSIGN:
         stmts = this->stmts_assign;
+        break;
 
     case stmt_type::CALL:
         stmts = this->stmts_call;
-    
+        break;
+
     case stmt_type::IF:
         stmts = this->stmts_if;
+        break;
 
     case stmt_type::PRINT:
         stmts = this->stmts_print;
+        break;
 
     case stmt_type::READ:
         stmts = this->stmts_read;
+        break;
 
     case stmt_type::WHILE:
         stmts = this->stmts_while;
+        break;
 
     case stmt_type::STATEMENT:
         stmts = this->stmts;
+        break;
 
     default:
         throw "Invalid statement type passed"; 
@@ -707,24 +771,31 @@ std::vector<stmt_ref> ActionsExecutor::get_all_stmts_uses(stmt_type type) {
     
     case stmt_type::ASSIGN:
         stmts = this->stmts_assign;
+        break;
 
     case stmt_type::CALL:
         stmts = this->stmts_call;
-    
+        break;
+
     case stmt_type::IF:
         stmts = this->stmts_if;
+        break;
 
     case stmt_type::PRINT:
         stmts = this->stmts_print;
+        break;
 
     case stmt_type::READ:
         stmts = this->stmts_read;
+        break;
 
     case stmt_type::WHILE:
         stmts = this->stmts_while;
+        break;
 
     case stmt_type::STATEMENT:
         stmts = this->stmts;
+        break;
 
     default:
         throw "Invalid statement type passed"; 
@@ -755,24 +826,31 @@ std::vector<stmt_ref> ActionsExecutor::get_all_stmts_uses(stmt_type type, var_re
     
     case stmt_type::ASSIGN:
         stmts = this->stmts_assign;
+        break;
 
     case stmt_type::CALL:
         stmts = this->stmts_call;
-    
+        break;
+
     case stmt_type::IF:
         stmts = this->stmts_if;
+        break;
 
     case stmt_type::PRINT:
         stmts = this->stmts_print;
+        break;
 
     case stmt_type::READ:
         stmts = this->stmts_read;
+        break;
 
     case stmt_type::WHILE:
         stmts = this->stmts_while;
+        break;
 
     case stmt_type::STATEMENT:
         stmts = this->stmts;
+        break;
 
     default:
         throw "Invalid statement type passed"; 
@@ -965,24 +1043,31 @@ std::vector<var_ref> ActionsExecutor::get_all_variables_modifies(stmt_type other
     
     case stmt_type::ASSIGN:
         stmts_wildcard = this->stmts_assign;
+        break;
 
     case stmt_type::CALL:
         stmts_wildcard = this->stmts_call;
+        break;
     
     case stmt_type::IF:
         stmts_wildcard = this->stmts_if;
+        break;
 
     case stmt_type::PRINT:
         stmts_wildcard = this->stmts_print;
+        break;
 
     case stmt_type::READ:
         stmts_wildcard = this->stmts_read;
+        break;
 
     case stmt_type::WHILE:
         stmts_wildcard = this->stmts_while;
+        break;
 
     case stmt_type::STATEMENT:
         stmts_wildcard = this->stmts;
+        break;
 
     default:
         throw "Invalid statement type passed"; 
@@ -1099,24 +1184,31 @@ std::vector<var_ref> ActionsExecutor::get_all_variables_uses(stmt_type other_stm
     
     case stmt_type::ASSIGN:
         stmts_wildcard = this->stmts_assign;
+        break;
 
     case stmt_type::CALL:
         stmts_wildcard = this->stmts_call;
+        break;
     
     case stmt_type::IF:
         stmts_wildcard = this->stmts_if;
+        break;
 
     case stmt_type::PRINT:
         stmts_wildcard = this->stmts_print;
+        break;
 
     case stmt_type::READ:
         stmts_wildcard = this->stmts_read;
+        break;
 
     case stmt_type::WHILE:
         stmts_wildcard = this->stmts_while;
+        break;
 
     case stmt_type::STATEMENT:
         stmts_wildcard = this->stmts;
+        break;
 
     default:
         throw "Invalid statement type passed"; 
