@@ -9,38 +9,6 @@
 #include <string>
 #include <vector>
 
-// /** name :- letter (letter | digit)* */
-// std::string name(State &s) {
-//   int init = s.i;
-//   try {
-//     char r1 = charPredicate(s, &alphaPred, "letter");
-//     // :- letter
-//     std::string r2 = alphaNum(s);
-//     // :- (letter | digit)*
-//     r2.insert(r2.begin(), r1);
-//     return r2;
-//   } catch (ParseException &e) {
-//     s.excps.push_back(e);
-//     throw ParseException(init, s.i, "name", "");
-//   }
-// }
-
-// /** integer :- digit digit* */
-// std::string integer(State &s) {
-//   int init = s.i;
-//   try {
-//     char r1 = charPredicate(s, &digitPred, "digit");
-//     // :- digit
-//     std::string r2 = digit(s);
-//     // :- digit*
-//     r2.insert(r2.begin(), r1);
-//     return r2;
-//   } catch (ParseException &e) {
-//     s.excps.push_back(e);
-//     throw ParseException(init, s.i, "integer", "");
-//   }
-// }
-
 /** program :- procedure+ */
 TNode program(State &s) {
   State so(s);
