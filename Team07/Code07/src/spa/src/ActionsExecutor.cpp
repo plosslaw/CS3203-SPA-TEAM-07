@@ -943,8 +943,8 @@ std::vector<var_ref> ActionsExecutor::get_all_variables_modifies(stmt_type other
 
     unordered_set<var_ref> unique_set;
 
+    // TODO(plosslaw): refactor to reduce nesting
     if (other_stmt_type == stmt_type::PROCEDURE) {
-        // TODO(plosslaw): refactor to reduce nesting
         for (proc_ref proc_wildcard : this->procs) {
             for (var_ref var : this->vars) {
                 if (pkb_query_controller.procedureModifies(proc_wildcard, var)) {
@@ -1077,8 +1077,8 @@ std::vector<var_ref> ActionsExecutor::get_all_variables_uses(stmt_type other_stm
 
     unordered_set<var_ref> unique_set;
 
+    // TODO(plosslaw): refactor to reduce nesting
     if (other_stmt_type == stmt_type::PROCEDURE) {
-        // TODO(plosslaw): refactor to reduce nesting
         for (proc_ref proc_wildcard : this->procs) {
             for (var_ref var : this->vars) {
                 if (pkb_query_controller.procedureUses(proc_wildcard, var)) {
@@ -1142,6 +1142,19 @@ std::vector<var_ref> ActionsExecutor::get_all_variables_uses(stmt_type other_stm
 // Default: Assign statements
 std::vector<stmt_ref> ActionsExecutor::get_all_stmts_pattern(pattern pattern) {
     vector<stmt_ref> results;
+
+    unordered_set<stmt_ref> unique_set;
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (stmt_ref stmt : this->stmts_assign) {
+        if (pkb_query_controller.satisfiesPattern(stmt, pattern)) {
+            if (unique_set.find(stmt) == unique_set.end()) {
+                unique_set.insert(stmt);
+                results.push_back(stmt);
+            }
+        }
+    }
+    
     return results;
 } 
 
@@ -1149,11 +1162,49 @@ std::vector<stmt_ref> ActionsExecutor::get_all_stmts_pattern(pattern pattern) {
 // Wildcard operation
 std::vector<var_ref> ActionsExecutor::get_all_variables_pattern_assign() {
     vector<var_ref> results;
+
+    unordered_set<var_ref> unique_set;
+    
+    pattern trial_pattern;
+    trial_pattern.rvalue = "_";
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (stmt_ref stmt_wildcard : this->stmts_assign) {
+        for (var_ref var : this->vars) {
+            trial_pattern.lvalue = var;
+            if (pkb_query_controller.satisfiesPattern(stmt_wildcard, trial_pattern)) {
+                if (unique_set.find(var) == unique_set.end()) {
+                    unique_set.insert(var);
+                    results.push_back(var);
+                }
+            }
+        }
+    }
+    
     return results;
 } 
 
 std::vector<var_ref> ActionsExecutor::get_all_variables_pattern_assign(std::string pattern_string) {
     vector<var_ref> results;
+
+    unordered_set<var_ref> unique_set;
+
+    pattern trial_pattern;
+    trial_pattern.rvalue = pattern_string;
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (stmt_ref stmt_wildcard : this->stmts_assign) {
+        for (var_ref var : this->vars) {
+            trial_pattern.lvalue = var;
+            if (pkb_query_controller.satisfiesPattern(stmt_wildcard, trial_pattern)) {
+                if (unique_set.find(var) == unique_set.end()) {
+                    unique_set.insert(var);
+                    results.push_back(var);
+                }
+            }
+        }
+    }
+    
     return results;
 }
 
