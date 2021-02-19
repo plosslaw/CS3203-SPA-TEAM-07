@@ -105,77 +105,767 @@ vector<var_ref> ActionsExecutor::get_all_variables() {
 
 // Wildcard operation
 std::vector<stmt_ref> ActionsExecutor::get_all_stmts_follows(stmt_type type, arg_pos pos, bool is_starred) {
+    vector<stmt_ref> stmts;
     vector<stmt_ref> results;
+
+    unordered_set<stmt_ref> unique_set;
+
+    switch (type) {
+    
+    case stmt_type::ASSIGN:
+        stmts = this->stmts_assign;
+
+    case stmt_type::CALL:
+        stmts = this->stmts_call;
+    
+    case stmt_type::IF:
+        stmts = this->stmts_if;
+
+    case stmt_type::PRINT:
+        stmts = this->stmts_print;
+
+    case stmt_type::READ:
+        stmts = this->stmts_read;
+
+    case stmt_type::WHILE:
+        stmts = this->stmts_while;
+
+    case stmt_type::STATEMENT:
+        stmts = this->stmts;
+
+    default:
+        throw "Invalid statement type passed"; 
+    }
+
+    // TODO(plosslaw): refactor to reduce nesting
+    if (pos == arg_pos::FIRST_ARG && is_starred) {
+        for (stmt_ref stmt_wildcard : this->stmts) {
+            for (stmt_ref stmt : stmts) {
+                if (pkb_query_controller.isFollowsStar(stmt, stmt_wildcard)) {
+                    if (unique_set.find(stmt) == unique_set.end()) {
+                        unique_set.insert(stmt);
+                        results.push_back(stmt);
+                    }
+                }
+            }
+        }
+    } else if (pos == arg_pos::FIRST_ARG && !is_starred) {
+        for (stmt_ref stmt_wildcard : this->stmts) {
+            for (stmt_ref stmt : stmts) {
+                if (pkb_query_controller.isFollows(stmt, stmt_wildcard)) {
+                    if (unique_set.find(stmt) == unique_set.end()) {
+                        unique_set.insert(stmt);
+                        results.push_back(stmt);
+                    }
+                }
+            }
+        }
+    } else if (pos == arg_pos::SECOND_ARG && is_starred) {
+        for (stmt_ref stmt_wildcard : this->stmts) {
+            for (stmt_ref stmt : stmts) {
+                if (pkb_query_controller.isFollowsStar(stmt_wildcard, stmt)) {
+                    if (unique_set.find(stmt) == unique_set.end()) {
+                        unique_set.insert(stmt);
+                        results.push_back(stmt);
+                    }
+                }
+            }
+        }
+    } else if (pos == arg_pos::SECOND_ARG && !is_starred) {
+        for (stmt_ref stmt_wildcard : this->stmts) {
+            for (stmt_ref stmt : stmts) {
+                if (pkb_query_controller.isFollows(stmt_wildcard, stmt)) {
+                    if (unique_set.find(stmt) == unique_set.end()) {
+                        unique_set.insert(stmt);
+                        results.push_back(stmt);
+                    }
+                }
+            }
+        }
+    } else {
+        throw "Unexpected path";
+    }
+
     return results;
 }
 
 std::vector<stmt_ref> ActionsExecutor::get_all_stmts_follows(stmt_type type, arg_pos pos, stmt_ref other_stmt, bool is_starred) {
+    vector<stmt_ref> stmts;
     vector<stmt_ref> results;
+
+    unordered_set<stmt_ref> unique_set;
+
+    switch (type) {
+    
+    case stmt_type::ASSIGN:
+        stmts = this->stmts_assign;
+
+    case stmt_type::CALL:
+        stmts = this->stmts_call;
+    
+    case stmt_type::IF:
+        stmts = this->stmts_if;
+
+    case stmt_type::PRINT:
+        stmts = this->stmts_print;
+
+    case stmt_type::READ:
+        stmts = this->stmts_read;
+
+    case stmt_type::WHILE:
+        stmts = this->stmts_while;
+
+    case stmt_type::STATEMENT:
+        stmts = this->stmts;
+
+    default:
+        throw "Invalid statement type passed"; 
+    }
+
+    // TODO(plosslaw): refactor to reduce nesting
+    if (pos == arg_pos::FIRST_ARG && is_starred) {
+        for (stmt_ref stmt : stmts) {
+            if (pkb_query_controller.isFollowsStar(stmt, other_stmt)) {
+                if (unique_set.find(stmt) == unique_set.end()) {
+                    unique_set.insert(stmt);
+                    results.push_back(stmt);
+                }
+            }
+        }
+    } else if (pos == arg_pos::FIRST_ARG && !is_starred) {
+        for (stmt_ref stmt : stmts) {
+            if (pkb_query_controller.isFollows(stmt, other_stmt)) {
+                if (unique_set.find(stmt) == unique_set.end()) {
+                    unique_set.insert(stmt);
+                    results.push_back(stmt);
+                }
+            }
+        }
+    } else if (pos == arg_pos::SECOND_ARG && is_starred) {
+        for (stmt_ref stmt : stmts) {
+            if (pkb_query_controller.isFollowsStar(other_stmt, stmt)) {
+                if (unique_set.find(stmt) == unique_set.end()) {
+                    unique_set.insert(stmt);
+                    results.push_back(stmt);
+                }
+            }
+        }
+    } else if (pos == arg_pos::SECOND_ARG && !is_starred) {
+        for (stmt_ref stmt : stmts) {
+            if (pkb_query_controller.isFollows(other_stmt, stmt)) {
+                if (unique_set.find(stmt) == unique_set.end()) {
+                    unique_set.insert(stmt);
+                    results.push_back(stmt);
+                }
+            }
+        }
+    } else {
+        throw "Unexpected path";
+    }
+
     return results;
 }
 
 std::vector<stmt_ref> ActionsExecutor::get_all_stmts_follows(stmt_type type, arg_pos pos, stmt_type other_stmt_type, bool is_starred) {
+    vector<stmt_ref> stmts;
+    vector<stmt_ref> stmts_wildcard = this->get_all_statements_of_type(other_stmt_type);
     vector<stmt_ref> results;
+
+    unordered_set<stmt_ref> unique_set;
+
+    switch (type) {
+    
+    case stmt_type::ASSIGN:
+        stmts = this->stmts_assign;
+
+    case stmt_type::CALL:
+        stmts = this->stmts_call;
+    
+    case stmt_type::IF:
+        stmts = this->stmts_if;
+
+    case stmt_type::PRINT:
+        stmts = this->stmts_print;
+
+    case stmt_type::READ:
+        stmts = this->stmts_read;
+
+    case stmt_type::WHILE:
+        stmts = this->stmts_while;
+
+    case stmt_type::STATEMENT:
+        stmts = this->stmts;
+
+    default:
+        throw "Invalid statement type passed"; 
+    }
+
+    // TODO(plosslaw): refactor to reduce nesting
+    if (pos == arg_pos::FIRST_ARG && is_starred) {
+        for (stmt_ref stmt_wildcard : stmts_wildcard) {
+            for (stmt_ref stmt : stmts) {
+                if (pkb_query_controller.isFollowsStar(stmt, stmt_wildcard)) {
+                    if (unique_set.find(stmt) == unique_set.end()) {
+                        unique_set.insert(stmt);
+                        results.push_back(stmt);
+                    }
+                }
+            }
+        }
+    } else if (pos == arg_pos::FIRST_ARG && !is_starred) {
+        for (stmt_ref stmt_wildcard : stmts_wildcard) {
+            for (stmt_ref stmt : stmts) {
+                if (pkb_query_controller.isFollows(stmt, stmt_wildcard)) {
+                    if (unique_set.find(stmt) == unique_set.end()) {
+                        unique_set.insert(stmt);
+                        results.push_back(stmt);
+                    }
+                }
+            }
+        }
+    } else if (pos == arg_pos::SECOND_ARG && is_starred) {
+        for (stmt_ref stmt_wildcard : stmts_wildcard) {
+            for (stmt_ref stmt : stmts) {
+                if (pkb_query_controller.isFollowsStar(stmt_wildcard, stmt)) {
+                    if (unique_set.find(stmt) == unique_set.end()) {
+                        unique_set.insert(stmt);
+                        results.push_back(stmt);
+                    }
+                }
+            }
+        }
+    } else if (pos == arg_pos::SECOND_ARG && !is_starred) {
+        for (stmt_ref stmt_wildcard : stmts_wildcard) {
+            for (stmt_ref stmt : stmts) {
+                if (pkb_query_controller.isFollows(stmt_wildcard, stmt)) {
+                    if (unique_set.find(stmt) == unique_set.end()) {
+                        unique_set.insert(stmt);
+                        results.push_back(stmt);
+                    }
+                }
+            }
+        }
+    } else {
+        throw "Unexpected path";
+    }
+
     return results;
 }
 
 // Wildcard operation
 std::vector<stmt_ref> ActionsExecutor::get_all_stmts_parent(stmt_type type, arg_pos pos, bool is_starred) {
+    vector<stmt_ref> stmts;
     vector<stmt_ref> results;
+
+    unordered_set<stmt_ref> unique_set;
+
+    switch (type) {
+    
+    case stmt_type::ASSIGN:
+        stmts = this->stmts_assign;
+
+    case stmt_type::CALL:
+        stmts = this->stmts_call;
+    
+    case stmt_type::IF:
+        stmts = this->stmts_if;
+
+    case stmt_type::PRINT:
+        stmts = this->stmts_print;
+
+    case stmt_type::READ:
+        stmts = this->stmts_read;
+
+    case stmt_type::WHILE:
+        stmts = this->stmts_while;
+
+    case stmt_type::STATEMENT:
+        stmts = this->stmts;
+
+    default:
+        throw "Invalid statement type passed"; 
+    }
+
+    // TODO(plosslaw): refactor to reduce nesting
+    if (pos == arg_pos::FIRST_ARG && is_starred) {
+        for (stmt_ref stmt_wildcard : this->stmts) {
+            for (stmt_ref stmt : stmts) {
+                if (pkb_query_controller.isParentStar(stmt, stmt_wildcard)) {
+                    if (unique_set.find(stmt) == unique_set.end()) {
+                        unique_set.insert(stmt);
+                        results.push_back(stmt);
+                    }
+                }
+            }
+        }
+    } else if (pos == arg_pos::FIRST_ARG && !is_starred) {
+        for (stmt_ref stmt_wildcard : this->stmts) {
+            for (stmt_ref stmt : stmts) {
+                if (pkb_query_controller.isParent(stmt, stmt_wildcard)) {
+                    if (unique_set.find(stmt) == unique_set.end()) {
+                        unique_set.insert(stmt);
+                        results.push_back(stmt);
+                    }
+                }
+            }
+        }
+    } else if (pos == arg_pos::SECOND_ARG && is_starred) {
+        for (stmt_ref stmt_wildcard : this->stmts) {
+            for (stmt_ref stmt : stmts) {
+                if (pkb_query_controller.isParentStar(stmt_wildcard, stmt)) {
+                    if (unique_set.find(stmt) == unique_set.end()) {
+                        unique_set.insert(stmt);
+                        results.push_back(stmt);
+                    }
+                }
+            }
+        }
+    } else if (pos == arg_pos::SECOND_ARG && !is_starred) {
+        for (stmt_ref stmt_wildcard : this->stmts) {
+            for (stmt_ref stmt : stmts) {
+                if (pkb_query_controller.isParent(stmt_wildcard, stmt)) {
+                    if (unique_set.find(stmt) == unique_set.end()) {
+                        unique_set.insert(stmt);
+                        results.push_back(stmt);
+                    }
+                }
+            }
+        }
+    } else {
+        throw "Unexpected path";
+    }
+
     return results;
 }
 
 std::vector<stmt_ref> ActionsExecutor::get_all_stmts_parent(stmt_type type, arg_pos pos, stmt_ref other_stmt, bool is_starred) {
+    vector<stmt_ref> stmts;
     vector<stmt_ref> results;
+
+    unordered_set<stmt_ref> unique_set;
+
+    switch (type) {
+    
+    case stmt_type::ASSIGN:
+        stmts = this->stmts_assign;
+
+    case stmt_type::CALL:
+        stmts = this->stmts_call;
+    
+    case stmt_type::IF:
+        stmts = this->stmts_if;
+
+    case stmt_type::PRINT:
+        stmts = this->stmts_print;
+
+    case stmt_type::READ:
+        stmts = this->stmts_read;
+
+    case stmt_type::WHILE:
+        stmts = this->stmts_while;
+
+    case stmt_type::STATEMENT:
+        stmts = this->stmts;
+
+    default:
+        throw "Invalid statement type passed"; 
+    }
+
+    // TODO(plosslaw): refactor to reduce nesting
+    if (pos == arg_pos::FIRST_ARG && is_starred) {
+        for (stmt_ref stmt : stmts) {
+            if (pkb_query_controller.isParentStar(stmt, other_stmt)) {
+                if (unique_set.find(stmt) == unique_set.end()) {
+                    unique_set.insert(stmt);
+                    results.push_back(stmt);
+                }
+            }
+        }
+    } else if (pos == arg_pos::FIRST_ARG && !is_starred) {
+        for (stmt_ref stmt : stmts) {
+            if (pkb_query_controller.isParent(stmt, other_stmt)) {
+                if (unique_set.find(stmt) == unique_set.end()) {
+                    unique_set.insert(stmt);
+                    results.push_back(stmt);
+                }
+            }
+        }
+    } else if (pos == arg_pos::SECOND_ARG && is_starred) {
+        for (stmt_ref stmt : stmts) {
+            if (pkb_query_controller.isParentStar(other_stmt, stmt)) {
+                if (unique_set.find(stmt) == unique_set.end()) {
+                    unique_set.insert(stmt);
+                    results.push_back(stmt);
+                }
+            }
+        }
+    } else if (pos == arg_pos::SECOND_ARG && !is_starred) {
+        for (stmt_ref stmt : stmts) {
+            if (pkb_query_controller.isParent(other_stmt, stmt)) {
+                if (unique_set.find(stmt) == unique_set.end()) {
+                    unique_set.insert(stmt);
+                    results.push_back(stmt);
+                }
+            }
+        }
+    } else {
+        throw "Unexpected path";
+    }
+
     return results;
 }
 
 std::vector<stmt_ref> ActionsExecutor::get_all_stmts_parent(stmt_type type, arg_pos pos, stmt_type other_stmt_type, bool is_starred) {
+    vector<stmt_ref> stmts;
+    vector<stmt_ref> stmts_wildcard = this->get_all_statements_of_type(other_stmt_type);
     vector<stmt_ref> results;
+
+    unordered_set<stmt_ref> unique_set;
+
+    switch (type) {
+    
+    case stmt_type::ASSIGN:
+        stmts = this->stmts_assign;
+
+    case stmt_type::CALL:
+        stmts = this->stmts_call;
+    
+    case stmt_type::IF:
+        stmts = this->stmts_if;
+
+    case stmt_type::PRINT:
+        stmts = this->stmts_print;
+
+    case stmt_type::READ:
+        stmts = this->stmts_read;
+
+    case stmt_type::WHILE:
+        stmts = this->stmts_while;
+
+    case stmt_type::STATEMENT:
+        stmts = this->stmts;
+
+    default:
+        throw "Invalid statement type passed"; 
+    }
+
+    // TODO(plosslaw): refactor to reduce nesting
+    if (pos == arg_pos::FIRST_ARG && is_starred) {
+        for (stmt_ref stmt_wildcard : stmts_wildcard) {
+            for (stmt_ref stmt : stmts) {
+                if (pkb_query_controller.isParentStar(stmt, stmt_wildcard)) {
+                    if (unique_set.find(stmt) == unique_set.end()) {
+                        unique_set.insert(stmt);
+                        results.push_back(stmt);
+                    }
+                }
+            }
+        }
+    } else if (pos == arg_pos::FIRST_ARG && !is_starred) {
+        for (stmt_ref stmt_wildcard : stmts_wildcard) {
+            for (stmt_ref stmt : stmts) {
+                if (pkb_query_controller.isParent(stmt, stmt_wildcard)) {
+                    if (unique_set.find(stmt) == unique_set.end()) {
+                        unique_set.insert(stmt);
+                        results.push_back(stmt);
+                    }
+                }
+            }
+        }
+    } else if (pos == arg_pos::SECOND_ARG && is_starred) {
+        for (stmt_ref stmt_wildcard : stmts_wildcard) {
+            for (stmt_ref stmt : stmts) {
+                if (pkb_query_controller.isParentStar(stmt_wildcard, stmt)) {
+                    if (unique_set.find(stmt) == unique_set.end()) {
+                        unique_set.insert(stmt);
+                        results.push_back(stmt);
+                    }
+                }
+            }
+        }
+    } else if (pos == arg_pos::SECOND_ARG && !is_starred) {
+        for (stmt_ref stmt_wildcard : stmts_wildcard) {
+            for (stmt_ref stmt : stmts) {
+                if (pkb_query_controller.isParent(stmt_wildcard, stmt)) {
+                    if (unique_set.find(stmt) == unique_set.end()) {
+                        unique_set.insert(stmt);
+                        results.push_back(stmt);
+                    }
+                }
+            }
+        }
+    } else {
+        throw "Unexpected path";
+    }
+
     return results;
 }
 
 // Wildcard operation
 std::vector<stmt_ref> ActionsExecutor::get_all_stmts_modifies(stmt_type type) {
+    vector<stmt_ref> stmts;
     vector<stmt_ref> results;
+
+    unordered_set<stmt_ref> unique_set;
+
+    switch (type) {
+    
+    case stmt_type::ASSIGN:
+        stmts = this->stmts_assign;
+
+    case stmt_type::CALL:
+        stmts = this->stmts_call;
+    
+    case stmt_type::IF:
+        stmts = this->stmts_if;
+
+    case stmt_type::PRINT:
+        stmts = this->stmts_print;
+
+    case stmt_type::READ:
+        stmts = this->stmts_read;
+
+    case stmt_type::WHILE:
+        stmts = this->stmts_while;
+
+    case stmt_type::STATEMENT:
+        stmts = this->stmts;
+
+    default:
+        throw "Invalid statement type passed"; 
+    }
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (var_ref var_wildcard : this->vars) {
+        for (stmt_ref stmt : stmts) {
+            if (pkb_query_controller.statementModifies(stmt, var_wildcard)) {
+                if (unique_set.find(stmt) == unique_set.end()) {
+                    unique_set.insert(stmt);
+                    results.push_back(stmt);
+                }
+            }
+        }
+    }
+
     return results;
 }
 
 std::vector<stmt_ref> ActionsExecutor::get_all_stmts_modifies(stmt_type type, var_ref var) {
+    vector<stmt_ref> stmts;
     vector<stmt_ref> results;
+
+    unordered_set<stmt_ref> unique_set;
+
+    switch (type) {
+    
+    case stmt_type::ASSIGN:
+        stmts = this->stmts_assign;
+
+    case stmt_type::CALL:
+        stmts = this->stmts_call;
+    
+    case stmt_type::IF:
+        stmts = this->stmts_if;
+
+    case stmt_type::PRINT:
+        stmts = this->stmts_print;
+
+    case stmt_type::READ:
+        stmts = this->stmts_read;
+
+    case stmt_type::WHILE:
+        stmts = this->stmts_while;
+
+    case stmt_type::STATEMENT:
+        stmts = this->stmts;
+
+    default:
+        throw "Invalid statement type passed"; 
+    }
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (stmt_ref stmt : stmts) {
+        if (pkb_query_controller.statementModifies(stmt, var)) {
+            if (unique_set.find(stmt) == unique_set.end()) {
+                unique_set.insert(stmt);
+                results.push_back(stmt);
+            }
+        }
+    }
+
     return results;
 }
 
 // Wildcard operation
 std::vector<stmt_ref> ActionsExecutor::get_all_stmts_uses(stmt_type type) {
+    vector<stmt_ref> stmts;
     vector<stmt_ref> results;
+
+    unordered_set<stmt_ref> unique_set;
+
+    switch (type) {
+    
+    case stmt_type::ASSIGN:
+        stmts = this->stmts_assign;
+
+    case stmt_type::CALL:
+        stmts = this->stmts_call;
+    
+    case stmt_type::IF:
+        stmts = this->stmts_if;
+
+    case stmt_type::PRINT:
+        stmts = this->stmts_print;
+
+    case stmt_type::READ:
+        stmts = this->stmts_read;
+
+    case stmt_type::WHILE:
+        stmts = this->stmts_while;
+
+    case stmt_type::STATEMENT:
+        stmts = this->stmts;
+
+    default:
+        throw "Invalid statement type passed"; 
+    }
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (var_ref var_wildcard : this->vars) {
+        for (stmt_ref stmt : stmts) {
+            if (pkb_query_controller.statementUses(stmt, var_wildcard)) {
+                if (unique_set.find(stmt) == unique_set.end()) {
+                    unique_set.insert(stmt);
+                    results.push_back(stmt);
+                }
+            }
+        }
+    }
+
     return results;
 }
 
 std::vector<stmt_ref> ActionsExecutor::get_all_stmts_uses(stmt_type type, var_ref var) {
+    vector<stmt_ref> stmts;
     vector<stmt_ref> results;
+
+    unordered_set<stmt_ref> unique_set;
+
+    switch (type) {
+    
+    case stmt_type::ASSIGN:
+        stmts = this->stmts_assign;
+
+    case stmt_type::CALL:
+        stmts = this->stmts_call;
+    
+    case stmt_type::IF:
+        stmts = this->stmts_if;
+
+    case stmt_type::PRINT:
+        stmts = this->stmts_print;
+
+    case stmt_type::READ:
+        stmts = this->stmts_read;
+
+    case stmt_type::WHILE:
+        stmts = this->stmts_while;
+
+    case stmt_type::STATEMENT:
+        stmts = this->stmts;
+
+    default:
+        throw "Invalid statement type passed"; 
+    }
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (stmt_ref stmt : stmts) {
+        if (pkb_query_controller.statementUses(stmt, var)) {
+            if (unique_set.find(stmt) == unique_set.end()) {
+                unique_set.insert(stmt);
+                results.push_back(stmt);
+            }
+        }
+    }
+
     return results;
 }
 
 // Wildcard operation
 std::vector<proc_ref> ActionsExecutor::get_all_procedures_modifies() {
     vector<proc_ref> results;
+
+    unordered_set<proc_ref> unique_set;
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (var_ref var_wildcard : this->vars) {
+        for (proc_ref proc : this->procs) {
+            if (pkb_query_controller.procedureModifies(proc, var_wildcard)) {
+                if (unique_set.find(proc) == unique_set.end()) {
+                    unique_set.insert(proc);
+                    results.push_back(proc);
+                }
+            }
+        }
+    }
+
     return results;
 }
 
 std::vector<proc_ref> ActionsExecutor::get_all_procedures_modifies(var_ref var) {
     vector<proc_ref> results;
+
+    unordered_set<proc_ref> unique_set;
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (proc_ref proc : this->procs) {
+        if (pkb_query_controller.procedureModifies(proc, var)) {
+            if (unique_set.find(proc) == unique_set.end()) {
+                unique_set.insert(proc);
+                results.push_back(proc);
+            }
+        }
+    }
+
     return results;
 }
 
 // Wildcard operation
 std::vector<proc_ref> ActionsExecutor::get_all_procedures_uses() {
     vector<proc_ref> results;
+
+    unordered_set<proc_ref> unique_set;
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (var_ref var_wildcard : this->vars) {
+        for (proc_ref proc : this->procs) {
+            if (pkb_query_controller.procedureUses(proc, var_wildcard)) {
+                if (unique_set.find(proc) == unique_set.end()) {
+                    unique_set.insert(proc);
+                    results.push_back(proc);
+                }
+            }
+        }
+    }
+
     return results;
 }
 
 std::vector<proc_ref> ActionsExecutor::get_all_procedures_uses(var_ref var) {
     vector<proc_ref> results;
+
+    unordered_set<proc_ref> unique_set;
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (proc_ref proc : this->procs) {
+        if (pkb_query_controller.procedureUses(proc, var)) {
+            if (unique_set.find(proc) == unique_set.end()) {
+                unique_set.insert(proc);
+                results.push_back(proc);
+            }
+        }
+    }
+
     return results;
 }
 
