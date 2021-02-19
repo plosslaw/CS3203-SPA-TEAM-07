@@ -14,8 +14,8 @@ using namespace std;
 //constructor
 ActionsGenerator::ActionsGenerator() {}
 
-ActionsGenerator::ActionsGenerator(QueryMap mapQuery, ActionsExecutor executerActions) {
-    executer = executerActions;
+ActionsGenerator::ActionsGenerator(QueryMap mapQuery, ActionsExecutor executorActions) {
+    executor = executorActions;
     queryMap = mapQuery;
 }
 
@@ -42,56 +42,56 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
         Single s = i.second;
 
         if (s == Single::STATEMENT) {
-            vector<stmt_ref> statement_lst = executer.get_all_statements_of_type(stmt_type::STATEMENT);
+            vector<stmt_ref> statement_lst = executor.get_all_statements_of_type(stmt_type::STATEMENT);
             vector<string> statement_lst_string;
             for(auto stmt : statement_lst) {
                 statement_lst_string.push_back(to_string(stmt));
             }
             stmtStorage[declaration_name] = statement_lst_string;
         } else if (s == Single::READ) {    
-            vector<stmt_ref> read_lst = executer.get_all_statements_of_type(stmt_type::READ);
+            vector<stmt_ref> read_lst = executor.get_all_statements_of_type(stmt_type::READ);
             vector<string> read_lst_string;
             for(auto rd : read_lst) {
                 read_lst_string.push_back(to_string(rd));
             }
             readStorage[declaration_name] = read_lst_string;             
         } else if (s == Single::PRINT) {
-            vector<stmt_ref> print_lst = executer.get_all_statements_of_type(stmt_type::PRINT);
+            vector<stmt_ref> print_lst = executor.get_all_statements_of_type(stmt_type::PRINT);
             vector<string> print_lst_string;
             for(auto pr : print_lst) {
                 print_lst_string.push_back(to_string(pr));
             }
             stmtStorage[declaration_name] = print_lst_string;
         } else if (s == Single::WHILE) {
-            vector<stmt_ref> while_lst = executer.get_all_statements_of_type(stmt_type::WHILE);
+            vector<stmt_ref> while_lst = executor.get_all_statements_of_type(stmt_type::WHILE);
             vector<string> while_lst_string;
             for(auto while_ : while_lst) {
                 while_lst_string.push_back(to_string(while_));
             }
             whileStorage[declaration_name] = while_lst_string;
         } else if (s == Single::IF) {
-            vector<stmt_ref> if_lst = executer.get_all_statements_of_type(stmt_type::IF);
+            vector<stmt_ref> if_lst = executor.get_all_statements_of_type(stmt_type::IF);
             vector<string> if_lst_string;
             for(auto ifs : if_lst) {
                 if_lst_string.push_back(to_string(ifs));
             }
             ifStorage[declaration_name] = if_lst_string;
         } else if (s == Single::ASSIGN) {
-            vector<stmt_ref> assign_lst = executer.get_all_statements_of_type(stmt_type::ASSIGN);
+            vector<stmt_ref> assign_lst = executor.get_all_statements_of_type(stmt_type::ASSIGN);
             vector<string> assign_lst_string;
             for(auto ass : assign_lst) {
                 assign_lst_string.push_back(to_string(ass));
             }
             assignStorage[declaration_name] = assign_lst_string;  
         } else if (s == Single::CONSTANT) {
-            vector<constant> constant_lst = executer.get_all_constants();
+            vector<constant> constant_lst = executor.get_all_constants();
             vector<string> constant_lst_string;
             for(auto cnst : constant_lst) {
                 constant_lst_string.push_back(to_string(cnst));
             }
             constantStorage[declaration_name] = constant_lst_string;   
         } else if (s == Single::VARIABLE) {
-            vector<var_ref> variable_lst= executer.get_all_variables();
+            vector<var_ref> variable_lst= executor.get_all_variables();
             variableStorage[declaration_name] = variable_lst;
         } else {
             throw "Payload Single is not STATEMENT/READ/PRINT/CALL/WHILE/IF/ASSIGN.";
@@ -144,7 +144,7 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
         if (such_that_second_arg == select_value) {
             is_select_val_in_suchthat.second = true;
         }
-        SuchThatEval such_that_eval(storeDeclaration, mapStorage, executer);
+        SuchThatEval such_that_eval(storeDeclaration, mapStorage, executor);
 
         vector<string> return_result = such_that_eval.one_such_that_zero_pattern(such_that_pay_load, select_value, select_type, is_select_val_in_suchthat);
         if (is_select_val_in_suchthat.first || is_select_val_in_suchthat.second) {
@@ -169,7 +169,7 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
         if (pattern_second_arg == select_value) {
             is_select_val_in_pattern.second = true;
         }
-        PatternEval pattern_eval(storeDeclaration, mapStorage, executer);
+        PatternEval pattern_eval(storeDeclaration, mapStorage, executor);
 
         vector<string> return_result = pattern_eval.zero_such_that_one_pattern(pattern_pay_load, select_value, select_type, is_select_val_in_pattern);
         if (is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
@@ -243,7 +243,7 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
 //     vector<string> first_arg_lst = mapStorage[storeDeclaration[such_that_first_arg]][such_that_first_arg];
 //     vector<string> second_arg_lst = mapStorage[storeDeclaration[such_that_second_arg]][such_that_second_arg];
 //     vector<pair<string,string>> products = ActionsGenerator::crossproduct(first_arg_lst, second_arg_lst);
-//     map<string, vector<string>> output = SuchThatEval::such_that_eval_3(products, such_that_load.getType().pair, such_that_first_arg, such_that_second_arg,executer);
+//     map<string, vector<string>> output = SuchThatEval::such_that_eval_3(products, such_that_load.getType().pair, such_that_first_arg, such_that_second_arg,executor);
     
 //     //evaluate pattern clause by passing results from suchthat clause to it
 //     map<string, vector<string>> output2 = ActionsGenerator::two_common_synonyms_pattern_val(pattern_load, output);
@@ -257,7 +257,7 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
 //     vector<string> first_arg_lst = eval_map[pattern_first_arg]; 
 //     vector<string> second_arg_lst = eval_map[pattern_second_arg];
 //     vector<pair<string,string>> products = ActionsGenerator::crossproduct(first_arg_lst, second_arg_lst);
-//     return PatternEval::pattern_eval_two_variables(products, pattern_first_arg, pattern_second_arg, pattern_third_arg, executer);
+//     return PatternEval::pattern_eval_two_variables(products, pattern_first_arg, pattern_second_arg, pattern_third_arg, executor);
 // }    
    
 // utilities

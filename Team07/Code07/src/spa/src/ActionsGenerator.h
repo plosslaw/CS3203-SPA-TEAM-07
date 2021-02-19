@@ -11,7 +11,7 @@ using namespace std;
 class ActionsGenerator {
     private:
         //variables
-        ActionsExecutor executer;
+        ActionsExecutor executor;
         QueryMap queryMap;
 
         // List of payloads from respective clauses - SELECT, DECLARATION, SUCHTHAT, PATTERN
@@ -55,6 +55,6 @@ class ActionsGenerator {
         vector<string> inner_join_A(vector<string> lstA, vector<string> lstB);//check if elements in lstA is present in lstB
     public:
         ActionsGenerator();
-        ActionsGenerator(QueryMap mapQuery, ActionsExecutor executerActions);
+        ActionsGenerator(QueryMap mapQuery, ActionsExecutor executorActions);
         std::vector<std::string> TraverseQueryMap();
 };
