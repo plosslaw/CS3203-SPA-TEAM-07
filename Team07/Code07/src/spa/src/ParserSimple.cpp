@@ -14,6 +14,7 @@ TNode program(State &s) {
   State so(s);
   TNode t("", PROGRAM);
   bool consumed = false;
+  whitespace(s);
   try {
     while (true) {
       t.addChild(procedure(s));
