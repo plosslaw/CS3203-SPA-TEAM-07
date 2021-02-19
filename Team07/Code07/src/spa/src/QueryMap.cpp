@@ -1,6 +1,7 @@
 #include "QueryMap.h"
 
-PayLoad::PayLoad(Tag loadTag, Single loadType, std::vector<std::string> loadVal) {
+PayLoad::PayLoad(Tag loadTag, Single loadType,
+                 std::vector<std::string> loadVal) {
   tag = loadTag;
   type.single = loadType;
   value = loadVal;
@@ -14,28 +15,32 @@ PayLoad::PayLoad(Tag loadTag, Pair loadType, std::vector<std::string> loadVal) {
   flag = std::vector<bool>{false, false};
 }
 
-PayLoad::PayLoad(Tag loadTag, Triple loadType, std::vector<std::string> loadVal) {
+PayLoad::PayLoad(Tag loadTag, Triple loadType,
+                 std::vector<std::string> loadVal) {
   tag = loadTag;
   type.triple = loadType;
   value = loadVal;
   flag = std::vector<bool>{false, false, false};
 }
 
-PayLoad::PayLoad(Tag loadTag, Single loadType, std::vector<std::string> loadVal, std::vector<bool> load_flags) {
+PayLoad::PayLoad(Tag loadTag, Single loadType, std::vector<std::string> loadVal,
+                 std::vector<bool> load_flags) {
   tag = loadTag;
   type.single = loadType;
   value = loadVal;
   flag = load_flags;
 }
 
-PayLoad::PayLoad(Tag loadTag, Pair loadType, std::vector<std::string> loadVal, std::vector<bool> load_flags) {
+PayLoad::PayLoad(Tag loadTag, Pair loadType, std::vector<std::string> loadVal,
+                 std::vector<bool> load_flags) {
   tag = loadTag;
   type.pair = loadType;
   value = loadVal;
   flag = load_flags;
 }
 
-PayLoad::PayLoad(Tag loadTag, Triple loadType, std::vector<std::string> loadVal, std::vector<bool> load_flags) {
+PayLoad::PayLoad(Tag loadTag, Triple loadType, std::vector<std::string> loadVal,
+                 std::vector<bool> load_flags) {
   tag = loadTag;
   type.triple = loadType;
   value = loadVal;
@@ -71,4 +76,11 @@ std::vector<PayLoad> QueryMap::getList(ClauseType key) { return table[key]; }
 
 void QueryMap::addItem(ClauseType key, PayLoad item) {
   table[key].push_back(item);
+}
+
+bool QueryMap::is_empty() {
+  return table[ClauseType::SELECT].size() == 0 &&
+         table[ClauseType::DECLARATION].size() == 0 &&
+         table[ClauseType::SUCHTHAT].size() == 0 &&
+         table[ClauseType::PATTERN].size() == 0;
 }
