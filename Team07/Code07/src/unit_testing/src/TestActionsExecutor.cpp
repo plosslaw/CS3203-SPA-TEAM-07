@@ -3,25 +3,84 @@
 #include "MockAST.h"
 
 #include "../../../lib/catch.hpp"
+#include <unordered_set>
 
 using namespace std;
 
 // helper functions
 bool verify_const_vector(vector<const_value> test_vector, vector<const_value> ans_vector){
-    return false;
+    if (test_vector.size() != ans_vector.size()) {
+        return false;
+    }
+    unordered_set<const_value> unique_set;
+    for (const_value ele : ans_vector) {
+        unique_set.insert(ele);
+    }
+
+    for (const_value ele : test_vector) {
+        if (unique_set.find(ele) == unique_set.end()) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 bool verify_proc_vector(vector<proc_ref> test_vector, vector<proc_ref> ans_vector){
-    return false;
+    if (test_vector.size() != ans_vector.size()) {
+        return false;
+    }
+    unordered_set<proc_ref> unique_set;
+    for (proc_ref ele : ans_vector) {
+        unique_set.insert(ele);
+    }
+
+    for (proc_ref ele : test_vector) {
+        if (unique_set.find(ele) == unique_set.end()) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 bool verify_stmt_vector(vector<stmt_ref> test_vector, vector<stmt_ref> ans_vector){
-    return false;
+    if (test_vector.size() != ans_vector.size()) {
+        return false;
+    }
+    unordered_set<stmt_ref> unique_set;
+    for (stmt_ref ele : ans_vector) {
+        unique_set.insert(ele);
+    }
+
+    for (stmt_ref ele : test_vector) {
+        if (unique_set.find(ele) == unique_set.end()) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 bool verify_var_vector(vector<var_ref> test_vector, vector<var_ref> ans_vector){
-    return false;
+    if (test_vector.size() != ans_vector.size()) {
+        return false;
+    }
+    unordered_set<var_ref> unique_set;
+    for (var_ref ele : ans_vector) {
+        unique_set.insert(ele);
+    }
+
+    for (var_ref ele : test_vector) {
+        if (unique_set.find(ele) == unique_set.end()) {
+            return false;
+        }
+    }
+
+    return true;
 }
+
+//TODO(plosslaw): add test cases for boolean ActionsExecutor API
 
 TEST_CASE("get_all_entities") {
     TNode ast_tree = getMockAST();
@@ -88,16 +147,16 @@ TEST_CASE("single_such_that_clause") {
     vector<stmt_ref> ans_vector_follows_while_first_stmt_non_starred {3};
 
     // answer vectors - parent
-    vector<stmt_ref> ans_vector_parent_stmt_first_starred {1,2,3,4,5,6,7,8,9,10,11};
-    vector<stmt_ref> ans_vector_parent_if_second_non_starred {1,2,3,4,5,6,7,8,9,10,11};
-    vector<stmt_ref> ans_vector_parent_stmt_second_10_starred {1,2,3,4,5,6,7,8,9,10,11};
-    vector<stmt_ref> ans_vector_parent_while_first_stmt_non_starred {1,2,3,4,5,6,7,8,9,10,11};
+    vector<stmt_ref> ans_vector_parent_stmt_first_starred {3,5,9};
+    vector<stmt_ref> ans_vector_parent_if_first_non_starred {5};
+    vector<stmt_ref> ans_vector_parent_stmt_second_9_starred {10};
+    vector<stmt_ref> ans_vector_parent_while_first_stmt_non_starred {3,9};
 
     // answer vectors - modifies
-    vector<stmt_ref> ans_vector_modifies_stmt {1,2,3,4,5,6,7,8,9,10,11};
-    vector<stmt_ref> ans_vector_modifies_assign {1,2,3,4,5,6,7,8,9,10,11};
-    vector<stmt_ref> ans_vector_modifies_while {1,2,3,4,5,6,7,8,9,10,11};
-    vector<stmt_ref> ans_vector_modifies_stmt_x {1,2,3,4,5,6,7,8,9,10,11};
+    vector<stmt_ref> ans_vector_modifies_stmt {1,4,6,7,8,10};
+    vector<stmt_ref> ans_vector_modifies_assign {4,6,7,8,10};
+    vector<stmt_ref> ans_vector_modifies_while {3,9};
+    vector<stmt_ref> ans_vector_modifies_stmt_x {3,7};
     vector<proc_ref> ans_vector_proc_modifies {"main"};
     vector<proc_ref> ans_vector_proc_modifies_x {"main"};
     vector<proc_ref> ans_vector_proc_modifies_j {};
@@ -108,10 +167,10 @@ TEST_CASE("single_such_that_clause") {
 
 
     // answer vectors - uses
-    vector<stmt_ref> ans_vector_uses_stmt {1,2,3,4,5,6,7,8,9,10,11};
-    vector<stmt_ref> ans_vector_uses_assign_y {1,2,3,4,5,6,7,8,9,10,11};
-    vector<stmt_ref> ans_vector_uses_while {1,2,3,4,5,6,7,8,9,10,11};
-    vector<stmt_ref> ans_vector_uses_stmt_x {1,2,3,4,5,6,7,8,9,10,11};
+    vector<stmt_ref> ans_vector_uses_stmt {2,3,4,5,6,9,10,11};
+    vector<stmt_ref> ans_vector_uses_assign_y {6};
+    vector<stmt_ref> ans_vector_uses_while {3,9};
+    vector<stmt_ref> ans_vector_uses_stmt_x {3,4,5,11};
     vector<proc_ref> ans_vector_proc_uses {"main"};
     vector<proc_ref> ans_vector_proc_uses_x {"main"};
     vector<proc_ref> ans_vector_proc_uses_j {};
@@ -145,12 +204,12 @@ TEST_CASE("single_such_that_clause") {
             ans_vector_parent_stmt_first_starred));
 
         REQUIRE(verify_stmt_vector(
-            executor.get_all_stmts_parent(stmt_type::IF, arg_pos::SECOND_ARG, false),
-            ans_vector_parent_if_second_non_starred));
+            executor.get_all_stmts_parent(stmt_type::IF, arg_pos::FIRST_ARG, false),
+            ans_vector_parent_if_first_non_starred));
 
         REQUIRE(verify_stmt_vector(
-            executor.get_all_stmts_parent(stmt_type::STATEMENT, arg_pos::SECOND_ARG, 10, true),
-            ans_vector_parent_stmt_second_10_starred));
+            executor.get_all_stmts_parent(stmt_type::STATEMENT, arg_pos::SECOND_ARG, 9, true),
+            ans_vector_parent_stmt_second_9_starred));
 
         REQUIRE(verify_stmt_vector(
             executor.get_all_stmts_parent(stmt_type::WHILE, arg_pos::FIRST_ARG, stmt_type::STATEMENT, false),
@@ -262,10 +321,10 @@ TEST_CASE("single_pattern_clause") {
 
     // TODO(plosslaw): add more test cases
     // answer vectors - assignments
-    vector<stmt_ref> ans_vector_assign_w__y_ {1,2,3,5,7,8};
-    vector<stmt_ref> ans_vector_assign_x__ {8};
-    vector<stmt_ref> ans_vector_assign___v_minus_1 {5,11};
-    vector<stmt_ref> ans_vector_assign____y_ {3};
+    vector<stmt_ref> ans_vector_assign_w__y_ {6};
+    vector<stmt_ref> ans_vector_assign_x__ {4,7};
+    vector<stmt_ref> ans_vector_assign___v_minus_1 {10};
+    vector<stmt_ref> ans_vector_assign____y_ {6};
 
     // answer vectors - variables
     vector<var_ref> ans_vector_var_y_times_2 {"w"};
