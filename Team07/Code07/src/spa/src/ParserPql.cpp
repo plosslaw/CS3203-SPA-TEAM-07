@@ -12,6 +12,7 @@ std::string var_name(State &state) {
   try {
     return name(state);
   } catch (ParseException &e) {
+    state.excps.push_back(e);
     throw ParseException(so.i, state.i, "var_name", "");
   }
 }
@@ -22,6 +23,7 @@ std::string constant(State &state) {
   try {
     return integer(state);
   } catch (ParseException &e) {
+    state.excps.push_back(e);
     throw ParseException(so.i, state.i, "constant", "");
   }
 }
@@ -36,7 +38,6 @@ std::string factor(State &state) {
     try {
       return constant(state);
     } catch (ParseException &e) {
-      state.assign(so);
       state.excps.push_back(e);
       throw ParseException(so.i, state.i, "factor", "");
     }
@@ -57,7 +58,7 @@ std::string stmt_ref(State &state) {
       try {
         return wildcard(state);
       } catch (ParseException &e) {
-        state.assign(so);
+        state.excps.push_back(e);
         throw ParseException(so.i, state.i, "stmt_ref", "");
       }
     }
@@ -84,11 +85,10 @@ std::string ent_ref(State &state) {
       return dbl_quotes_1 + val + dbl_quotes_2;
     } catch (ParseException &e) {
       state.assign(so);
-
       try {
         return wildcard(state);
       } catch (ParseException &e) {
-        state.assign(so);
+        state.excps.push_back(e);
         throw ParseException(so.i, state.i, "ent_ref", "");
       }
     }
@@ -120,14 +120,14 @@ std::string expr_spec(State &state) {
     try {
       return wildcard(state);
     } catch (ParseException &e) {
-      state.assign(so);
+      state.excps.push_back(e);
       throw ParseException(so.i, state.i, "expr_spec", "");
     }
   }
 }
 
-// TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent, ent and expr
-// ‘(’ stmtRef ‘,’ stmtRef ‘)’
+// TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent, ent
+// and expr ‘(’ stmtRef ‘,’ stmtRef ‘)’
 std::vector<std::string> stmt_and_stmt_ref(State &state) {
   std::vector<std::string> values;
   State so(state);
@@ -149,14 +149,14 @@ std::vector<std::string> stmt_and_stmt_ref(State &state) {
 
     return values;
   } catch (ParseException &e) {
-    state.assign(so);
+    state.excps.push_back(e);
     throw ParseException(so.i, state.i, "stmt_and_stmt_ref", "");
   }
   return values;
 }
 
-// TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent, ent and expr
-// ‘(’ stmtRef ‘,’ entRef ‘)’
+// TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent, ent
+// and expr ‘(’ stmtRef ‘,’ entRef ‘)’
 std::vector<std::string> stmt_and_ent_ref(State &state) {
   std::vector<std::string> values;
   State so(state);
@@ -178,14 +178,14 @@ std::vector<std::string> stmt_and_ent_ref(State &state) {
 
     return values;
   } catch (ParseException &e) {
-    state.assign(so);
+    state.excps.push_back(e);
     throw ParseException(so.i, state.i, "stmt_and_ent_ref", "");
   }
   return values;
 }
 
-// TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent, ent and expr
-// ‘(‘entRef ’,’ expression-spec ’)’
+// TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent, ent
+// and expr ‘(‘entRef ’,’ expression-spec ’)’
 std::vector<std::string> ent_and_expr_spec(State &state) {
   std::vector<std::string> values;
   State so(state);
@@ -207,7 +207,7 @@ std::vector<std::string> ent_and_expr_spec(State &state) {
 
     return values;
   } catch (ParseException &e) {
-    state.assign(so);
+    state.excps.push_back(e);
     throw ParseException(so.i, state.i, "ent_and_expr_spec", "");
   }
   return values;
@@ -226,11 +226,8 @@ PayLoad declaration(State &state, std::string design_entity, Single load_type) {
     values.push_back(synonym(state));
     whitespace(state);
 
-    so.assign(state);
     return PayLoad(SINGLE, load_type, values);
   } catch (ParseException &e) {
-    State so1(state);
-    state.assign(so);
     state.excps.push_back(e);
     throw ParseException(so.i, state.i, "declaration", "");
   }
@@ -254,13 +251,10 @@ std::vector<PayLoad> repeat_declaration(State &state, std::string design_entity,
       so.assign(state);
     }
   } catch (ParseException &e) {
-    State so1(state);
-    state.assign(so);
     try {
       stringMatch(state, ";");
       whitespace(state);
     } catch (ParseException &e) {
-      state.assign(so1);
       throw e;
     }
   }
@@ -370,11 +364,8 @@ PayLoad select(State &state, Single load_type) {
     values.push_back(synonym(state));
     whitespace(state);
 
-    so.assign(state);
     return PayLoad(SINGLE, load_type, values);
   } catch (ParseException &e) {
-    State so1(state);
-    state.assign(so);
     state.excps.push_back(e);
     throw ParseException(so.i, state.i, "select", "");
   }
@@ -388,7 +379,7 @@ std::vector<PayLoad> select_cl(State &state) {
     selects.push_back(select(state, Single::SYNONYM));
     return selects;
   } catch (ParseException &e) {
-    state.assign(so);
+    state.excps.push_back(e);
     throw ParseException(so.i, state.i, "select_cl", "");
   }
 }
@@ -414,7 +405,7 @@ PayLoad rel_ref(State &state, std::string design_relation, Pair load_type) {
 
     return PayLoad(PAIR, load_type, values);
   } catch (ParseException &e) {
-    state.assign(so);
+    state.excps.push_back(e);
     throw ParseException(so.i, state.i, "stmt_and_stmt_ref", "");
   }
 }
@@ -424,7 +415,7 @@ PayLoad parent(State &state) {
   try {
     return rel_ref(state, "Parent", PARENT);
   } catch (ParseException &e) {
-    state.assign(so);
+    state.excps.push_back(e);
     throw ParseException(so.i, state.i, "parent", "");
   }
 }
@@ -434,7 +425,7 @@ PayLoad parent_t(State &state) {
   try {
     return rel_ref(state, "Parent*", PARENTT);
   } catch (ParseException &e) {
-    state.assign(so);
+    state.excps.push_back(e);
     throw ParseException(so.i, state.i, "parent_t", "");
   }
 }
@@ -444,7 +435,7 @@ PayLoad follows(State &state) {
   try {
     return rel_ref(state, "Follows", FOLLOWS);
   } catch (ParseException &e) {
-    state.assign(so);
+    state.excps.push_back(e);
     throw ParseException(so.i, state.i, "follows", "");
   }
 }
@@ -454,7 +445,7 @@ PayLoad follows_t(State &state) {
   try {
     return rel_ref(state, "Follows*", FOLLOWST);
   } catch (ParseException &e) {
-    state.assign(so);
+    state.excps.push_back(e);
     throw ParseException(so.i, state.i, "follows_t", "");
   }
 }
@@ -464,7 +455,7 @@ PayLoad modifies(State &state) {
   try {
     return rel_ref(state, "Modifies", MODIFIES);
   } catch (ParseException &e) {
-    state.assign(so);
+    state.excps.push_back(e);
     throw ParseException(so.i, state.i, "modifies", "");
   }
 }
@@ -474,7 +465,7 @@ PayLoad uses(State &state) {
   try {
     return rel_ref(state, "Uses", USES);
   } catch (ParseException &e) {
-    state.assign(so);
+    state.excps.push_back(e);
     throw ParseException(so.i, state.i, "uses", "");
   }
 }
@@ -504,7 +495,7 @@ PayLoad suchthat(State &state) {
             try {
               return uses(state);
             } catch (ParseException &e) {
-              state.assign(so);
+              state.excps.push_back(e);
               throw ParseException(so.i, state.i, "suchthat", "");
             }
           }
@@ -528,7 +519,7 @@ PayLoad suchthat_cl(State &state) {
     so.assign(state);
     return clause;
   } catch (ParseException &e) {
-    state.assign(so);
+    state.excps.push_back(e);
     throw ParseException(so.i, state.i, "suchthat_cl", "");
   }
 }
@@ -549,7 +540,7 @@ PayLoad syn_assign(State &state) {
 
     return PayLoad(TRIPLE, SYN_ASSIGN, values);
   } catch (ParseException &e) {
-    state.assign(so);
+    state.excps.push_back(e);
     throw ParseException(so.i, state.i, "syn_assign", "");
   }
 }
@@ -559,6 +550,7 @@ PayLoad pattern(State &state) {
   try {
     return syn_assign(state);
   } catch (ParseException &e) {
+    state.excps.push_back(e);
     throw ParseException(so.i, state.i, "pattern", "");
   }
 }
@@ -577,7 +569,7 @@ PayLoad pattern_cl(State &state) {
     so.assign(state);
     return clause;
   } catch (ParseException &e) {
-    state.assign(so);
+    state.excps.push_back(e);
     throw ParseException(so.i, state.i, "pattern_cl", "");
   }
 }
