@@ -26,7 +26,8 @@ int ParserMapper::get_line(int i) {
   int l = 0;
   while (r >= l) {
     int mid = l + (r - l) / 2;
-    if (line_start[mid] == i || mid == line_start.size() - 1) return mid;
+    if (mid >= line_start.size()) return line_start.size() - 1;
+    if (line_start[mid] == i) return mid;
     if (line_start[mid] > i) {
       r = mid - 1;
     } else {
