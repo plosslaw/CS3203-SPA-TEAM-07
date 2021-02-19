@@ -741,12 +741,17 @@ bool is_suchthat_clause_valid(QueryMap table) {
   std::vector<PayLoad> declarations = table.getList(ClauseType::DECLARATION);
   std::vector<PayLoad> suchthats = table.getList(ClauseType::SUCHTHAT);
 
+  // optional suchthat-cl absent
   if (suchthats.size() == 0) {
     return true;
   }
 
-  // TODO(zs): check all synonyms are declared
-
+  for (auto it = suchthats.begin(); it != suchthats.end(); ++it) {
+    PayLoad target = (*it);
+    if (!is_synonym_declared(declarations, target)) {
+      return false;
+    }
+  }
   return true;
 }
 
