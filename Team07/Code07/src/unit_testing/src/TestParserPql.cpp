@@ -944,3 +944,13 @@ TEST_CASE("Validation of pattern clause") {
     REQUIRE_FALSE(input_query_map == output_query_map);
   }
 }
+
+TEST_CASE("Validation of empty string") {
+  SECTION("Empty query map") {
+    QueryMap input_query_map;
+    QueryMap expected_query_map;
+
+    QueryMap actual_query_map = pql_validate(input_query_map);
+    REQUIRE(actual_query_map == expected_query_map);
+  }
+}
