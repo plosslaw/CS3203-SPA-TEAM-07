@@ -568,7 +568,7 @@ PayLoad pattern_cl(State &state) {
   }
 }
 
-QueryMap pqlParse(std::string query) {
+QueryMap pql_query(std::string query) {
   QueryMap queryMap;
   std::vector<PayLoad> declarations;
   std::vector<PayLoad> selects;
@@ -612,6 +612,11 @@ QueryMap pqlParse(std::string query) {
     so.assign(state);
   } catch (ParseException &e) {
     state.assign(so);
+  }
+
+  whitespace(state);
+  if (state.i != (*state.source).size()) {
+    throw ParseException(so.i, state.i, "pql_query", "");
   }
 
   return QueryMap(declarations, selects, suchthats, patterns);

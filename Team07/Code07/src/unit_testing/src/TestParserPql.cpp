@@ -15,7 +15,7 @@ TEST_CASE("QueryMap ClauseType::declaration") {
         ClauseType::DECLARATION,
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s1"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -29,7 +29,7 @@ TEST_CASE("QueryMap ClauseType::declaration") {
         ClauseType::DECLARATION,
         PayLoad(SINGLE, Single::WHILE, std::vector<std::string>{"w2"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -49,7 +49,7 @@ TEST_CASE("QueryMap ClauseType::declaration") {
         ClauseType::DECLARATION,
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s2"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 }
@@ -62,7 +62,7 @@ TEST_CASE(
       ClauseType::SELECT,
       PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"w"}));
 
-  QueryMap actualQueryMap = pqlParse(query);
+  QueryMap actualQueryMap = pql_query(query);
   REQUIRE(expectedQueryMap == actualQueryMap);
 }
 
@@ -77,7 +77,7 @@ TEST_CASE("QueryMap with no such that and no pattern") {
         ClauseType::SELECT,
         PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"w"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -91,7 +91,7 @@ TEST_CASE("QueryMap with no such that and no pattern") {
         ClauseType::SELECT,
         PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -105,7 +105,7 @@ TEST_CASE("QueryMap with no such that and no pattern") {
         ClauseType::SELECT,
         PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"re"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 }
@@ -127,7 +127,7 @@ TEST_CASE("QueryMap repeated declaration with no such that and no pattern") {
         ClauseType::SELECT,
         PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"w1"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -147,7 +147,7 @@ TEST_CASE("QueryMap repeated declaration with no such that and no pattern") {
         ClauseType::SELECT,
         PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -167,7 +167,7 @@ TEST_CASE("QueryMap repeated declaration with no such that and no pattern") {
         ClauseType::SELECT,
         PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"re1"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 }
@@ -189,7 +189,7 @@ TEST_CASE("one such that Parent") {
         ClauseType::SUCHTHAT,
         PayLoad(PAIR, PARENT, std::vector<std::string>{"s1", "s2"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -206,7 +206,7 @@ TEST_CASE("one such that Parent") {
         ClauseType::SUCHTHAT,
         PayLoad(PAIR, PARENT, std::vector<std::string>{"s1", "_"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -223,7 +223,7 @@ TEST_CASE("one such that Parent") {
         ClauseType::SUCHTHAT,
         PayLoad(PAIR, PARENT, std::vector<std::string>{"s1", "1"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -249,7 +249,7 @@ TEST_CASE("one such that Parent") {
         ClauseType::SUCHTHAT,
         PayLoad(PAIR, PARENT, std::vector<std::string>{"1", "s1"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -278,7 +278,7 @@ TEST_CASE("one such that Parent*") {
         ClauseType::SUCHTHAT,
         PayLoad(PAIR, PARENTT, std::vector<std::string>{"s1", "s2"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -325,7 +325,7 @@ TEST_CASE("one such that Follows") {
         ClauseType::SUCHTHAT,
         PayLoad(PAIR, FOLLOWS, std::vector<std::string>{"s1", "s2"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -372,7 +372,7 @@ TEST_CASE("one such that Follows*") {
         ClauseType::SUCHTHAT,
         PayLoad(PAIR, FOLLOWST, std::vector<std::string>{"s1", "s2"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -419,7 +419,7 @@ TEST_CASE("one such that Modifies") {
         ClauseType::SUCHTHAT,
         PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s1", "s2"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -439,7 +439,7 @@ TEST_CASE("one such that Modifies") {
         ClauseType::SUCHTHAT,
         PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s1", "\"x\""}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -480,7 +480,7 @@ TEST_CASE("one such that Uses") {
         ClauseType::SUCHTHAT,
         PayLoad(PAIR, USES, std::vector<std::string>{"s1", "s2"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -528,7 +528,7 @@ TEST_CASE("one pattern syn_assign, ent_ref and expr_spec ") {
         PayLoad(TRIPLE, SYN_ASSIGN,
                 std::vector<std::string>{"a", "s", "_\"var\"_"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -548,7 +548,7 @@ TEST_CASE("one pattern syn_assign, ent_ref and expr_spec ") {
         ClauseType::PATTERN,
         PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "s", "_"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -590,7 +590,7 @@ TEST_CASE("one such that and one pattern") {
         ClauseType::PATTERN,
         PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "s1", "_"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -614,7 +614,7 @@ TEST_CASE("one such that and one pattern") {
         ClauseType::PATTERN,
         PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "s", "_"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 
@@ -646,7 +646,7 @@ TEST_CASE("one such that and one pattern") {
         PayLoad(TRIPLE, SYN_ASSIGN,
                 std::vector<std::string>{"a", "s", "_\"123\"_"}));
 
-    QueryMap actualQueryMap = pqlParse(query);
+    QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
   }
 }
