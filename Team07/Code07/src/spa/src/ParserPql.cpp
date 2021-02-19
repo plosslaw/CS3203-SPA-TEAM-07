@@ -631,14 +631,26 @@ bool is_synonym_unique(std::vector<PayLoad> declarations) {
 }
 
 // TODO(zs): Optimise comparison
-bool is_synonym_declared(std::vector<PayLoad> declarations,
-                         PayLoad target_synonym) {
-  for (auto it = declarations.begin(); it != declarations.end(); ++it) {
-    PayLoad current_synonym = (*it);
-    if (current_synonym == target_synonym) {
-      return true;
+bool is_synonym_declared(std::vector<PayLoad> declarations, PayLoad target) {
+  std::vector<std::string> values = target.getValue();
+  for (auto it = values.begin(); it != values.end(); ++it) {
+    // TODO(zs): check if values in target are of type synonym
+
+    bool flag = false;
+    std::string target_val = (*it);
+    for (auto it_decl = declarations.begin(); it_decl != declarations.end();
+         ++it_decl) {
+      std::string current_val = (*it_decl).getValue()[0];
+      if (current_val == target_val) {
+        flag = true;
+      }
+    }
+
+    if (flag == false) {
+      return flag;
     }
   }
+
   return true;
 }
 
@@ -667,7 +679,15 @@ bool is_select_clause_valid(QueryMap table) {
 // TODO(zs):
 // synonyms declared
 // wildcard does not exist as first argument of Uses/ Modifies
-bool is_suchthat_clause_valid() { return true; }
+bool is_suchthat_clause_valid(QueryMap table) {
+  // std::vector<PayLoad> declarations = table.getList(ClauseType::DECLARATION);
+  // std::vector<PayLoad> suchthats = table.getList(ClauseType::SUCHTHAT);
+  // PayLoad target = suchthats[0];
+  // if (!is_synonym_declared(declarations, target)) {
+  //   return false;
+  // }
+  return true;
+}
 
 // TODO(zs):
 // synonyms declared
@@ -681,7 +701,7 @@ QueryMap pql_validate(QueryMap query) {
   if (!is_select_clause_valid(query)) {
     return QueryMap();
   }
-  if (!is_suchthat_clause_valid()) {
+  if (!is_suchthat_clause_valid(query)) {
     return QueryMap();
   }
   if (!is_pattern_clause_valid()) {
