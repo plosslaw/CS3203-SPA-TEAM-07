@@ -655,7 +655,6 @@ QueryMap pql_query(State &state) {
     state.assign(so);
   }
 
-  whitespace(state);
   if (state.i != (*state.source).size()) {
     throw ParseException(so.i, state.i, "pql_query", "");
   }
