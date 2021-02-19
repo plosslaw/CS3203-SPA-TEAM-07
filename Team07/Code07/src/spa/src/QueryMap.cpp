@@ -31,6 +31,16 @@ QueryMap::QueryMap() {
   table[ClauseType::PATTERN] = std::vector<PayLoad>();
 }
 
+QueryMap::QueryMap(std::vector<PayLoad> declaration_cl,
+                   std::vector<PayLoad> select_cl,
+                   std::vector<PayLoad> suchthat_cl,
+                   std::vector<PayLoad> pattern_cl) {
+  table[ClauseType::DECLARATION] = declaration_cl;
+  table[ClauseType::SELECT] = select_cl;
+  table[ClauseType::SUCHTHAT] = suchthat_cl;
+  table[ClauseType::PATTERN] = pattern_cl;
+}
+
 std::vector<PayLoad> QueryMap::getList(ClauseType key) { return table[key]; }
 
 void QueryMap::addItem(ClauseType key, PayLoad item) {

@@ -8,8 +8,6 @@
 void validateUniqueProcedureNames(TNode &root, std::unordered_set<std::string> &procs);
 void validateCallProcedureExists(TNode &root, std::unordered_set<std::string> &procs);
 
-std::string name(State &s);
-std::string integer(State &s);
 TNode program(State &s);
 TNode procedure(State &s);
 TNode stmtLst(State &s);

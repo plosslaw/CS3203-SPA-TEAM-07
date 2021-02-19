@@ -37,13 +37,13 @@ public:
     bool satisfies_pattern(assign_ref a, pattern p);
     
     // Returns list of all constants in the SIMPLE program
-    std::vector<constant> get_all_constants();
+    std::vector<const_value> get_all_constants();
 
     // Returns list of all procedures in the SIMPLE program
     std::vector<proc_ref> get_all_procedures();
     
     // Returns list of all statements in the SIMPLE program
-    std::vector<statement> get_all_statements();
+    std::vector<stmt_ref> get_all_statements();
     
     // Returns list of all statements of type t in the SIMPLE program
     std::vector<stmt_ref> get_all_statements_of_type(stmt_type t);
