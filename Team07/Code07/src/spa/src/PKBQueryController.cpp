@@ -49,6 +49,15 @@ bool PKBQueryController::statementModifies(stmt_ref s, var_ref v) {
     return stmt.modifies.find(v) != stmt.modifies.end();
 }
 
+bool PKBQueryController::procedureUses(proc_ref p, var_ref v) {
+    return false;
+}
+
+bool PKBQueryController::procedureModifies(proc_ref p, var_ref v) {
+    return false;
+}
+
+
 bool PKBQueryController::satisfiesPattern(assign_ref a, pattern p) {
     // if (pkb.assignments.find(a) == pkb.assignments.end()) return false;
     // assignment asmt = pkb.assignments.at(a);

@@ -79,12 +79,12 @@ public:
     std::vector<var_ref> get_all_variables_modifies(); // wildcard operation
     std::vector<var_ref> get_all_variables_modifies(proc_ref procedure);
     std::vector<var_ref> get_all_variables_modifies(stmt_ref other_stmt);
-    std::vector<var_ref> get_all_variables_modifies(stmt_type other_stmt_type);
+    std::vector<var_ref> get_all_variables_modifies(stmt_type other_stmt_type); // can pass PROCEDURE as stmt_type
 
     std::vector<var_ref> get_all_variables_uses(); // wildcard operation
     std::vector<var_ref> get_all_variables_uses(proc_ref procedure);
     std::vector<var_ref> get_all_variables_uses(stmt_ref other_stmt);
-    std::vector<var_ref> get_all_variables_uses(stmt_type other_stmt_type);
+    std::vector<var_ref> get_all_variables_uses(stmt_type other_stmt_type); // can pass PROCEDURE as stmt_type
 
     // Pattern Clauses for Assign
 

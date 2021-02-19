@@ -872,42 +872,268 @@ std::vector<proc_ref> ActionsExecutor::get_all_procedures_uses(var_ref var) {
 // Wildcard operation
 std::vector<var_ref> ActionsExecutor::get_all_variables_modifies() {
     vector<var_ref> results;
+
+    unordered_set<var_ref> unique_set;
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (proc_ref proc_wildcard : this->procs) {
+        for (var_ref var : this->vars) {
+            if (pkb_query_controller.procedureModifies(proc_wildcard, var)) {
+                if (unique_set.find(var) == unique_set.end()) {
+                    unique_set.insert(var);
+                    results.push_back(var);
+                }
+            }
+        }
+    }
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (stmt_ref stmt_wildcard : this->stmts) {
+        for (var_ref var : this->vars) {
+            if (pkb_query_controller.statementModifies(stmt_wildcard, var)) {
+                if (unique_set.find(var) == unique_set.end()) {
+                    unique_set.insert(var);
+                    results.push_back(var);
+                }
+            }
+        }
+    }
+
     return results;
 }
 
 std::vector<var_ref> ActionsExecutor::get_all_variables_modifies(proc_ref procedure) {
     vector<var_ref> results;
+
+    unordered_set<var_ref> unique_set;
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (var_ref var : this->vars) {
+        if (pkb_query_controller.procedureModifies(procedure, var)) {
+            if (unique_set.find(var) == unique_set.end()) {
+                unique_set.insert(var);
+                results.push_back(var);
+            }
+        }
+    }
+
     return results;
 }
 
 std::vector<var_ref> ActionsExecutor::get_all_variables_modifies(stmt_ref other_stmt) {
     vector<var_ref> results;
+
+    unordered_set<var_ref> unique_set;
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (var_ref var : this->vars) {
+        if (pkb_query_controller.statementModifies(other_stmt, var)) {
+            if (unique_set.find(var) == unique_set.end()) {
+                unique_set.insert(var);
+                results.push_back(var);
+            }
+        }
+    }
+
     return results;
 }
 
 std::vector<var_ref> ActionsExecutor::get_all_variables_modifies(stmt_type other_stmt_type) {
     vector<var_ref> results;
+
+    unordered_set<var_ref> unique_set;
+
+    if (other_stmt_type == stmt_type::PROCEDURE) {
+        // TODO(plosslaw): refactor to reduce nesting
+        for (proc_ref proc_wildcard : this->procs) {
+            for (var_ref var : this->vars) {
+                if (pkb_query_controller.procedureModifies(proc_wildcard, var)) {
+                    if (unique_set.find(var) == unique_set.end()) {
+                        unique_set.insert(var);
+                        results.push_back(var);
+                    }
+                }
+            }
+        }
+        
+        return results;
+    }
+
+    vector<stmt_ref> stmts_wildcard;
+    
+    switch (other_stmt_type) {
+    
+    case stmt_type::ASSIGN:
+        stmts_wildcard = this->stmts_assign;
+
+    case stmt_type::CALL:
+        stmts_wildcard = this->stmts_call;
+    
+    case stmt_type::IF:
+        stmts_wildcard = this->stmts_if;
+
+    case stmt_type::PRINT:
+        stmts_wildcard = this->stmts_print;
+
+    case stmt_type::READ:
+        stmts_wildcard = this->stmts_read;
+
+    case stmt_type::WHILE:
+        stmts_wildcard = this->stmts_while;
+
+    case stmt_type::STATEMENT:
+        stmts_wildcard = this->stmts;
+
+    default:
+        throw "Invalid statement type passed"; 
+    }
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (stmt_ref stmt_wildcard : stmts_wildcard) {
+        for (var_ref var : this->vars) {
+            if (pkb_query_controller.statementModifies(stmt_wildcard, var)) {
+                if (unique_set.find(var) == unique_set.end()) {
+                    unique_set.insert(var);
+                    results.push_back(var);
+                }
+            }
+        }
+    }
+
     return results;
 }
 
 // Wildcard operation
 std::vector<var_ref> ActionsExecutor::get_all_variables_uses() {
     vector<var_ref> results;
+
+    unordered_set<var_ref> unique_set;
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (proc_ref proc_wildcard : this->procs) {
+        for (var_ref var : this->vars) {
+            if (pkb_query_controller.procedureUses(proc_wildcard, var)) {
+                if (unique_set.find(var) == unique_set.end()) {
+                    unique_set.insert(var);
+                    results.push_back(var);
+                }
+            }
+        }
+    }
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (stmt_ref stmt_wildcard : this->stmts) {
+        for (var_ref var : this->vars) {
+            if (pkb_query_controller.statementUses(stmt_wildcard, var)) {
+                if (unique_set.find(var) == unique_set.end()) {
+                    unique_set.insert(var);
+                    results.push_back(var);
+                }
+            }
+        }
+    }
+
     return results;
 }
 
 std::vector<var_ref> ActionsExecutor::get_all_variables_uses(proc_ref procedure) {
     vector<var_ref> results;
+
+    unordered_set<var_ref> unique_set;
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (var_ref var : this->vars) {
+        if (pkb_query_controller.procedureUses(procedure, var)) {
+            if (unique_set.find(var) == unique_set.end()) {
+                unique_set.insert(var);
+                results.push_back(var);
+            }
+        }
+    }
+
     return results;
 }
 
-std::vector<var_ref> ActionsExecutor::get_all_variables_uses(stmt_ref otherStmt) {
+std::vector<var_ref> ActionsExecutor::get_all_variables_uses(stmt_ref other_stmt) {
     vector<var_ref> results;
+
+    unordered_set<var_ref> unique_set;
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (var_ref var : this->vars) {
+        if (pkb_query_controller.statementUses(other_stmt, var)) {
+            if (unique_set.find(var) == unique_set.end()) {
+                unique_set.insert(var);
+                results.push_back(var);
+            }
+        }
+    }
+
     return results;
 }
 
-std::vector<var_ref> ActionsExecutor::get_all_variables_uses(stmt_type otherStmtType) {
+std::vector<var_ref> ActionsExecutor::get_all_variables_uses(stmt_type other_stmt_type) {
     vector<var_ref> results;
+
+    unordered_set<var_ref> unique_set;
+
+    if (other_stmt_type == stmt_type::PROCEDURE) {
+        // TODO(plosslaw): refactor to reduce nesting
+        for (proc_ref proc_wildcard : this->procs) {
+            for (var_ref var : this->vars) {
+                if (pkb_query_controller.procedureUses(proc_wildcard, var)) {
+                    if (unique_set.find(var) == unique_set.end()) {
+                        unique_set.insert(var);
+                        results.push_back(var);
+                    }
+                }
+            }
+        }
+        
+        return results;
+    }
+
+    vector<stmt_ref> stmts_wildcard;
+    
+    switch (other_stmt_type) {
+    
+    case stmt_type::ASSIGN:
+        stmts_wildcard = this->stmts_assign;
+
+    case stmt_type::CALL:
+        stmts_wildcard = this->stmts_call;
+    
+    case stmt_type::IF:
+        stmts_wildcard = this->stmts_if;
+
+    case stmt_type::PRINT:
+        stmts_wildcard = this->stmts_print;
+
+    case stmt_type::READ:
+        stmts_wildcard = this->stmts_read;
+
+    case stmt_type::WHILE:
+        stmts_wildcard = this->stmts_while;
+
+    case stmt_type::STATEMENT:
+        stmts_wildcard = this->stmts;
+
+    default:
+        throw "Invalid statement type passed"; 
+    }
+
+    // TODO(plosslaw): refactor to reduce nesting
+    for (stmt_ref stmt_wildcard : stmts_wildcard) {
+        for (var_ref var : this->vars) {
+            if (pkb_query_controller.statementUses(stmt_wildcard, var)) {
+                if (unique_set.find(var) == unique_set.end()) {
+                    unique_set.insert(var);
+                    results.push_back(var);
+                }
+            }
+        }
+    }
+
     return results;
 }
 
