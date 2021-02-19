@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "PKB.h"
@@ -78,12 +79,12 @@ public:
     std::vector<var_ref> get_all_variables_modifies(); // wildcard operation
     std::vector<var_ref> get_all_variables_modifies(proc_ref procedure);
     std::vector<var_ref> get_all_variables_modifies(stmt_ref other_stmt);
-    std::vector<var_ref> get_all_variables_modifies(stmt_type other_stmt_type);
+    std::vector<var_ref> get_all_variables_modifies(stmt_type other_stmt_type); // can pass PROCEDURE as stmt_type
 
     std::vector<var_ref> get_all_variables_uses(); // wildcard operation
     std::vector<var_ref> get_all_variables_uses(proc_ref procedure);
     std::vector<var_ref> get_all_variables_uses(stmt_ref other_stmt);
-    std::vector<var_ref> get_all_variables_uses(stmt_type other_stmt_type);
+    std::vector<var_ref> get_all_variables_uses(stmt_type other_stmt_type); // can pass PROCEDURE as stmt_type
 
     // Pattern Clauses for Assign
 
@@ -92,6 +93,7 @@ public:
     // variable position assumed to be on left side
     std::vector<var_ref> get_all_variables_pattern_assign(); // wildcard operation
     std::vector<var_ref> get_all_variables_pattern_assign(std::string pattern_string);
+    std::vector<var_ref> get_variable_pattern_assign(stmt_ref assign_stmt, std::string pattern_string);
 
 private:
     PKBQueryController pkb_query_controller;
@@ -105,6 +107,8 @@ private:
     std::vector<stmt_ref> stmts_read;
     std::vector<stmt_ref> stmts_while;
     std::vector<var_ref> vars;
+
+    std::unordered_set<stmt_ref> unique_set_assign;
 
 };
 
