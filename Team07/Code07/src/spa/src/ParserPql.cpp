@@ -215,8 +215,10 @@ std::vector<std::string> ent_and_expr_spec(State &state) {
 
 // -------------------- Declaration Clause -------------------- //
 
-// declaration : design-entity synonym
-PayLoad declaration(State &state, std::string design_entity, Single load_type) {
+// declaration : design-entity synonym (‘,’ synonym)* ‘;’
+std::vector<PayLoad> declaration(State &state, std::string design_entity,
+                                 Single load_type) {
+  std::vector<PayLoad> declarations;
   State so(state);
   try {
     stringMatch(state, design_entity);
@@ -226,39 +228,31 @@ PayLoad declaration(State &state, std::string design_entity, Single load_type) {
     values.push_back(synonym(state));
     whitespace(state);
 
-    return PayLoad(SINGLE, load_type, values);
-  } catch (ParseException &e) {
-    state.excps.push_back(e);
-    throw ParseException(so.i, state.i, "declaration", "");
-  }
-}
-
-// declaration : design-entity synonym (‘,’ synonym)* ‘;’
-std::vector<PayLoad> repeat_declaration(State &state, std::string design_entity,
-                                        Single load_type) {
-  State so(state);
-  std::vector<PayLoad> declarations;
-
-  try {
-    declarations.push_back(declaration(state, design_entity, load_type));
+    declarations.push_back(PayLoad(SINGLE, load_type, values));
     so.assign(state);
-  } catch (ParseException &e) {
-    throw e;
-  }
-  try {
+
     while (true) {
-      declarations.push_back(declaration(state, ",", load_type));
+      stringMatch(state, ",");
+      whitespace(state);
+
+      std::vector<std::string> values;
+      values.push_back(synonym(state));
+      whitespace(state);
+
+      declarations.push_back(PayLoad(SINGLE, load_type, values));
       so.assign(state);
     }
   } catch (ParseException &e) {
+    state.assign(so);
     try {
       stringMatch(state, ";");
       whitespace(state);
+      return declarations;
     } catch (ParseException &e) {
-      throw e;
+      state.excps.push_back(e);
+      throw ParseException(so.i, state.i, "declaration", "");
     }
   }
-  return declarations;
 }
 
 // design-entity : ‘stmt’ | ‘read’ | ‘print’ | ‘call’ | ‘while’ | ‘if’ |
@@ -268,71 +262,71 @@ std::vector<PayLoad> declaration_cl(State &state) {
   std::vector<PayLoad> declarations;
   try {
     std::vector<PayLoad> while_decl =
-        repeat_declaration(state, "while", Single::WHILE);
+        declaration(state, "while", Single::WHILE);
     declarations.insert(declarations.end(), while_decl.begin(),
                         while_decl.end());
   } catch (ParseException &e) {
     state.assign(so);
     try {
       std::vector<PayLoad> stmt_decl =
-          repeat_declaration(state, "stmt", Single::STATEMENT);
+          declaration(state, "stmt", Single::STATEMENT);
       declarations.insert(declarations.end(), stmt_decl.begin(),
                           stmt_decl.end());
     } catch (ParseException &e) {
       state.assign(so);
       try {
         std::vector<PayLoad> read_decl =
-            repeat_declaration(state, "read", Single::READ);
+            declaration(state, "read", Single::READ);
         declarations.insert(declarations.end(), read_decl.begin(),
                             read_decl.end());
       } catch (ParseException &e) {
         state.assign(so);
         try {
           std::vector<PayLoad> print_decl =
-              repeat_declaration(state, "print", Single::PRINT);
+              declaration(state, "print", Single::PRINT);
           declarations.insert(declarations.end(), print_decl.begin(),
                               print_decl.end());
         } catch (ParseException &e) {
           state.assign(so);
           try {
             std::vector<PayLoad> call_decl =
-                repeat_declaration(state, "call", Single::CALL);
+                declaration(state, "call", Single::CALL);
             declarations.insert(declarations.end(), call_decl.begin(),
                                 call_decl.end());
           } catch (ParseException &e) {
             state.assign(so);
             try {
               std::vector<PayLoad> if_decl =
-                  repeat_declaration(state, "if", Single::IF);
+                  declaration(state, "if", Single::IF);
               declarations.insert(declarations.end(), if_decl.begin(),
                                   if_decl.end());
             } catch (ParseException &e) {
               state.assign(so);
               try {
                 std::vector<PayLoad> assign_decl =
-                    repeat_declaration(state, "assign", Single::ASSIGN);
+                    declaration(state, "assign", Single::ASSIGN);
                 declarations.insert(declarations.end(), assign_decl.begin(),
                                     assign_decl.end());
               } catch (ParseException &e) {
                 state.assign(so);
                 try {
                   std::vector<PayLoad> variable_decl =
-                      repeat_declaration(state, "variable", Single::VARIABLE);
+                      declaration(state, "variable", Single::VARIABLE);
                   declarations.insert(declarations.end(), variable_decl.begin(),
                                       variable_decl.end());
                 } catch (ParseException &e) {
                   state.assign(so);
                   try {
                     std::vector<PayLoad> constant_decl =
-                        repeat_declaration(state, "constant", Single::CONSTANT);
+                        declaration(state, "constant", Single::CONSTANT);
                     declarations.insert(declarations.end(),
                                         constant_decl.begin(),
                                         constant_decl.end());
                   } catch (ParseException &e) {
                     state.assign(so);
                     try {
-                      std::vector<PayLoad> procedure_decl = repeat_declaration(
-                          state, "procedure", Single::PROCEDURE);
+                      std::vector<PayLoad> procedure_decl =
+                          declaration(state, "procedure", Single::PROCEDURE);
                       declarations.insert(declarations.end(),
                                           procedure_decl.begin(),
                                           procedure_decl.end());

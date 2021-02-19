@@ -2,7 +2,7 @@
 #include "QueryMap.h"
 #include <string.h>
 
-PayLoad declaration(State &state, std::string design_entity, Single load_type);
+std::vector<PayLoad> declaration(State &state, std::string design_entity, Single load_type);
 std::vector<PayLoad> repeat_declaration(State &state, std::string design_entity,
                                         Single load_type);
 std::vector<PayLoad> declaration_cl(State &state);
