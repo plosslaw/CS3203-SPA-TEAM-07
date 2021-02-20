@@ -29,35 +29,19 @@ vector<string> PatternEval::zero_such_that_one_pattern(PayLoad pattern_pay_load,
     }  
     if (select_type == Single::ASSIGN) {
         vector<stmt_ref> result = executor.get_all_stmts_pattern(p);
-        if (arg_pairs.first) {
-            vector<string> result2;
-            for(auto item : result) {
-                result2.push_back(to_string(item));
-            }
-            return result2;
-        } else {
-            // select a1 pattern a(v,_);
-            return is_result_empty_yes_none_no_default_soln(result.empty(), select_type, select_value);
-        }
+        return PatternEval::convert_lst_string_to_int(result);
     } else if (select_type == Single::VARIABLE) {
         if (third_arg == "_") {
+            //because select type is VARIABLE, it is assumed that pattern 2nd parameter is variable(wild) as well.
             vector<var_ref> result  = executor.get_all_variables_pattern_assign();
-            if(arg_pairs.second) {
-                return result;
-            } else {
-                return is_result_empty_yes_none_no_default_soln(result.empty(), select_type, select_value);
-            }
+            return result;
         } else {
             vector<var_ref> result  = executor.get_all_variables_pattern_assign(third_arg);
-            if(arg_pairs.second) {
-                return result;
-            } else {
-                return is_result_empty_yes_none_no_default_soln(result.empty(), select_type, select_value);
-            }
+            return result;
         }
     } else {
         vector<stmt_ref> result = executor.get_all_stmts_pattern(p);
-        return is_result_empty_yes_none_no_default_soln(result.empty(), select_type, select_value);
+        return PatternEval::convert_lst_string_to_int(result);
     }
 }
 
@@ -110,11 +94,10 @@ stmt_type PatternEval::convert_single_to_stmt_type(Single s) {
     }
 }
 
-vector<string> PatternEval::is_result_empty_yes_none_no_default_soln(bool is_result_empty, Single select_type, string select_value) {
-    if (is_result_empty) {
-        return vector<string>{"None"};              
-    } else {
-        vector<string> default_solution = (mapStorage[select_type])[select_value];
-        return default_solution;                      
+vector<string> PatternEval::convert_lst_string_to_int(vector<int> lstA) {
+    vector<string> output;
+    for(auto i : lstA) {
+        output.push_back(to_string(i));
     }
+    return output;
 }
