@@ -85,3 +85,12 @@ TEST_CASE("TEST V: Uses relationship without function calls") {
     REQUIRE(pkb.statements[2].modifies.find("b") == pkb.statements[2].modifies.end());
     REQUIRE(pkb.statements[3].modifies.find("z") == pkb.statements[3].modifies.end());
 }
+
+TEST_CASE("Test VI: Assignment statement extraction") {
+    PKBBuilder builder = PKBBuilder(root);
+    PKB pkb = builder.build();
+
+    REQUIRE(pkb.assignments[4].rightValue == "(x-1)");
+    REQUIRE(pkb.assignments[6].rightValue == "(y*2)");
+    REQUIRE(pkb.assignments.find(5) == pkb.assignments.end());
+}
