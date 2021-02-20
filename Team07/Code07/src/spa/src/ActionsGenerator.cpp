@@ -48,6 +48,9 @@ void ActionsGenerator::set_Query_Map(QueryMap mapQuery) {
     
 }
 
+std::vector<PayLoad> ActionsGenerator::get_patternList() {
+    return suchThatList;
+}
 std::unordered_map<Single, 
         std::unordered_map<std::string, std::vector<std::string>>> ActionsGenerator::preprocess() {
     // preprocessing - retrieval of queryMap clauses
@@ -167,7 +170,7 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
 
     bool is_such_that_empty = suchThatList.empty();
     bool is_pattern_empty = patternList.empty();
-    if(is_such_that_empty && is_such_that_empty) {
+    if(is_such_that_empty && is_pattern_empty) {
         // There is no such that and pattern clause.
         return default_solution;
     }
