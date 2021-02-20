@@ -43,23 +43,24 @@ void TestWrapper::parse(std::string filename) {
 
 // method to evaluating a query
 void TestWrapper::evaluate(std::string query, std::list<std::string> &results) {
-  // parse the query into query map
-  QueryMap parsed_query = parse_pql(query);
-  if (parsed_query.is_empty()) {
-    std::cout << "Unable to parse PQL" << std::endl;
+  try {
+    // parse the query into query map
+    QueryMap parsed_query = parse_pql(query);
+
+    // evaluate the query
+    auto evaluationResults = evaluator.QERunQuery(parsed_query);
+
+    // set value of results list
+    results = std::list<std::string> (evaluationResults.begin(), evaluationResults.end());
+
+    // print results to stdout
+    for (auto item: evaluationResults) {
+      std::cout << item << " ";
+    }
+    std::cout << std::endl;
+  } catch (std::string &e) {
+    std::cerr << e << std::endl;
   }
-
-  // evaluate the query
-  auto evaluationResults = evaluator.QERunQuery(parsed_query);
-
-  // set value of results list
-  results = std::list<std::string> (evaluationResults.begin(), evaluationResults.end());
-
-  // print results to stdout
-  for (auto item: evaluationResults) {
-    std::cout << item << " ";
-  }
-  std::cout << std::endl;
 
   return;
 }

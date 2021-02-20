@@ -41,8 +41,12 @@ TNode Parse (std::string file) {
 
 QueryMap parse_pql(std::string query) {
   State state(&query);
-  QueryMap parsed_query_map = pql_query(state);
-  QueryMap validated_query_map = pql_validate(parsed_query_map);
-  
-  return validated_query_map;
+	ParserMapper map(&query);
+	try{
+    QueryMap parsed_query_map = pql_query(state);
+    return pql_validate(parsed_query_map);
+	} catch (ParseException &e) {
+		state.excps.push_back(e);
+		throw prettyPrintException(map, state);
+	}
 }

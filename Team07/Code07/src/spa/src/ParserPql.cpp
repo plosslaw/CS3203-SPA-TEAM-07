@@ -784,17 +784,21 @@ bool is_pattern_clause_valid(QueryMap table) {
 }
 
 QueryMap pql_validate(QueryMap query) {
+  if (query.is_empty()) {
+    throw prettyPrintValidation("Empty query.");
+  }
+
   if (!is_declaration_clause_valid(query)) {
-    return QueryMap();
+    throw prettyPrintValidation("Invalid declaration clause.");
   }
   if (!is_select_clause_valid(query)) {
-    return QueryMap();
+    throw prettyPrintValidation("Invalid select clause.");
   }
   if (!is_suchthat_clause_valid(query)) {
-    return QueryMap();
+    throw prettyPrintValidation("Invalid such that clause.");
   }
   if (!is_pattern_clause_valid(query)) {
-    return QueryMap();
+    throw prettyPrintValidation("Invalid pattern clause.");
   }
 
   return query;

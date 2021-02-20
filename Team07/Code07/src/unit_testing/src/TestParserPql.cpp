@@ -744,8 +744,10 @@ TEST_CASE("Validation of declaration clause") {
         ClauseType::DECLARATION,
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"w1"}));
 
-    QueryMap output_query_map = pql_validate(input_query_map);
-    REQUIRE_FALSE(input_query_map == output_query_map);
+    // QueryMap output_query_map = pql_validate(input_query_map);
+    // REQUIRE_FALSE(input_query_map == output_query_map);
+    REQUIRE_THROWS(pql_validate(input_query_map),
+                   prettyPrintValidation("Invalid declaration clause."));
   }
 }
 
@@ -760,8 +762,8 @@ TEST_CASE("Validation of select clause") {
         ClauseType::DECLARATION,
         PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s1"}));
 
-    QueryMap output_query_map = pql_validate(input_query_map);
-    REQUIRE_FALSE(input_query_map == output_query_map);
+    REQUIRE_THROWS(pql_validate(input_query_map),
+                   prettyPrintValidation("Invalid select clause."));
   }
 
   SECTION("Select synonym declared") {
@@ -796,13 +798,13 @@ TEST_CASE("Validation of select clause") {
                                     std::vector<std::string>{"s1"},
                                     std::vector<bool>{true}));
 
-    QueryMap output_query_map = pql_validate(input_query_map);
-    REQUIRE_FALSE(input_query_map == output_query_map);
+    REQUIRE_THROWS(pql_validate(input_query_map),
+                   prettyPrintValidation("Invalid select clause."));
   }
 }
 
 TEST_CASE("Validation of such that clause") {
-  // TODO(zs):
+
   SECTION("Such that synonyms declared") {
     std::string query = "while w; stmt s; Select s such that Parent(w, s)";
     QueryMap input_query_map;
@@ -843,8 +845,8 @@ TEST_CASE("Validation of such that clause") {
                                     std::vector<std::string>{"w1", "s"},
                                     std::vector<bool>{true, true}));
 
-    QueryMap output_query_map = pql_validate(input_query_map);
-    REQUIRE_FALSE(input_query_map == output_query_map);
+    REQUIRE_THROWS(pql_validate(input_query_map),
+                   prettyPrintValidation("Invalid such that clause."));
   }
 
   SECTION("Such that second argument synonym undeclared") {
@@ -865,8 +867,8 @@ TEST_CASE("Validation of such that clause") {
                                     std::vector<std::string>{"w", "s1"},
                                     std::vector<bool>{true, true}));
 
-    QueryMap output_query_map = pql_validate(input_query_map);
-    REQUIRE_FALSE(input_query_map == output_query_map);
+    REQUIRE_THROWS(pql_validate(input_query_map),
+                   prettyPrintValidation("Invalid such that clause."));
   }
 
   // TODO(zs):
@@ -918,8 +920,8 @@ TEST_CASE("Validation of pattern clause") {
                                     std::vector<std::string>{"a", "s1", "_"},
                                     std::vector<bool>{true, true, false}));
 
-    QueryMap output_query_map = pql_validate(input_query_map);
-    REQUIRE_FALSE(input_query_map == output_query_map);
+    REQUIRE_THROWS(pql_validate(input_query_map),
+                   prettyPrintValidation("Invalid pattern clause."));
   }
 
   SECTION("syn-assign is not of type assign") {
@@ -940,8 +942,8 @@ TEST_CASE("Validation of pattern clause") {
                                     std::vector<std::string>{"a", "s", "_"},
                                     std::vector<bool>{true, true, false}));
 
-    QueryMap output_query_map = pql_validate(input_query_map);
-    REQUIRE_FALSE(input_query_map == output_query_map);
+    REQUIRE_THROWS(pql_validate(input_query_map),
+                   prettyPrintValidation("Invalid pattern clause."));
   }
 }
 
@@ -950,7 +952,7 @@ TEST_CASE("Validation of empty string") {
     QueryMap input_query_map;
     QueryMap expected_query_map;
 
-    QueryMap actual_query_map = pql_validate(input_query_map);
-    REQUIRE(actual_query_map == expected_query_map);
+    REQUIRE_THROWS(pql_validate(input_query_map),
+                   throw prettyPrintValidation("Empty query."));
   }
 }
