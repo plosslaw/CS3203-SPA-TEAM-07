@@ -2,6 +2,11 @@
 
 using namespace std;
 
+QueryEvaluator::QueryEvaluator() {
+    PKBQueryController emptyPKBQueryController = PKBQueryController();
+    this->actionsExecutor = ActionsExecutor(PKBQueryController());
+}
+
 QueryEvaluator::QueryEvaluator(PKBQueryController pkb_query_controller) {
     this->actionsExecutor = ActionsExecutor(pkb_query_controller);
 }

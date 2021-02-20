@@ -12,18 +12,18 @@
 /** program :- procedure+ */
 TNode program(State &s) {
   State so(s);
-  TNode t("", PROGRAM);
-  bool consumed = false;
-  try {
-    while (true) {
-      t.addChild(procedure(s));
-      so.assign(s);
-      consumed = true;
-    }
-  } catch (ParseException &e) {
-    if (!consumed) {
-      throw e;
-    }
+  TNode t("", PROGRAM, 0);
+	bool consumed = false;
+	try {
+		while(true) {
+			t.addChild(procedure(s));
+			so.assign(s);
+			consumed = true;
+		}
+	} catch (ParseException &e){
+		if(!consumed) {
+			throw e;
+		}
     if (so.i != (*s.source).size()) {
       throw e;
     }

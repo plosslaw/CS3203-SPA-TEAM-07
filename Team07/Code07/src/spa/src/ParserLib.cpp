@@ -4,6 +4,9 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <cctype>
+#include "ParserLib.h"
+#include "ParserIndexMapper.h"
 
 // class definitions ----------------------------------------------------------
 
@@ -43,125 +46,29 @@ const char *ParseException::what() const throw() {
   return str.c_str();
 }
 
-std::string prettyPrintValidation(std::string *str, int pos, std::string msg) {
-  std::string strv = *str;
-  std::vector<char> linebuilder;
-  bool atLine = false;
-  int lineNum = 0;
-  int colBegin = -1;
-  for (int i = 0; i < strv.length(); i++) {
-    char c = strv.at(i);
-    if (i == pos) {
-      atLine = true;
-    }
-    if (c == '\n') {
-      if (atLine) {
-        break;
-      } else {
-        lineNum++;
-        colBegin = i;
-        linebuilder.clear();
-      }
-    } else {
-      linebuilder.push_back(c);
-    }
-  }
-  std::string linestrvalue(linebuilder.begin(), linebuilder.end());
-  int colNum = pos - colBegin;
-  // calculate line and col from pos
-
-  std::string outputstr("ValidationError");
-  outputstr += " at line " + std::to_string(lineNum + 1) + " col " +
-               std::to_string(colNum) + "\n\n";
-  std::string preoutput = "  " + std::to_string(lineNum + 1) + "|  ";
-  outputstr += preoutput + linestrvalue + "\n";
-  std::string whitespaceprefix =
-      std::string(preoutput.length() + colNum - 1, ' ');
-  outputstr += whitespaceprefix + "^\n";
-  outputstr += "  " + msg + "\n";
-  return outputstr;
-  // pretty print
+std::string prettyPrintValidation(ParserMapper &map, int pos, std::string msg) {
+	std::string outputstr("ValidationError");
+	outputstr += map.get_pos_print(pos) + "\n";
+	outputstr += map.get_line_caret(pos, 2);
+	outputstr += "  " + msg + "\n";
+	return outputstr;
 }
 
-std::string prettyPrintException(State &s, bool show_stack) {
-  std::string *str = s.source;
-  std::vector<ParseException> e = s.excps;
-  int at = e[0].at;
+std::string prettyPrintException(ParserMapper &map, State &s, bool show_stack) {
+	std::vector<ParseException> e = s.excps;
+	int pos = e[0].at;
 
-  std::vector<int> fs;
-  std::vector<std::string> es;
-  for (int i = 0; i < e.size(); i++) {
-    fs.push_back(e[i].from);
-    es.push_back(e[i].errorMessage());
+	std::string outputstr("ParseError");
+	outputstr += map.get_pos_print(pos) + "\n";
+	outputstr += map.get_line_caret(pos, 2);
+	if(show_stack) {
+		std::vector<int> fs;
+		std::vector<std::string> es;
+		for(int i = 0; i < e.size(); i++) {
+			outputstr += "  " + e[i].errorMessage() + "\n";
+			outputstr += map.get_pos_print(e[i].from, 4);
+		}
   }
-  std::vector<int> fromLine(fs.size());
-  std::vector<int> fromCol(fs.size());
-
-  std::vector<int> linelengths;
-  std::vector<std::string> linestr;
-  std::vector<char> linebuilder;
-
-  int curLineLength = 0;
-  int prevLineLength = 0;
-  int curLine = 0;
-  int atLine = 0;
-  int atCol = 0;
-
-  std::string strv = *str;
-  for (int i = 0; i < strv.length(); i++) {
-    char c = strv.at(i);
-    curLineLength++;
-    if (c == '\n') {
-      linelengths.push_back(curLineLength);
-      std::string linestrvalue(linebuilder.begin(), linebuilder.end());
-      linestr.push_back(linestrvalue);
-      linebuilder.clear();
-      curLine++;
-      prevLineLength = curLineLength;
-    } else {
-      linebuilder.push_back(c);
-    }
-    if (i == at) {
-      atLine = curLine;
-      atCol = curLineLength - prevLineLength - 1;
-    }
-    for (int j = 0; j < fs.size(); j++) {
-      if (i == fs[j]) {
-        fromLine[j] = curLine;
-        fromCol[j] = curLineLength - prevLineLength - 1;
-      }
-    }
-  }
-  if (at == strv.size()) {
-    atLine = curLine;
-    atCol = strv.size() - prevLineLength - 1;
-  }
-  for (int i = 0; i < fs.size(); i++) {
-    if (fs[i] == strv.size()) {
-      fromLine[i] = curLine;
-      fromCol[i] = strv.size() - prevLineLength - 1;
-    }
-  }
-  linelengths.push_back(curLineLength);
-  std::string linestrvalue(linebuilder.begin(), linebuilder.end());
-  linestr.push_back(linestrvalue);
-  // calculate from line cols and line strings
-
-  std::string outputstr("ParseError");
-  outputstr += " at line " + std::to_string(atLine + 1) + " col " +
-               std::to_string(atCol + 1) + "\n\n";
-  std::string preoutput = "  " + std::to_string(atLine + 1) + "|  ";
-  outputstr += preoutput + linestr[atLine] + "\n";
-  std::string whitespaceprefix = std::string(preoutput.length() + atCol, ' ');
-  outputstr += whitespaceprefix + "^\n";
-  if (show_stack) {
-    for (int i = 0; i < fromLine.size(); i++) {
-      outputstr += "  " + es[i] + "\n";
-      outputstr += "    from line " + std::to_string(fromLine[i] + 1) +
-                   " col " + std::to_string(fromCol[i] + 1) + "\n";
-    }
-  }
-  // generate pretty output
   return outputstr;
 }
 
