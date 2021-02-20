@@ -1,104 +1,44 @@
-// #include "ActionsGenerator.h"
-// #include "catch.hpp"
-// #include <iostream>
-// #include <vector>
+#include "MockAST.h"
+#include "../../spa/src/ActionsExecutor.h"
+#include "../../spa/src/ActionsGenerator.h"
+#include "../../spa/src/PKBBuilder.hpp"
+#include "catch.hpp"
+#include <iostream>
+#include <vector>
 
-// class ActionsExecutorTest: public ActionsExecutor {
-//     public: 
-//         int current_test;
-//         ActionsExecutorTest() {
-//             current_test = 0;
-//         }
-//         void set_current_test(int set_number) {
-//             current_test = set_number;
-//         }
-        
-//         // Returns true if and only if Follows/*(s1,s2)
-//         bool is_follows(stmt_ref s1, stmt_ref s2, bool is_starred) {
-//             return true;
-//         }
+using namespace std;
 
-//         // Returns true if and only if Parent/*(s1,s2)
-//         bool is_parent(stmt_ref s1, stmt_ref s2, bool is_starred) {
-//             return true;
-//         }
+//using mockast
 
-//         // Returns true if and only if Uses(s,v)
-//         bool statement_uses(stmt_ref s, var_ref v) {
-//             return true;
-//         }
+TEST_CASE("NO SELECT CLAUSE, SUCH THAT AND PATTERN") {
+    TNode ast_tree = getMockAST();
+    PKBBuilder pkb_builder(ast_tree);
+    PKBQueryController pkb_query_controller(pkb_builder.build());
+    ActionsExecutor executor(pkb_query_controller);
+    //ActionsGenerator generator(executor);
 
-//         // Returns true if and only if Modifies(s,v)
-//         bool statement_modifies(stmt_ref s, var_ref v) {
-//             return true;
-//         }
+}
 
-//         // Returns true if and only if assignment statement a matches pattern p
-//         bool satisfies_pattern(assign_ref a, pattern p) {
-//             return true;
-//         }
-//         // Returns list of all constants in the SIMPLE program
-//         std::vector<constant> get_all_constants() {
-//             if (current_test == 1) {
-//                 return vector<constant>{1};
-//             }
-//         }
+TEST_CASE("SELECT CLAUSE ONLY") {
 
-//         // Returns list of all procedures in the SIMPLE program
-//         std::vector<proc_ref> get_all_procedures() {
-//             return vector<proc_ref>{"first_procedure"};
-//         };
-        
-//         // Returns list of all statements in the SIMPLE program
-//         //std::vector<statement> get_all_statements();
-        
-//         // Returns list of all statements of type t in the SIMPLE program
-//         std::vector<stmt_ref> get_all_statements_of_type(stmt_type t) {
-//                 return vector<stmt_ref>{1,2,3};
-//             if (stmt_type::STATEMENT) {
-//                 if (current_test == 1) {
-//                 return vector<stmt_ref>{1,2,3};
-//                 }
-//             }
-//             if (stmt_type::READ) {
-//                 if (current_test == 1) {
-//                     return vector<stmt_ref>{};
-//                 }
-//             }
-//             if (stmt_type::PRINT) {
-//                 if (current_test == 1) {
-//                     return vector<stmt_ref>{};
-//                 }
-//             }
-//             if (stmt_type::WHILE) {
-//                 if (current_test == 1) {
-//                     return vector<stmt_ref>{};
-//                 }
-//             }
-//             if (stmt_type::IF) {
-//                 if (current_test == 1) {
-//                     return vector<stmt_ref>{};
-//                 }
-//             }
-//             if (stmt_type::ASSIGN) {
-//                 if (current_test == 1) {
-//                     return vector<stmt_ref>{};
-//                 }
-//             } 
-//         }
-        
-//         // Returns list of all variables in the SIMPLE program
-//         std::vector<var_ref> get_all_variables() {
-//             if (current_test == 1) {
-//                 return vector<var_ref>{"x","y","z"};
-//             }
-//         }
-// };
+}
+
+TEST_CASE("SELECT CLAUSE SUCH THAT CLAUSE" ) {
+
+}
+
+TEST_CASE("SELECT CLAUSE PATTERN CLAUSE") {
+
+}
+
+TEST_CASE("SELECT CLAUSE SUCH THAT PATTERN CLAUSE") {
+
+}
 
 // class TestCases {
 //     public:
 //         ActionsGenerator generator;
-//         ActionsExecutorTest executor;
+//         ActionsExecutor executor;
 //         QueryMap query;
 //         int current_test = 0;
 //         TestCases() {
