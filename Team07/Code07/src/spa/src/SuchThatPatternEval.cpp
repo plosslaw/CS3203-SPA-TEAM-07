@@ -99,7 +99,7 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
         such_that_or_pattern.first = true;
     }
     if (select_value == pattern_first_arg || select_value == pattern_second_arg) {
-        such_that_or_pattern.first = true;
+        such_that_or_pattern.second = true;
     }
 
     Single common_type;
@@ -192,11 +192,7 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                     }
                 }
             }
-            vector<string> output;
-            for (auto i : result ) {
-                output.push_back(to_string(i));
-            }
-            return output;
+            return SuchThatPatternEval::convert_lst_string_to_int(result);
         } else {
             // select value appears neither in such that or pattern
             return vector<string>{};       

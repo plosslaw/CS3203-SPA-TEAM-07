@@ -216,28 +216,50 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
         PatternEval pattern_eval(storeDeclaration, mapStorage, executor);
 
         vector<string> return_result = pattern_eval.zero_such_that_one_pattern(pattern_pay_load, select_value, select_type, is_select_val_in_pattern);
-        if (is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
-            //select a pattern a(v,_) or select v pattern a(v,_)
-            return return_result;
-        } else {
-            if (return_result.empty()) {
+        if (return_result.empty()) {
                 return vector<string> {"None"};
+        } else {
+            if (is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
+                return return_result;    
             } else {
                 return default_solution;
             }
         }
     } else {
         // there is both such that and pattern.
-        //todo
         PayLoad such_that_pay_load = suchThatList.at(0);
         PayLoad pattern_pay_load = patternList.at(0);
         SuchThatPatternEval such_that_pattern(storeDeclaration, mapStorage, executor);
-        vector<string> output = such_that_pattern.such_that_pattern_eval(such_that_pay_load, pattern_pay_load,select_value,select_type);
+        
+        vector<string> return_result = such_that_pattern.such_that_pattern_eval(such_that_pay_load, pattern_pay_load,select_value,select_type);
+        
+        string such_that_first_arg = such_that_pay_load.getValue()[0];
+        string such_that_second_arg = such_that_pay_load.getValue()[1];
+        string pattern_first_arg = pattern_pay_load.getValue()[0];
+        string pattern_second_arg = pattern_pay_load.getValue()[1];
+        pair<bool, bool> is_select_val_in_suchthat(false, false);  
+        if (such_that_first_arg == select_value) {
+            is_select_val_in_suchthat.first = true;
+        }
+        if (such_that_second_arg == select_value) {
+            is_select_val_in_suchthat.second = true;
+        }
+        pair<bool, bool> is_select_val_in_pattern(false, false);  
+        if (pattern_first_arg == select_value) {
+            is_select_val_in_pattern.first = true;
+        }
+        if (pattern_second_arg == select_value) {
+            is_select_val_in_pattern.second = true;
+        }
 
-        if(output.empty()){
-            return vector<string>{"None"};
+        if (return_result.empty()) {
+                return vector<string> {"None"};
         } else {
-            return output;
+            if (is_select_val_in_suchthat.first || is_select_val_in_suchthat.second || is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
+                return return_result;    
+            } else {
+                return default_solution;
+            }
         }    
     }
     return default_solution;
