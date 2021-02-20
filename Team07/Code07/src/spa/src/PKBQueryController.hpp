@@ -30,6 +30,12 @@ class PKBQueryController {
         // Returns true if and only if Modifies(s,v)
         bool statementModifies(stmt_ref s, var_ref v);
 
+        // Returns true if and only if Uses(p,v)
+        bool procedureUses(proc_ref p, var_ref v);
+
+        // Returns true if and only if Modifies(p,v)
+        bool procedureModifies(proc_ref p, var_ref v);
+
         // Returns true if and only if assignment statement a matches pattern p
         bool satisfiesPattern(assign_ref a, pattern p);
 

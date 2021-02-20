@@ -2,6 +2,7 @@
 #include "../../spa/src/Parser.h"
 #include "../../spa/src/ParserPql.h"
 #include "../../spa/src/TNode.h"
+#include "../../spa/src/PKBBuilder.hpp"
 #include <iostream>
 
 // implementation code of WrapperFactory - do NOT modify the next 5 lines
@@ -14,10 +15,9 @@ AbstractWrapper *WrapperFactory::createWrapper() {
 // Do not modify the following line
 volatile bool AbstractWrapper::GlobalStop = false;
 
-// a default constructor
 TestWrapper::TestWrapper() {
-  // create any objects here as instance variables of this class
-  // as well as any initialization required for your spa program
+  // this creates a query evaluator with an empty pkb
+  evaluator = QueryEvaluator();
 }
 
 // method for parsing the SIMPLE source
@@ -25,20 +25,38 @@ void TestWrapper::parse(std::string filename) {
   // call your parser to do the parsing
   // ...rest of your code...
   try {
+    // parse code to ast
     TNode ast = Parse(filename);
-    // parse
-    std::cout << ast.toSexp() << "\n";
-    // pass to pkb (placeholder)
+    // extract design
+    PKBBuilder builder = PKBBuilder(ast);
+    PKB pkb = builder.build();
+    PKBQueryController controller = PKBQueryController(pkb);
+    // save the pkb into the testwrapper
+    this -> evaluator = QueryEvaluator(controller);
   } catch (std::string &e) {
     std::cerr << e << "\n";
+    exit (EXIT_FAILURE);
   }
+
+  return;
 }
 
 // method to evaluating a query
 void TestWrapper::evaluate(std::string query, std::list<std::string> &results) {
-  // call your evaluator to evaluate the query here
-  // ...code to evaluate query...
-  parse_pql(query);
-  // store the answers to the query in the results list (it is initially empty)
-  // each result must be a string.
+  // parse the query into query map
+  QueryMap parsedQuery = parse_pql(query);
+
+  // evaluate the query
+  auto evaluationResults = evaluator.QERunQuery(parsedQuery);
+
+  // set value of results list
+  results = std::list<std::string> (evaluationResults.begin(), evaluationResults.end());
+
+  // print results to stdout
+  for (auto item: evaluationResults) {
+    std::cout << item << " ";
+  }
+  std::cout << std::endl;
+
+  return;
 }

@@ -3,6 +3,7 @@
 #include "ParserSimple.h"
 #include "QueryMap.h"
 #include "TNode.h"
+#include "ParserIndexMapper.h"
 #include <fstream>
 #include <stdio.h>
 #include <streambuf>
@@ -16,6 +17,7 @@ TNode Parse (std::string file) {
 	std::string str((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
 	
 	State s(&str);
+	ParserMapper map(&str);
 	try{
 		TNode ast;
 		ast = program(s);
@@ -28,12 +30,12 @@ TNode Parse (std::string file) {
 			validateCallProcedureExists(ast, procs);
 			return ast;
 		} catch (int &valRes) {
-			throw prettyPrintValidation(&str, valRes, valPhase == 0 ? "repeated procedure definition" : "call on undefined procedure");
+			throw prettyPrintValidation(map, valRes, valPhase == 0 ? "repeated procedure definition" : "call on undefined procedure");
 		}
 		// validate
 	} catch (ParseException &e) {
 		s.excps.push_back(e);
-		throw prettyPrintException(s);
+		throw prettyPrintException(map, s);
 	}
 }
 

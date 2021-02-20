@@ -437,7 +437,7 @@ TEST_CASE("one such that Modifies") {
         PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"}));
     expectedQueryMap.addItem(
         ClauseType::SUCHTHAT,
-        PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s1", "\"x\""}));
+        PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s1", "x"}));
 
     QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
@@ -609,7 +609,7 @@ TEST_CASE("one such that and one pattern") {
         PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}));
     expectedQueryMap.addItem(
         ClauseType::SUCHTHAT,
-        PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s", "\"var\""}));
+        PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s", "var"}));
     expectedQueryMap.addItem(
         ClauseType::PATTERN,
         PayLoad(TRIPLE, SYN_ASSIGN, std::vector<std::string>{"a", "s", "_"}));
@@ -640,7 +640,7 @@ TEST_CASE("one such that and one pattern") {
         PayLoad(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"}));
     expectedQueryMap.addItem(
         ClauseType::SUCHTHAT,
-        PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s", "\"var\""}));
+        PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s", "var"}));
     expectedQueryMap.addItem(
         ClauseType::PATTERN,
         PayLoad(TRIPLE, SYN_ASSIGN,

@@ -82,7 +82,7 @@ std::string ent_ref(State &state) {
       std::string dbl_quotes_2 = double_quotes(state);
       whitespace(state);
 
-      return dbl_quotes_1 + val + dbl_quotes_2;
+      return val;
     } catch (ParseException &e) {
       state.assign(so);
       try {

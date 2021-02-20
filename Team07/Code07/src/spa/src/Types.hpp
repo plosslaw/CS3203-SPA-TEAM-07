@@ -21,6 +21,12 @@ enum stmt_type {
   PROGRAM,
 };
 
+//Argument Position for relation/pattern functions e.g. Follows(s1, 9) -> arg_pos = FIRST_ARG
+enum arg_pos {
+    FIRST_ARG,
+    SECOND_ARG
+};
+
 // Statement number of the referenced assign statement
 typedef int assign_ref;
 

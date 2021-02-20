@@ -6,7 +6,6 @@
 #include <unordered_map>
 #include <unordered_set>
 
-/*
 TEST_CASE("One") {
     // SIMPLE code:
     // 0.  procedure gcd {
@@ -81,6 +80,9 @@ TEST_CASE("One") {
     indirect_follows4.insert(8);
     statement four = {reference4, type4, ast4, uses4, modifies4, parent4, follows4, indirect_parent4, indirect_follows4};
     statements.insert(std::make_pair(reference4, four));
+    assignment assignment1 = {"a % b"};
+    assign_ref assign4 = 4;
+    assignments.insert(std::make_pair(assign4, assignment1));
 
     //line 5
     stmt_ref reference5 = 4;
@@ -201,6 +203,29 @@ TEST_CASE("One") {
         REQUIRE(pkbQueryController.statementUses(4, "temp") == false);
     }
 
+    SECTION("Check satisfiesPattern") {
+        assign_ref a = 4;
+        pattern p1 = {"v", "a % b"};
+        pattern p2 = {"v", "_a % b"};
+        pattern p3 = {"v", "a % b_"};
+        pattern p4 = {"v", "_a % b_"};
+        pattern p5 = {"v", "b"};
+        pattern p6 = {"v", "a"};
+        pattern p7 = {"v", "_a + c_"};
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p1) == true);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p2) == true);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p3) == true);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p4) == true);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p5) == false);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p6) == false);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p7) == false);
+
+    }
     // implement the rest in iteration/v1.3
+
+    SECTION("check get_statements_of_type") {
+        stmt_type print = PRINT;
+        REQUIRE(pkbQueryController.getStatementsOfType(print).size() == 1);
+    }
+
 }
-*/
