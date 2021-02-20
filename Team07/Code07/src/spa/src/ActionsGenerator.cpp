@@ -41,7 +41,6 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
     for(auto i: storeDeclaration) {
         string declaration_name = i.first;
         Single s = i.second;
-
         if (s == Single::STATEMENT) {
             vector<stmt_ref> statement_lst = executor.get_all_statements_of_type(stmt_type::STATEMENT);
             vector<string> statement_lst_string;
@@ -55,14 +54,14 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
             for(auto rd : read_lst) {
                 read_lst_string.push_back(to_string(rd));
             }
-            readStorage[declaration_name] = read_lst_string;             
+            readStorage[declaration_name] = read_lst_string;           
         } else if (s == Single::PRINT) {
             vector<stmt_ref> print_lst = executor.get_all_statements_of_type(stmt_type::PRINT);
             vector<string> print_lst_string;
             for(auto pr : print_lst) {
                 print_lst_string.push_back(to_string(pr));
             }
-            stmtStorage[declaration_name] = print_lst_string;
+            printStorage[declaration_name] = print_lst_string;
         } else if (s == Single::WHILE) {
             vector<stmt_ref> while_lst = executor.get_all_statements_of_type(stmt_type::WHILE);
             vector<string> while_lst_string;
@@ -95,15 +94,16 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
             vector<var_ref> variable_lst= executor.get_all_variables();
             variableStorage[declaration_name] = variable_lst;
         } else if (s == Single::PROCEDURE) {
-            vector<stmt_ref> procedure_lst = executor.get_all_statements_of_type(stmt_type::PROCEDURE);
-            vector<string> procedure_lst_string;
-            for(auto proc : procedure_lst) {
-                procedure_lst_string.push_back(to_string(proc));
+            vector<proc_ref> procedure_lst = executor.get_all_procedures();
+            procedureStorage[declaration_name] = procedure_lst;  
+        } else if (s == Single::CALL) {
+            vector<stmt_ref> call_lst = executor.get_all_statements_of_type(stmt_type::CALL);
+            vector<string> call_lst_string;
+            for(auto cll : call_lst) {
+                call_lst_string.push_back(to_string(cll));
             }
-            procedureStorage[declaration_name] = procedure_lst_string;  
-        } else {
-            throw "Payload Single is not STATEMENT/READ/PRINT/CALL/WHILE/IF/ASSIGN.";
-        }
+            callStorage[declaration_name] = call_lst_string;  
+        } 
     } 
 
     //map all types of storage such as stmt, read etc into mapStorage
