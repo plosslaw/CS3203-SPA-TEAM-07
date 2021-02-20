@@ -34,9 +34,9 @@ typedef struct {
 
 } statement;
 
-typedef struct assignment {
+typedef struct {
     std::string rightValue;
-};
+} assignment;
 
 typedef struct {
     // Reference to this variable (variable name)
