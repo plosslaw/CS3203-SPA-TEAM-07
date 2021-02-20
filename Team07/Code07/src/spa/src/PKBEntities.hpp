@@ -34,13 +34,9 @@ typedef struct {
 
 } statement;
 
-typedef struct {
-    // struct inheritance
-    struct statement;
-    // right side of equation, left hand side always one variable.
-    // variable assessible with parent class attribute "modifies"
+typedef struct assignment {
     std::string rightValue;
-} assignment;
+};
 
 typedef struct {
     // Reference to this variable (variable name)
