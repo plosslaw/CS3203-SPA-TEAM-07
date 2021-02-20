@@ -31,6 +31,7 @@ class ActionsGenerator {
         std::unordered_map<std::string, std::vector<std::string>> ifStorage;
         std::unordered_map<std::string, std::vector<std::string>> constantStorage;
         std::unordered_map<std::string, std::vector<std::string>> variableStorage;
+        std::unordered_map<std::string, std::vector<std::string>> callStorage;
 
         //storeDeclaration maps declaration name to Single (entitity type) for fast conversion, example: v1 => VARIABLE
         std::unordered_map<std::string, Single> storeDeclaration;

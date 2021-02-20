@@ -101,6 +101,13 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
                 procedure_lst_string.push_back(to_string(proc));
             }
             procedureStorage[declaration_name] = procedure_lst_string;  
+        } else if (s == Single::CALL) {
+            vector<stmt_ref> call_lst = executor.get_all_statements_of_type(stmt_type::CALL);
+            vector<string> call_lst_string;
+            for(auto cll : call_lst) {
+                call_lst_string.push_back(to_string(cll));
+            }
+            callStorage[declaration_name] = call_lst_string;  
         } else {
             throw "Payload Single is not STATEMENT/READ/PRINT/CALL/WHILE/IF/ASSIGN.";
         }
