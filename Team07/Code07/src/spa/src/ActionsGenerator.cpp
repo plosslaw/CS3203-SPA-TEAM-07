@@ -18,11 +18,38 @@ ActionsGenerator::ActionsGenerator() {}
 ActionsGenerator::ActionsGenerator(QueryMap mapQuery, ActionsExecutor executorActions) {
     executor = executorActions;
     queryMap = mapQuery;
+    preprocess();
 }
 
-//methods
-vector<string> ActionsGenerator::TraverseQueryMap() {
+// //methods
+void ActionsGenerator::set_map_storage_storeDeclaration(unordered_map<Single, 
+        unordered_map<string, vector<string>>> storage_map, 
+        unordered_map<string, Single> store_declaration) {
+            mapStorage = storage_map;
+            procedureStorage = storage_map[Single::PROCEDURE];
+            stmtStorage = storage_map[Single::STATEMENT];
+            readStorage = storage_map[Single::READ];
+            printStorage = storage_map[Single::PRINT];
+            assignStorage = storage_map[Single::ASSIGN];
+            whileStorage = storage_map[Single::WHILE];
+            ifStorage = storage_map[Single::IF];
+            constantStorage = storage_map[Single::CONSTANT];
+            variableStorage = storage_map[Single::VARIABLE];
+            callStorage = storage_map[Single::CALL];
+            storeDeclaration = store_declaration;
+}
+
+void ActionsGenerator::set_Query_Map(QueryMap mapQuery) {
+    this->queryMap = mapQuery;
+    declarationList = mapQuery.getList(ClauseType::DECLARATION);
+    selectList = mapQuery.getList(ClauseType::SELECT);
+    suchThatList = mapQuery.getList(ClauseType::SUCHTHAT);
+    patternList = mapQuery.getList(ClauseType::PATTERN);
     
+}
+
+std::unordered_map<Single, 
+        std::unordered_map<std::string, std::vector<std::string>>> ActionsGenerator::preprocess() {
     // preprocessing - retrieval of queryMap clauses
     declarationList = queryMap.getList(ClauseType::DECLARATION);
     selectList = queryMap.getList(ClauseType::SELECT);
@@ -41,7 +68,6 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
     for(auto i: storeDeclaration) {
         string declaration_name = i.first;
         Single s = i.second;
-
         if (s == Single::STATEMENT) {
             vector<stmt_ref> statement_lst = executor.get_all_statements_of_type(stmt_type::STATEMENT);
             vector<string> statement_lst_string;
@@ -55,14 +81,14 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
             for(auto rd : read_lst) {
                 read_lst_string.push_back(to_string(rd));
             }
-            readStorage[declaration_name] = read_lst_string;             
+            readStorage[declaration_name] = read_lst_string;           
         } else if (s == Single::PRINT) {
             vector<stmt_ref> print_lst = executor.get_all_statements_of_type(stmt_type::PRINT);
             vector<string> print_lst_string;
             for(auto pr : print_lst) {
                 print_lst_string.push_back(to_string(pr));
             }
-            stmtStorage[declaration_name] = print_lst_string;
+            printStorage[declaration_name] = print_lst_string;
         } else if (s == Single::WHILE) {
             vector<stmt_ref> while_lst = executor.get_all_statements_of_type(stmt_type::WHILE);
             vector<string> while_lst_string;
@@ -95,12 +121,8 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
             vector<var_ref> variable_lst= executor.get_all_variables();
             variableStorage[declaration_name] = variable_lst;
         } else if (s == Single::PROCEDURE) {
-            vector<stmt_ref> procedure_lst = executor.get_all_statements_of_type(stmt_type::PROCEDURE);
-            vector<string> procedure_lst_string;
-            for(auto proc : procedure_lst) {
-                procedure_lst_string.push_back(to_string(proc));
-            }
-            procedureStorage[declaration_name] = procedure_lst_string;  
+            vector<proc_ref> procedure_lst = executor.get_all_procedures();
+            procedureStorage[declaration_name] = procedure_lst;  
         } else if (s == Single::CALL) {
             vector<stmt_ref> call_lst = executor.get_all_statements_of_type(stmt_type::CALL);
             vector<string> call_lst_string;
@@ -123,7 +145,10 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
     mapStorage[Single::IF] = ifStorage;
     mapStorage[Single::CONSTANT] = constantStorage;
     mapStorage[Single::VARIABLE] = variableStorage;
-    
+    return mapStorage; 
+}
+vector<string> ActionsGenerator::TraverseQueryMap() {
+
     //SELECT
     if(selectList.empty()) {
         return vector<string>{"Invalid"};
@@ -135,6 +160,7 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
     }
     string select_value = (select_payload.getValue())[0];
     Single select_type = storeDeclaration[select_value];
+    
     vector<string> default_solution = (mapStorage[select_type])[select_value];
     vector<string> solution_such_that;
     vector<string> solution_pattern;

@@ -57,5 +57,11 @@ class ActionsGenerator {
     public:
         ActionsGenerator();
         ActionsGenerator(QueryMap mapQuery, ActionsExecutor executorActions);
+        std::unordered_map<Single, 
+            std::unordered_map<std::string, std::vector<std::string>>> preprocess();
+        void set_map_storage_storeDeclaration(std::unordered_map<Single, 
+            std::unordered_map<std::string, std::vector<std::string>>> storage_map,
+            std::unordered_map<std::string, Single> store_declaration);
+        void set_Query_Map(QueryMap mapQuery);
         std::vector<std::string> TraverseQueryMap();
 };
