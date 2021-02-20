@@ -2,6 +2,7 @@
 #include "StringUtil.h"
 #include "SuchThatEval.h"
 #include "PatternEval.h"
+#include "SuchThatPatternEval.h"
 #include "Types.hpp"
 #include <sstream>
 #include <string>
@@ -187,78 +188,18 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
         //todo
         PayLoad such_that_pay_load = suchThatList.at(0);
         PayLoad pattern_pay_load = patternList.at(0);
-        string such_that_first_arg = such_that_pay_load.getValue()[0];
-        string such_that_second_arg = such_that_pay_load.getValue()[1];
-        string pattern_first_arg = pattern_pay_load.getValue()[0];
-        string pattern_second_arg = pattern_pay_load.getValue()[1];
+        SuchThatPatternEval such_that_pattern(storeDeclaration, mapStorage, executor);
+        vector<string> output = such_that_pattern.such_that_pattern_eval(such_that_pay_load, pattern_pay_load,select_value,select_type);
 
-        pair<bool, bool> is_select_val_in_suchthat(false, false);  
-        if (such_that_first_arg == select_value) {
-            is_select_val_in_suchthat.first = true;
-        }
-        if (such_that_second_arg == select_value) {
-            is_select_val_in_suchthat.second = true;
-        }
-        pair<bool, bool> is_select_val_in_pattern(false, false);  
-        if (pattern_first_arg == select_value) {
-            is_select_val_in_pattern.first = true;
-        }
-        if (pattern_second_arg == select_value) {
-            is_select_val_in_pattern.second = true;
-        }
-        if (!is_select_val_in_suchthat.first && !is_select_val_in_suchthat.second && !is_select_val_in_pattern.first && !is_select_val_in_pattern.second) {
-            //select value is not present in both such that clause and pattern clause
-            return default_solution;
-        }
-        return default_solution;
-        // bool st_first_p_first = such_that_first_arg == pattern_first_arg;
-        // bool st_first_p_second = such_that_first_arg == pattern_second_arg; 
-        // bool st_second_p_first = such_that_second_arg == pattern_first_arg;
-        // bool st_second_p_second = such_that_second_arg == pattern_second_arg;
-        // if (st_first_p_first && st_second_p_second || st_first_p_second && st_second_p_first) {
-        //     //two common synonyms - such that first, pattern first and such that second, pattern second
-        //     return ActionsGenerator::two_common_synonyms(such_that_pay_load, pattern_pay_load, select_value, select_type);
-        // }
-        // if (!st_first_p_first && !st_first_p_first && !st_second_p_first &&!st_second_p_second) {
-        //     // no common synonym
-        //      return ActionsGenerator::zero_common_synonyms(such_that_pay_load, pattern_pay_load, select_value, select_type);
-        // }
-        // else {
-
-        // }
+        if(output.empty()){
+            return vector<string>{"None"};
+        } else {
+            return output;
+        }    
     }
     return default_solution;
 }
 
-// vector<string> ActionsGenerator::zero_common_synonyms(PayLoad such_that_load, PayLoad pattern_load, string select_value, Single select_type) {
-//     string such_that_first_arg = such_that_load.getValue()[0];
-//     string such_that_second_arg = such_that_load.getValue()[1];
-//     //
-// }
-// vector<string> ActionsGenerator::two_common_synonyms(PayLoad such_that_load, PayLoad pattern_load, string select_value, Single select_type) {
-//     string such_that_first_arg = such_that_load.getValue()[0];
-//     string such_that_second_arg = such_that_load.getValue()[1];
-    
-//     //evaluate such that clause first then pass the evaluated such that result to pattern.
-//     vector<string> first_arg_lst = mapStorage[storeDeclaration[such_that_first_arg]][such_that_first_arg];
-//     vector<string> second_arg_lst = mapStorage[storeDeclaration[such_that_second_arg]][such_that_second_arg];
-//     vector<pair<string,string>> products = ActionsGenerator::crossproduct(first_arg_lst, second_arg_lst);
-//     map<string, vector<string>> output = SuchThatEval::such_that_eval_3(products, such_that_load.getType().pair, such_that_first_arg, such_that_second_arg,executor);
-    
-//     //evaluate pattern clause by passing results from suchthat clause to it
-//     map<string, vector<string>> output2 = ActionsGenerator::two_common_synonyms_pattern_val(pattern_load, output);
-//     return output2[select_value];
-// }
-
-// map<string,vector<string>> ActionsGenerator::two_common_synonyms_pattern_val(PayLoad pattern_load, map<string,vector<string>> eval_map) {
-//     string pattern_first_arg = pattern_load.getValue()[0];
-//     string pattern_second_arg = pattern_load.getValue()[1];
-//     string pattern_third_arg = pattern_load.getValue()[2];
-//     vector<string> first_arg_lst = eval_map[pattern_first_arg]; 
-//     vector<string> second_arg_lst = eval_map[pattern_second_arg];
-//     vector<pair<string,string>> products = ActionsGenerator::crossproduct(first_arg_lst, second_arg_lst);
-//     return PatternEval::pattern_eval_two_variables(products, pattern_first_arg, pattern_second_arg, pattern_third_arg, executor);
-// }    
    
 // utilities
 
