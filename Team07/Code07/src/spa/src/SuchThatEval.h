@@ -18,8 +18,9 @@ class SuchThatEval {
         //utilities
         pair<bool,bool> check_if_args_are_variable(std::string first_arg, std::string second_arg);
         bool is_element_inside_vectorA(string element, vector<string> vectorA);
+        vector<string> convert_lst_string_to_int(vector<int> lstA);
         stmt_type convert_single_to_stmt_type(Single s);
-        vector<string> is_result_empty_yes_none_no_default_soln(bool is_result_empty, Single select_type, string select_value);
+    
     public:
         SuchThatEval(unordered_map<string, Single> declaration_store, unordered_map<Single, 
             unordered_map<string, vector<string>>> map_storage, ActionsExecutor executor_);

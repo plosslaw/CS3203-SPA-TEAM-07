@@ -188,11 +188,11 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
         SuchThatEval such_that_eval(storeDeclaration, mapStorage, executor);
 
         vector<string> return_result = such_that_eval.one_such_that_zero_pattern(such_that_pay_load, select_value, select_type, is_select_val_in_suchthat);
-        if (is_select_val_in_suchthat.first || is_select_val_in_suchthat.second) {
-            return return_result;    
-        } else {
-            if (return_result.empty()) {
+        if (return_result.empty()) {
                 return vector<string> {"None"};
+        } else {
+            if (is_select_val_in_suchthat.first || is_select_val_in_suchthat.second) {
+                return return_result;    
             } else {
                 return default_solution;
             }

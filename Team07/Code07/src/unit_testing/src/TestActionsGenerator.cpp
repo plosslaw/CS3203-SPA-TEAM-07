@@ -32,6 +32,7 @@ class Map_Query_unit {
             unordered_map<string, vector<string>> stmtStorage;
             stmtStorage["s1"] = stmt_lst;
             stmtStorage["s2"] = stmt_lst;
+            stmtStorage["s3"] = stmt_lst;
             unordered_map<string, vector<string>> readStorage;
             readStorage["re1"] = read_lst;
             unordered_map<string, vector<string>> printStorage;
@@ -60,6 +61,7 @@ class Map_Query_unit {
 
             store_declaration_MOCKAST["s1"] = Single::STATEMENT;
             store_declaration_MOCKAST["s2"] = Single::STATEMENT;
+            store_declaration_MOCKAST["s3"] = Single::STATEMENT;
             store_declaration_MOCKAST["re1"] = Single::READ;
             store_declaration_MOCKAST["pn1"] = Single::PRINT;
             store_declaration_MOCKAST["ca1"] = Single::CALL;
@@ -75,6 +77,7 @@ class Map_Query_unit {
             //vector<PayLoad> declaration_list{}
             PayLoad stmt(SINGLE, Single::STATEMENT, vector<string>{"s1"});
             PayLoad stmt2(SINGLE, Single::STATEMENT, vector<string>{"s2"});
+            PayLoad stmt3(SINGLE, Single::STATEMENT, vector<string>{"s3"});
             PayLoad re(SINGLE, Single::READ, vector<string>{"re1"});
             PayLoad pn(SINGLE, Single::PRINT, vector<string>{"pn1"});
             PayLoad call(SINGLE, Single::CALL, vector<string>{"ca1"});
@@ -87,6 +90,7 @@ class Map_Query_unit {
             vector<PayLoad> declaration_lst{stmt, re, pn, call,w,ifs,a,c,var,proc};
             mapquery.addItem(ClauseType::DECLARATION, stmt);
             mapquery.addItem(ClauseType::DECLARATION, stmt2);
+            mapquery.addItem(ClauseType::DECLARATION, stmt3);
             mapquery.addItem(ClauseType::DECLARATION, re);
             mapquery.addItem(ClauseType::DECLARATION, pn);
             mapquery.addItem(ClauseType::DECLARATION, call);
@@ -100,6 +104,9 @@ class Map_Query_unit {
 
         void add_Select_synonym(PayLoad syn) {
             mapquery.addItem(ClauseType::SELECT, syn);
+        }
+        void add_Such_that(PayLoad st) {
+            mapquery.addItem(ClauseType::SUCHTHAT, st);
         }
 
         Map_Query_unit() {
@@ -292,22 +299,263 @@ TEST_CASE("SELECT CLAUSE ONLY") {
     }
 }
 
-TEST_CASE("SELECT CLAUSE SUCH THAT CLAUSE" ) {
-    // SECTION("Select stmt") {
-    //     ActionsGenerator generator = build_up_actions_generator(true,true);
-    //     PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s2"});
-    //     Map_Query_unit map_unit;
-    //     map_unit.add_Select_synonym(syn);
-    //     map_unit.initialise_mock_ast_querymap();    
-    //     QueryMap mapQuery = map_unit.mapquery;
-    //     generator.set_Query_Map(mapQuery);
-    //     vector<string> output = generator.TraverseQueryMap();     
-    //     REQUIRE(output == vector<string>{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
-    // }
-    SECTION("Select stmt follows(s1,s2") {
-
-    }
+vector<string> such_that_using_mock_ast_mock_storage(PayLoad syn, PayLoad st) {
+    ActionsGenerator generator = build_up_actions_generator(true,true);
+    Map_Query_unit map_unit;
+    map_unit.add_Select_synonym(syn);
+    map_unit.add_Such_that(st);
+    map_unit.initialise_mock_ast_querymap();    
+    QueryMap mapQuery = map_unit.mapquery;
+    generator.set_Query_Map(mapQuery);
+    vector<string> output = generator.TraverseQueryMap();    
+    return output;
 }
+
+//FOLLOWS
+
+TEST_CASE("Select s1 follows(s1,1)" ) {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"s1","1"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"None"});
+}
+TEST_CASE("Select s2 follows(s1,1)" ) {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s2"});
+    PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"s1","1"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"None"});
+}
+TEST_CASE("Select s1 follows(s1,2)" ) {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"s1","2"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"1"});
+}
+TEST_CASE("Select s2 follows(s1,2)" ) {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s2"});
+    PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"s1","2"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+}
+TEST_CASE("Select s1 follows(3,s1)" ) {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"3","s1"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"5"});
+}
+TEST_CASE("Select s1 follows(s1,4" ) {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"s1","4"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"None"});
+}
+TEST_CASE("Select s1 follows(4,s1" ) {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"4","s1"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"None"});
+}
+TEST_CASE("Select s1 follows(7,s1" ) {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"7","s1"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"8"});
+}
+TEST_CASE("Select s1 follows(s1,s2" ) {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"s1","s2"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"9", "8", "5", "7", "1", "2", "3"});
+}
+TEST_CASE("Select s2 follows(s1,s2)" ) {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s2"});
+    PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"s1","s2"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"11", "9", "8", "3", "2", "5"});
+}
+TEST_CASE("Select s3 follows(s1,s2)" ) {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s3"});
+    PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"s1","s2"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+}
+TEST_CASE("Select s3 follows(1,3)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s3"});
+    PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"1","3"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"None"});
+}
+
+TEST_CASE("Select s1 follows(s1,w1)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"s1","w1"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"2","8"});
+}
+TEST_CASE("Select s1 follows(s1,a1)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"s1","a1"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"7"});
+}
+TEST_CASE("Select a1 follows(a1,s1)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
+    PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"a1","s1"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"None"});
+}
+TEST_CASE("Select a1 follows(w1,s1)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a"});
+    PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"w1","s1"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"4","6","7","8","10"});
+}
+//Follows*
+TEST_CASE("Select s1 followst(s1,s2)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::FOLLOWST, std::vector<std::string>{"s1","s2"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"2", "1", "3", "5", "8", "7"});
+}
+TEST_CASE("Select s3 followst(s1,s2)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s3"});
+    PayLoad st(PAIR, Pair::FOLLOWST, std::vector<std::string>{"s1","s2"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+}
+TEST_CASE("Select s1 followst(s1,3)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::FOLLOWST, std::vector<std::string>{"s1","3"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"2","1"});
+}
+TEST_CASE("Select s2 followst(s1,3)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s2"});
+    PayLoad st(PAIR, Pair::FOLLOWST, std::vector<std::string>{"s1","3"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+}
+TEST_CASE("Select s1 followst(3,s1)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::FOLLOWST, std::vector<std::string>{"3","s1"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"11","5"});
+}
+TEST_CASE("Select s2 followst(3,s1)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s2"});
+    PayLoad st(PAIR, Pair::FOLLOWST, std::vector<std::string>{"3","s1"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+}
+TEST_CASE("Select s1 followst(4,s1)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::FOLLOWST, std::vector<std::string>{"4","s1"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"None"});
+}
+TEST_CASE("Select s1 followst(s1,4)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::FOLLOWST, std::vector<std::string>{"s1","4"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"None"});
+}
+
+//USES
+//still need to test different type of statements such as read, print etc.
+TEST_CASE("Select s1 uses(5,\"y)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::USES, std::vector<std::string>{"5","y"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+}
+TEST_CASE("Select s1 uses(5,\"w)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::USES, std::vector<std::string>{"5","w"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"None"});
+}
+TEST_CASE("Select s1 uses(5,\"v)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::USES, std::vector<std::string>{"5","v"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+}
+TEST_CASE("Select s1 uses(s1,v1)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::USES, std::vector<std::string>{"s1","v1"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{ "10", "9", "5", "2", "11", "3", "4", "6"});
+}
+TEST_CASE("Select s2 uses(s1,v1)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s2"});
+    PayLoad st(PAIR, Pair::USES, std::vector<std::string>{"s1","v1"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+}
+TEST_CASE("Select v1 uses(s1,v1)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"v1"});
+    PayLoad st(PAIR, Pair::USES, std::vector<std::string>{"s1","v1"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"x", "v", "y", "b", "z"});
+}
+TEST_CASE("Select s1 uses(s1,\"y)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::USES, std::vector<std::string>{"s1","y"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"6", "3", "5"});
+}
+TEST_CASE("Select s1 uses(s1,\"z)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::USES, std::vector<std::string>{"s1","z"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"5"});
+}
+
+//MODIFIES
+//still need to test different type of statements such as read, print etc.
+TEST_CASE("Select s1 modifies(s1,v1)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::MODIFIES, std::vector<std::string>{"s1","v1"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"6", "5", "10", "9", "1", "7", "3", "4", "8"});
+}
+TEST_CASE("Select s2 modifies(s1,v1)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s2"});
+    PayLoad st(PAIR, Pair::MODIFIES, std::vector<std::string>{"s1","v1"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+}
+TEST_CASE("Select v1 modifies(s1,v1)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"v1"});
+    PayLoad st(PAIR, Pair::MODIFIES, std::vector<std::string>{"s1","v1"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"v", "y", "x", "w", "a"});
+}
+TEST_CASE("Select s1 modifies(5,\"y)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::MODIFIES, std::vector<std::string>{"5","y"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+}
+TEST_CASE("Select s1 modifies(5,\"w)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::MODIFIES, std::vector<std::string>{"5","w"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+}
+TEST_CASE("Select s1 modifies(s1,\"y)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::MODIFIES, std::vector<std::string>{"s1","y"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"8", "5"});
+}
+TEST_CASE("Select s1 modifies(s1,\"z)") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+    PayLoad st(PAIR, Pair::MODIFIES, std::vector<std::string>{"s1","z"});
+    vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
+    REQUIRE(output == vector<string>{"None"});
+}
+
 
 TEST_CASE("SELECT CLAUSE PATTERN CLAUSE") {
 
