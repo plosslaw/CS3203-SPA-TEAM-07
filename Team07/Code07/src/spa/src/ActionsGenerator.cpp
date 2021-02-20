@@ -94,6 +94,13 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
         } else if (s == Single::VARIABLE) {
             vector<var_ref> variable_lst= executor.get_all_variables();
             variableStorage[declaration_name] = variable_lst;
+        } else if (s == Single::PROCEDURE) {
+            vector<stmt_ref> procedure_lst = executor.get_all_statements_of_type(stmt_type::PROCEDURE);
+            vector<string> procedure_lst_string;
+            for(auto proc : procedure_lst) {
+                procedure_lst_string.push_back(to_string(proc));
+            }
+            procedureStorage[declaration_name] = procedure_lst_string;  
         } else {
             throw "Payload Single is not STATEMENT/READ/PRINT/CALL/WHILE/IF/ASSIGN.";
         }
