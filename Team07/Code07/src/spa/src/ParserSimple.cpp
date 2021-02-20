@@ -151,7 +151,14 @@ TNode unaryOp(State &s, std::string op, stmt_type typ) {
     stringMatch(s, ";");
     // :- ';'
     whitespace(s);
-    return TNode(s.advCurStmtNum(), n, typ, init);
+    if (typ == PRINT || typ == READ) {
+      TNode stmtNode = TNode(s.advCurStmtNum(), "", typ, init);
+      TNode varNode = TNode(n, VARIABLE);
+      stmtNode.addChild(varNode);
+      return stmtNode;
+    } else {
+      return TNode(s.advCurStmtNum(), n, typ, init);
+    }
   } catch (ParseException &e) {
     s.excps.push_back(e);
     throw ParseException(init, s.i, op, partial ? "partial" : "");
