@@ -478,7 +478,7 @@ TEST_CASE("one such that Modifies") {
                                      std::vector<bool>{true}));
     expectedQueryMap.addItem(ClauseType::SUCHTHAT,
                              PayLoad(PAIR, MODIFIES,
-                                     std::vector<std::string>{"s1", "\"x\""},
+                                     std::vector<std::string>{"s1", "x"},
                                      std::vector<bool>{true, false}));
 
     State state(&query);
@@ -666,7 +666,7 @@ TEST_CASE("one such that and one pattern") {
                                      std::vector<bool>{true}));
     expectedQueryMap.addItem(ClauseType::SUCHTHAT,
                              PayLoad(PAIR, MODIFIES,
-                                     std::vector<std::string>{"s", "\"var\""},
+                                     std::vector<std::string>{"s", "var"},
                                      std::vector<bool>{true, false}));
     expectedQueryMap.addItem(ClauseType::PATTERN,
                              PayLoad(TRIPLE, SYN_ASSIGN,
@@ -701,7 +701,7 @@ TEST_CASE("one such that and one pattern") {
                                      std::vector<bool>{true}));
     expectedQueryMap.addItem(ClauseType::SUCHTHAT,
                              PayLoad(PAIR, MODIFIES,
-                                     std::vector<std::string>{"s", "\"var\""},
+                                     std::vector<std::string>{"s", "var"},
                                      std::vector<bool>{true, false}));
     expectedQueryMap.addItem(
         ClauseType::PATTERN,

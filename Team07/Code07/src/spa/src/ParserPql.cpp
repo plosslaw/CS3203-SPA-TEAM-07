@@ -92,7 +92,7 @@ PayLoad ent_ref(State &state) {
 
       return PayLoad(
           SINGLE, Single::DOUBLE_QUOTE_IDENT,
-          std::vector<std::string>{dbl_quotes_1 + val + dbl_quotes_2});
+          std::vector<std::string>{val});
     } catch (ParseException &e) {
       state.assign(so);
       try {
