@@ -343,7 +343,8 @@ std::vector<PayLoad> declaration_cl(State &state) {
                                           procedure_decl.begin(),
                                           procedure_decl.end());
                     } catch (ParseException &e) {
-                      throw e;
+                      state.excps.push_back(e);
+                      throw ParseException(so.i, state.i, "declaration_cl", "");
                     }
                   }
                 }
