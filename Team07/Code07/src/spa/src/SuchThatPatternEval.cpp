@@ -60,15 +60,19 @@ vector<string> SuchThatPatternEval::zero_common_synonym(PayLoad such_that_pay_lo
             is_select_val_in_pattern.second = true;
         }
     vector<string> pattern_lst =  pattern_eval.zero_such_that_one_pattern(pattern_pay_load, select_value, select_type, is_select_val_in_pattern);
-    
     if(such_that_lst.empty() || pattern_lst.empty()) {
-        return SuchThatPatternEval::is_result_empty_yes_none_no_default_soln(true,select_type,select_value);
-    } else {
-        return vector<string>{"None"};
+        return vector<string>();
+    }
+    if (is_select_val_in_suchthat.first || is_select_val_in_suchthat.second) {
+        return such_that_lst;
+    } else if (is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
+        return pattern_lst;
+    }  else {
+        return vector<string>();
     }
 }
 
-
+//select a such that uses(a,v) pattern a(v2,_);
 vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_load, PayLoad pattern_pay_load,string select_value, Single select_type) {
     string such_that_first_arg = such_that_pay_load.getValue()[0];
     Single such_that_first_type = storeDeclaration[such_that_first_arg];
@@ -195,7 +199,7 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
             return output;
         } else {
             // select value appears neither in such that or pattern
-            return SuchThatPatternEval::is_result_empty_yes_none_no_default_soln(inner_join_lst.empty(), select_type, select_value);       
+            return vector<string>{};       
         }
     } 
     else {
@@ -293,7 +297,7 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                 return result;
             } else {
                 //select appear neither in such that or pattern
-                return SuchThatPatternEval::is_result_empty_yes_none_no_default_soln(inner_join_lst.empty(), select_type, select_value);                
+                return vector<string>{};                
             }
         } else {
             //such that uses and modifies
@@ -346,7 +350,7 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                 return result;
             } else {
                 // select value appears neither in such that or pattern
-                return SuchThatPatternEval::is_result_empty_yes_none_no_default_soln(inner_join_lst.empty(), select_type, select_value);          
+                return vector<string>{};
             }
         }
     }        
@@ -440,10 +444,10 @@ vector<string> SuchThatPatternEval::more_than_one_common_synonym(PayLoad such_th
     if (select_value == pattern_first_arg || select_value == pattern_second_arg) {
         such_that_or_pattern.first = true;
     }
-    if(!such_that_or_pattern.first && !such_that_or_pattern.second) {
-        //select value does not appear in either such that and pattern.
-        return SuchThatPatternEval::is_result_empty_yes_none_no_default_soln(v3.empty() || v4.empty(), select_type, select_value);
-    }
+    // if(!such_that_or_pattern.first && !such_that_or_pattern.second) {
+    //     //select value does not appear in either such that and pattern.
+    //     return SuchThatPatternEval::is_result_empty_yes_none_no_default_soln(v3.empty() || v4.empty(), select_type, select_value);
+    // }
     map<string,vector<string>> output2; output2[pattern_first_arg] = v3; output2[pattern_second_arg] = v4;
     return output2[select_value];
 }
@@ -501,15 +505,6 @@ stmt_type SuchThatPatternEval::convert_single_to_stmt_type(Single s) {
     }
 }
 
-vector<string> SuchThatPatternEval::is_result_empty_yes_none_no_default_soln(bool is_result_empty, Single select_type, string select_value) {
-    if (is_result_empty) {
-        return vector<string>{"None"};              
-    } else {
-        vector<string> default_solution = (mapStorage[select_type])[select_value];
-        return default_solution;                      
-    }
-}
-
 vector<string> SuchThatPatternEval::inner_join(vector<string> lstA, vector<string> lstB) {
     vector<string> output;
     for(int i = 0; i < lstA.size(); i++) {
@@ -531,3 +526,12 @@ vector<pair<string,string>> SuchThatPatternEval::crossproduct(vector<string> fir
     }
     return products;
 }
+
+vector<string> SuchThatPatternEval::convert_lst_string_to_int(vector<int> lstA) {
+    vector<string> output;
+    for(auto i : lstA) {
+        output.push_back(to_string(i));
+    }
+    return output;
+}
+
