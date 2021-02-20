@@ -10,6 +10,42 @@ using namespace std;
 
 //using mockast
 
+class Map_Query_unit {
+    
+    QueryMap mapquery;
+    void initialise_mock_ast_querymap() {
+        //vector<PayLoad> declaration_list{}
+        PayLoad stmt(SINGLE, Single::STATEMENT, std::vector<std::string>{"s1"});
+        PayLoad re(SINGLE, Single::READ, std::vector<std::string>{"re1"});
+        PayLoad pn(SINGLE, Single::PRINT, std::vector<std::string>{"pn1"});
+        PayLoad call(SINGLE, Single::CALL, std::vector<std::string>{"c1"});
+        PayLoad w(SINGLE, Single::WHILE, std::vector<std::string>{"w1"});
+        PayLoad ifs(SINGLE, Single::IF, std::vector<std::string>{"ifs1"});
+        PayLoad a(SINGLE, Single::ASSIGN, std::vector<std::string>{"a1"});
+        PayLoad c(SINGLE, Single::CONSTANT, std::vector<std::string>{"c1"});
+        PayLoad var(SINGLE, Single::VARIABLE, std::vector<std::string>{"v1"});
+        PayLoad proc(SINGLE, Single::PROCEDURE, std::vector<std::string>{"p1"});
+        vector<PayLoad> declaration_lst{stmt, re, pn, call,w,ifs,a,c,var,proc};
+        mapquery.addItem(ClauseType::DECLARATION, stmt);
+        mapquery.addItem(ClauseType::DECLARATION, re);
+        mapquery.addItem(ClauseType::DECLARATION, pn);
+        mapquery.addItem(ClauseType::DECLARATION, call);
+        mapquery.addItem(ClauseType::DECLARATION, ifs);
+        mapquery.addItem(ClauseType::DECLARATION, w);
+        mapquery.addItem(ClauseType::DECLARATION, a);
+        mapquery.addItem(ClauseType::DECLARATION, c);
+        mapquery.addItem(ClauseType::DECLARATION, var);
+        mapquery.addItem(ClauseType::DECLARATION, proc);
+
+    }
+
+    Map_Query_unit() {
+        mapquery = QueryMap::QueryMap();
+        
+    }
+};
+
+
 TEST_CASE("NO SELECT CLAUSE, SUCH THAT AND PATTERN") {
     TNode ast_tree = getMockAST();
     PKBBuilder pkb_builder(ast_tree);
