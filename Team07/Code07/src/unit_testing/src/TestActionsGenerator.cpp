@@ -613,13 +613,34 @@ TEST_CASE("Select a1 pattern a1(v1,\"x - 1\"") {
 }
 TEST_CASE("Select a1 pattern a1(\"y\",\"2\")") {
     PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
-    PayLoad pattern(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","\"y\"","\"2\""});
+    PayLoad pattern(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","y","2"});
     vector<string> output = pattern_using_mock_ast_mock_storage(syn, pattern);    
     //REQUIRE(output == vector<string>{"8"});
 }
 TEST_CASE("Select a1 pattern a1(\"w\",\"y*\"") {
     PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
-    PayLoad pattern(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","\"w\"","\"y*\""});
+    PayLoad pattern(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","w","y*"});
+    vector<string> output = pattern_using_mock_ast_mock_storage(syn, pattern);    
+    //REQUIRE(output == vector<string>{"6"});
+}
+
+TEST_CASE("Select a1 pattern a1(\"w\",\"y *\"") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
+    PayLoad pattern(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","w","y *"});
+    vector<string> output = pattern_using_mock_ast_mock_storage(syn, pattern);    
+    //REQUIRE(output == vector<string>{"6"});
+}
+
+TEST_CASE("Select a1 pattern a1(v1,\"-1\"") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
+    PayLoad pattern(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","v1","-1"});
+    vector<string> output = pattern_using_mock_ast_mock_storage(syn, pattern);    
+    //REQUIRE(output == vector<string>{"6"});
+}
+
+TEST_CASE("Select a1 pattern a1(v1,_\"-1\"_") {
+    PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
+    PayLoad pattern(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","v1","_"});
     vector<string> output = pattern_using_mock_ast_mock_storage(syn, pattern);    
     //REQUIRE(output == vector<string>{"6"});
 }
