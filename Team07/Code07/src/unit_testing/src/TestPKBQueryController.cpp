@@ -203,7 +203,7 @@ TEST_CASE("One") {
         REQUIRE(pkbQueryController.statementUses(4, "temp") == false);
     }
 
-    SECTION("Check statementModifies") {
+    SECTION("Check satisfiesPattern") {
         assign_ref a = 4;
         pattern p1 = {"v", "a % b"};
         pattern p2 = {"v", "_a % b"};
@@ -223,7 +223,7 @@ TEST_CASE("One") {
     }
     // implement the rest in iteration/v1.3
 
-    SECTION("checl get_statements_of_type") {
+    SECTION("check get_statements_of_type") {
         stmt_type print = PRINT;
         REQUIRE(pkbQueryController.getStatementsOfType(print).size() == 1);
     }

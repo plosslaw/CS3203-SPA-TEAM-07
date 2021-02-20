@@ -89,7 +89,7 @@ bool PKBQueryController::satisfiesPattern(assign_ref a, pattern p) {
     int j = 0;
     if (position_wildcard == -1) return text == substring; // no wildcard, must match exact
     for (int i = 2; i <= n; i++) {
-        while (j > 0 && substring[i - 1] == substring[j]) {
+        while (j > 0 && substring[i - 1] != substring[j]) {
             j = pointer_idx[j];
         } 
         if (substring[i - 1] == substring[j]) {
