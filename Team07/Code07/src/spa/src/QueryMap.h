@@ -40,7 +40,7 @@ private:
   Tag tag;
   LoadType type;
   std::vector<std::string> value;
-  std::vector<bool> flag;
+  std::vector<bool> flag; // flags to indicated if value is a synonym
 
 public:
   PayLoad(Tag loadTag, Single loadType, std::vector<std::string> loadVal);
