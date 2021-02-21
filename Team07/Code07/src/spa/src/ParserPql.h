@@ -2,7 +2,17 @@
 #include "QueryMap.h"
 #include <string.h>
 
-QueryMap pql_query(std::string query);
+QueryMap pql_query(State &state);
+std::vector<PayLoad> declaration_cl(State &state);
+std::vector<PayLoad> select_cl(State &state);
+PayLoad suchthat_cl(State &state);
+PayLoad pattern_cl(State &state);
+
+QueryMap pql_validate(QueryMap query);
+bool is_declaration_clause_valid(QueryMap query);
+bool is_select_clause_valid(QueryMap query);
+bool is_suchthat_clause_valid(QueryMap query);
+bool is_pattern_clause_valid(QueryMap query);
 
 /*
 // low level abstractions
@@ -20,11 +30,9 @@ std::vector<std::string> ent_and_expr_spec(State &state);
 // declaration clause
 std::vector<PayLoad> declaration(State &state, std::string design_entity,
                                  Single load_type);
-std::vector<PayLoad> declaration_cl(State &state);
 
 // select clause
 PayLoad select(State &state, Single load_type);
-std::vector<PayLoad> select_cl(State &state);
 
 // such that clause
 PayLoad rel_ref(State &state, std::string design_relation, Pair load_type);
@@ -35,10 +43,8 @@ PayLoad follows_t(State &state);
 PayLoad modifies(State &state);
 PayLoad uses(State &state);
 PayLoad suchthat(State &state);
-PayLoad suchthat_cl(State &state);
 
 // pattern clause
 PayLoad syn_assign(State &state);
 PayLoad pattern(State &state);
-PayLoad pattern_cl(State &state);
 */

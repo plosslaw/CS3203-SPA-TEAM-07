@@ -54,7 +54,7 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
                     if (arg_pairs.first) {
                         result = executor.get_all_stmts_follows(first_arg_stmt_type, arg_pos::FIRST_ARG, second_arg_stmt_type, IS_FOLLOWST);
                     } else {
-                        result = executor.get_all_stmts_follows(first_arg_stmt_type, arg_pos::SECOND_ARG, second_arg_stmt_type, IS_FOLLOWST);
+                        result = executor.get_all_stmts_follows(second_arg_stmt_type, arg_pos::SECOND_ARG, first_arg_stmt_type, IS_FOLLOWST);
                     }
                     return SuchThatEval::convert_lst_string_to_int(result);
                 } else {
@@ -64,27 +64,68 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
             }    
         } else if (!bool_pairs_args.first && !bool_pairs_args.second) {
             //both are constant
-            bool query = executor.is_follows(stoi(such_that_first_arg), stoi(such_that_second_arg), IS_FOLLOWST);
-            if (query) {
-                vector<string> default_solution = (mapStorage[select_type])[select_value];
-                return default_solution;
+            bool is_first_arg_wild = such_that_first_arg == "_";
+            bool is_second_arg_wild =  such_that_second_arg == "_";
+            if (is_first_arg_wild && is_second_arg_wild) {
+                //both wild
+                vector<stmt_ref> result1 = executor.get_all_stmts_follows(stmt_type::STATEMENT,arg_pos::FIRST_ARG, IS_FOLLOWST);
+                vector<stmt_ref> result2 = executor.get_all_stmts_follows(stmt_type::STATEMENT,arg_pos::SECOND_ARG, IS_FOLLOWST);
+                vector<string> result1_converted = SuchThatEval::convert_lst_string_to_int(result1);
+                vector<string> result2_converted = SuchThatEval::convert_lst_string_to_int(result2);
+                for(auto i : result2_converted) {
+                    if(!SuchThatEval::is_element_inside_vectorA(i,result1_converted)) {
+                        result1_converted.push_back(i);
+                    }
+                }
+                return result1_converted;
+            } else if(is_first_arg_wild && !is_second_arg_wild) {
+                //  first arg is wild only
+                vector<stmt_ref> result = executor.get_all_stmts_follows(stmt_type::STATEMENT,arg_pos::SECOND_ARG, IS_FOLLOWST);
+                return SuchThatEval::convert_lst_string_to_int(result); 
+            } else if(!is_first_arg_wild && is_second_arg_wild) {
+                //second arg is wild only
+                vector<stmt_ref> result = executor.get_all_stmts_follows(stmt_type::STATEMENT,arg_pos::FIRST_ARG, IS_FOLLOWST);
+                return SuchThatEval::convert_lst_string_to_int(result);
             } else {
-                return vector<string>{};
+                bool query = executor.is_follows(stoi(such_that_first_arg), stoi(such_that_second_arg), IS_FOLLOWST);
+                if (query) {
+                    vector<string> default_solution = (mapStorage[select_type])[select_value];
+                    return default_solution;
+                } else {
+                    return vector<string>{};
+                }
             }
         } else {
             //one of them is constant
+            bool is_second_arg_wild =  such_that_second_arg == "_";
             if (bool_pairs_args.first && !bool_pairs_args.second) {
                 //first parameter is variable and second parameter is a constant.
-                Single first_arg_type  = storeDeclaration[such_that_first_arg];
-                stmt_type first_arg_stmt_type = SuchThatEval::convert_single_to_stmt_type(first_arg_type);
-                vector<stmt_ref> result = executor.get_all_stmts_follows(first_arg_stmt_type, arg_pos::FIRST_ARG, stoi(such_that_second_arg), IS_FOLLOWST);
-                return SuchThatEval::convert_lst_string_to_int(result);          
+                if(is_second_arg_wild) {
+                    Single first_arg_type  = storeDeclaration[such_that_first_arg];
+                    stmt_type first_arg_stmt_type = SuchThatEval::convert_single_to_stmt_type(first_arg_type);
+                    vector<stmt_ref> result = executor.get_all_stmts_follows(first_arg_stmt_type, arg_pos::FIRST_ARG, IS_FOLLOWST);
+                    return SuchThatEval::convert_lst_string_to_int(result); 
+                } 
+                else {
+                    Single first_arg_type  = storeDeclaration[such_that_first_arg];
+                    stmt_type first_arg_stmt_type = SuchThatEval::convert_single_to_stmt_type(first_arg_type);
+                    vector<stmt_ref> result = executor.get_all_stmts_follows(first_arg_stmt_type, arg_pos::FIRST_ARG, stoi(such_that_second_arg), IS_FOLLOWST);
+                    return SuchThatEval::convert_lst_string_to_int(result); 
+                }         
             } else {
                 //first parameter is a constnat and second parameter is a variable.
-                Single second_arg_type  = storeDeclaration[such_that_second_arg];
-                stmt_type second_arg_stmt_type = SuchThatEval::convert_single_to_stmt_type(second_arg_type);
-                vector<stmt_ref> result = executor.get_all_stmts_follows(second_arg_stmt_type, arg_pos::SECOND_ARG, stoi(such_that_first_arg), IS_FOLLOWST);          
-                return SuchThatEval::convert_lst_string_to_int(result);
+                bool is_first_arg_wild =  such_that_first_arg == "_";
+                if(is_first_arg_wild) {
+                    Single second_arg_type  = storeDeclaration[such_that_second_arg];
+                    stmt_type second_arg_stmt_type = SuchThatEval::convert_single_to_stmt_type(second_arg_type);
+                    vector<stmt_ref> result = executor.get_all_stmts_follows(second_arg_stmt_type, arg_pos::SECOND_ARG, IS_FOLLOWST);          
+                    return SuchThatEval::convert_lst_string_to_int(result);
+                } else {
+                    Single second_arg_type  = storeDeclaration[such_that_second_arg];
+                    stmt_type second_arg_stmt_type = SuchThatEval::convert_single_to_stmt_type(second_arg_type);
+                    vector<stmt_ref> result = executor.get_all_stmts_follows(second_arg_stmt_type, arg_pos::SECOND_ARG, stoi(such_that_first_arg), IS_FOLLOWST);          
+                    return SuchThatEval::convert_lst_string_to_int(result);
+                }
             }
         }
     } else if (such_that_type == Pair::PARENT || such_that_type == Pair::PARENTT) {
@@ -121,7 +162,7 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
                     if (arg_pairs.first) {
                         result = executor.get_all_stmts_parent(first_arg_stmt_type, arg_pos::FIRST_ARG, second_arg_stmt_type, IS_PARENTT);
                     } else {
-                        result = executor.get_all_stmts_parent(first_arg_stmt_type, arg_pos::SECOND_ARG, second_arg_stmt_type, IS_PARENTT);
+                        result = executor.get_all_stmts_parent(second_arg_stmt_type, arg_pos::SECOND_ARG, first_arg_stmt_type, IS_PARENTT);
                     }
                     return SuchThatEval::convert_lst_string_to_int(result);
                 } else {
@@ -131,27 +172,68 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
             }    
         } else if (!bool_pairs_args.first && !bool_pairs_args.second) {
             //both are constant
-            bool query = executor.is_parent(stoi(such_that_first_arg), stoi(such_that_second_arg), IS_PARENTT);
-            if (query) {
-                vector<string> default_solution = (mapStorage[select_type])[select_value];
-                return default_solution;
+            bool is_first_arg_wild = such_that_first_arg == "_";
+            bool is_second_arg_wild =  such_that_second_arg == "_";
+            if (is_first_arg_wild && is_second_arg_wild) {
+                //both wild
+                vector<stmt_ref> result1 = executor.get_all_stmts_parent(stmt_type::STATEMENT,arg_pos::FIRST_ARG, IS_PARENTT);
+                vector<stmt_ref> result2 = executor.get_all_stmts_parent(stmt_type::STATEMENT,arg_pos::SECOND_ARG, IS_PARENTT);
+                vector<string> result1_converted = SuchThatEval::convert_lst_string_to_int(result1);
+                vector<string> result2_converted = SuchThatEval::convert_lst_string_to_int(result2);
+                for(auto i : result2_converted) {
+                    if(!SuchThatEval::is_element_inside_vectorA(i,result1_converted)) {
+                        result1_converted.push_back(i);
+                    }
+                }
+                return result1_converted;
+            } else if(is_first_arg_wild && !is_second_arg_wild) {
+                //  first arg is wild only
+                vector<stmt_ref> result = executor.get_all_stmts_parent(stmt_type::STATEMENT,arg_pos::SECOND_ARG, IS_PARENTT);
+                return SuchThatEval::convert_lst_string_to_int(result); 
+            } else if(!is_first_arg_wild && is_second_arg_wild) {
+                //second arg is wild only
+                vector<stmt_ref> result = executor.get_all_stmts_parent(stmt_type::STATEMENT,arg_pos::FIRST_ARG, IS_PARENTT);
+                return SuchThatEval::convert_lst_string_to_int(result);
             } else {
-                return vector<string>{};
+                bool query = executor.is_parent(stoi(such_that_first_arg), stoi(such_that_second_arg), IS_PARENTT);
+                if (query) {
+                    vector<string> default_solution = (mapStorage[select_type])[select_value];
+                    return default_solution;
+                } else {
+                    return vector<string>{};
+                }
             }
         } else {
             //one of them is constant
+            bool is_second_arg_wild =  such_that_second_arg == "_";
             if (bool_pairs_args.first && !bool_pairs_args.second) {
                 //first parameter is variable and second parameter is a constant.
-                Single first_arg_type  = storeDeclaration[such_that_first_arg];
-                stmt_type first_arg_stmt_type = SuchThatEval::convert_single_to_stmt_type(first_arg_type);
-                vector<stmt_ref> result = executor.get_all_stmts_parent(first_arg_stmt_type, arg_pos::FIRST_ARG, stoi(such_that_second_arg), IS_PARENTT);
-                return SuchThatEval::convert_lst_string_to_int(result);          
+                if(is_second_arg_wild) {
+                    Single first_arg_type  = storeDeclaration[such_that_first_arg];
+                    stmt_type first_arg_stmt_type = SuchThatEval::convert_single_to_stmt_type(first_arg_type);
+                    vector<stmt_ref> result = executor.get_all_stmts_parent(first_arg_stmt_type, arg_pos::FIRST_ARG, IS_PARENTT);
+                    return SuchThatEval::convert_lst_string_to_int(result); 
+                } 
+                else {
+                    Single first_arg_type  = storeDeclaration[such_that_first_arg];
+                    stmt_type first_arg_stmt_type = SuchThatEval::convert_single_to_stmt_type(first_arg_type);
+                    vector<stmt_ref> result = executor.get_all_stmts_parent(first_arg_stmt_type, arg_pos::FIRST_ARG, stoi(such_that_second_arg), IS_PARENTT);
+                    return SuchThatEval::convert_lst_string_to_int(result); 
+                }         
             } else {
                 //first parameter is a constnat and second parameter is a variable.
-                Single second_arg_type  = storeDeclaration[such_that_second_arg];
-                stmt_type second_arg_stmt_type = SuchThatEval::convert_single_to_stmt_type(second_arg_type);
-                vector<stmt_ref> result = executor.get_all_stmts_parent(second_arg_stmt_type, arg_pos::SECOND_ARG, stoi(such_that_first_arg), IS_PARENTT);          
-                return SuchThatEval::convert_lst_string_to_int(result);
+                bool is_first_arg_wild =  such_that_first_arg == "_";
+                if(is_first_arg_wild) {
+                    Single second_arg_type  = storeDeclaration[such_that_second_arg];
+                    stmt_type second_arg_stmt_type = SuchThatEval::convert_single_to_stmt_type(second_arg_type);
+                    vector<stmt_ref> result = executor.get_all_stmts_parent(second_arg_stmt_type, arg_pos::SECOND_ARG, IS_PARENTT);          
+                    return SuchThatEval::convert_lst_string_to_int(result);
+                } else {
+                    Single second_arg_type  = storeDeclaration[such_that_second_arg];
+                    stmt_type second_arg_stmt_type = SuchThatEval::convert_single_to_stmt_type(second_arg_type);
+                    vector<stmt_ref> result = executor.get_all_stmts_parent(second_arg_stmt_type, arg_pos::SECOND_ARG, stoi(such_that_first_arg), IS_PARENTT);          
+                    return SuchThatEval::convert_lst_string_to_int(result);
+                }
             }
         }
     } else if (such_that_type == Pair::MODIFIES) {
@@ -197,12 +279,24 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
             }
         } else if (!bool_pairs_args.first && !bool_pairs_args.second) {
             //both are constants
-            bool query = executor.statement_modifies(stoi(such_that_first_arg), such_that_second_arg);
-            if (query) {
-                vector<string> default_solution = (mapStorage[select_type])[select_value];
-                return default_solution;
-            } else {
-                return vector<string>{};
+            if (such_that_second_arg == "_") {
+                if(StringUtil::is_number(such_that_first_arg)) {
+                    //this means first arg is a statement
+                    vector<var_ref> result = executor.get_all_variables_modifies(stoi(such_that_first_arg));
+                    return result;
+                } else {
+                    vector<var_ref> result = executor.get_all_variables_modifies(such_that_first_arg);
+                    return result;                    
+                }
+            } 
+            else {
+                bool query = executor.statement_modifies(stoi(such_that_first_arg), such_that_second_arg);
+                if (query) {
+                    vector<string> default_solution = (mapStorage[select_type])[select_value];
+                    return default_solution;
+                } else {
+                    return vector<string>{};
+                }
             }
         } else {
             //one of them is a constant
@@ -211,18 +305,32 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
                 Single first_arg_type  = storeDeclaration[such_that_first_arg];
 
                 if(first_arg_type == Single::PROCEDURE) {
-                    vector<proc_ref> result = executor.get_all_procedures_modifies(such_that_second_arg);
-                    return result;
+                    if(such_that_second_arg == "_") {
+                        vector<proc_ref> result = executor.get_all_procedures_modifies();
+                        return result;
+                    } else {
+                        vector<proc_ref> result = executor.get_all_procedures_modifies(such_that_second_arg);
+                        return result;
+                    }
                 } else {
                     //first arg is statements not procedure.
                     stmt_type first_arg_stmt_type = SuchThatEval::convert_single_to_stmt_type(first_arg_type);
-                    vector<stmt_ref> result = executor.get_all_stmts_modifies(first_arg_stmt_type, such_that_second_arg);
-                    return SuchThatEval::convert_lst_string_to_int(result);
+                    if(such_that_second_arg == "_") {
+                        vector<stmt_ref> result = executor.get_all_stmts_modifies(first_arg_stmt_type);
+                        return SuchThatEval::convert_lst_string_to_int(result);
+                    } else {
+                        vector<stmt_ref> result = executor.get_all_stmts_modifies(first_arg_stmt_type, such_that_second_arg);
+                        return SuchThatEval::convert_lst_string_to_int(result);
+                    }
                 }      
             } else {
                 // first parameter is a constant and second parameter is a variable.
                 // second parameter has to be variable type
-                if (StringUtil::is_number(such_that_first_arg)) {
+                if(such_that_first_arg == "_") {
+                    vector<var_ref> result = executor.get_all_variables_modifies(such_that_first_arg);
+                    return result;
+                }
+                else if (StringUtil::is_number(such_that_first_arg)) {
                     //statement first arg type
                     vector<var_ref> result = executor.get_all_variables_modifies(stoi(such_that_first_arg));
                     return result;
@@ -276,12 +384,24 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
             }
         } else if (!bool_pairs_args.first && !bool_pairs_args.second) {
             //both are constants
-            bool query = executor.statement_uses(stoi(such_that_first_arg), such_that_second_arg);
-            if (query) {
-                vector<string> default_solution = (mapStorage[select_type])[select_value];
-                return default_solution;
-            } else {
-                return vector<string>{};
+            if (such_that_second_arg == "_") {
+                if(StringUtil::is_number(such_that_first_arg)) {
+                    //this means first arg is a statement
+                    vector<var_ref> result = executor.get_all_variables_uses(stoi(such_that_first_arg));
+                    return result;
+                } else {
+                    vector<var_ref> result = executor.get_all_variables_uses(such_that_first_arg);
+                    return result;                    
+                }
+            } 
+            else {
+                bool query = executor.statement_uses(stoi(such_that_first_arg), such_that_second_arg);
+                if (query) {
+                    vector<string> default_solution = (mapStorage[select_type])[select_value];
+                    return default_solution;
+                } else {
+                    return vector<string>{};
+                }
             }
         } else {
             //one of them is a constant
@@ -290,18 +410,32 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
                 Single first_arg_type  = storeDeclaration[such_that_first_arg];
 
                 if(first_arg_type == Single::PROCEDURE) {
-                    vector<proc_ref> result = executor.get_all_procedures_uses(such_that_second_arg);
-                    return result;
+                    if(such_that_second_arg == "_") {
+                        vector<proc_ref> result = executor.get_all_procedures_uses();
+                        return result;
+                    } else {
+                        vector<proc_ref> result = executor.get_all_procedures_uses(such_that_second_arg);
+                        return result;
+                    }
                 } else {
                     //first arg is statements not procedure.
                     stmt_type first_arg_stmt_type = SuchThatEval::convert_single_to_stmt_type(first_arg_type);
-                    vector<stmt_ref> result = executor.get_all_stmts_uses(first_arg_stmt_type, such_that_second_arg);
-                    return SuchThatEval::convert_lst_string_to_int(result);
+                    if(such_that_second_arg == "_") {
+                        vector<stmt_ref> result = executor.get_all_stmts_uses(first_arg_stmt_type);
+                        return SuchThatEval::convert_lst_string_to_int(result);
+                    } else {
+                        vector<stmt_ref> result = executor.get_all_stmts_uses(first_arg_stmt_type, such_that_second_arg);
+                        return SuchThatEval::convert_lst_string_to_int(result);
+                    }
                 }      
             } else {
                 // first parameter is a constant and second parameter is a variable.
                 // second parameter has to be variable type
-                if (StringUtil::is_number(such_that_first_arg)) {
+                if(such_that_first_arg == "_") {
+                    vector<var_ref> result = executor.get_all_variables_uses(such_that_first_arg);
+                    return result;
+                }
+                else if (StringUtil::is_number(such_that_first_arg)) {
                     //statement first arg type
                     vector<var_ref> result = executor.get_all_variables_uses(stoi(such_that_first_arg));
                     return result;
@@ -311,7 +445,7 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
                     return result;
                 }
             }
-        }     
+        }    
     } else {
         return vector<string> {};
     }

@@ -31,8 +31,8 @@ TEST_CASE("Test I: Procedure extraction") {
     }
     
     SECTION("Constant extraction") {
-        REQUIRE(pkb.constants.find(42) != pkb.constants.end());
-        REQUIRE(pkb.constants.find(65) == pkb.constants.end());
+        REQUIRE(pkb.constants.find("42") != pkb.constants.end());
+        REQUIRE(pkb.constants.find("65") == pkb.constants.end());
     }
 }
 

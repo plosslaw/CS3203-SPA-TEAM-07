@@ -1,4 +1,5 @@
 #include <vector>
+#include <iostream>
 #include "PKBEntities.hpp"
 #include "PKB.h"
 #include "PKBQueryController.hpp"
@@ -60,7 +61,13 @@ bool PKBQueryController::procedureModifies(proc_ref p, var_ref v) {
 
 bool PKBQueryController::satisfiesPattern(assign_ref a, pattern p) {
     if (pkb.assignments.find(a) == pkb.assignments.end()) return false;
+    // need to check if the assignment modifies a variable on left hand side
+    // assignment is also a statement
+    bool satisfies_left_hand_side = PKBQueryController::statementModifies(a, p.lvalue)  || (p.lvalue == "_");
     std::string pattern_string = p.rvalue;
+    if (pattern_string == "_") {
+        return satisfies_left_hand_side;
+    }
     int initial_pattern_length = pattern_string.length();
     std::string substring;
     // 0 wildcardleft
@@ -84,10 +91,14 @@ bool PKBQueryController::satisfiesPattern(assign_ref a, pattern p) {
     std::string text = asmt.rightValue;
     int m = text.length();
     int n = substring.length();
-    if (substring == "_") return true;  
     int pointer_idx[n];
     int j = 0;
-    if (position_wildcard == -1) return text == substring; // no wildcard, must match exact
+    if (position_wildcard == -1) {
+        // check if the pattern is an exact of the assignment's right value
+        // the assignment left value has to be modified by the assignment
+        // an assignment is a statement
+        return text == substring && satisfies_left_hand_side; 
+    }// no wildcard, must match exact
     for (int i = 2; i <= n; i++) {
         while (j > 0 && substring[i - 1] != substring[j]) {
             j = pointer_idx[j];
@@ -111,14 +122,14 @@ bool PKBQueryController::satisfiesPattern(assign_ref a, pattern p) {
                 // wildcard at left, the pattern must be at rightmost
                 // j is the ending of the pattern,   
                 // check if the pattern start has some strings before it.    
-                return i - n >= 0;
+                return i - n >= 0 && satisfies_left_hand_side;
             } else if (position_wildcard == 1) {
                 // wildcard at right, pattern at leftmost
                 // j is the ending of the pattern, 
                 // check if the pattern end has some strings after it.
-                return j <= m;
+                return j <= m && PKBQueryController::statementModifies(a, p.lvalue);;
             } else {
-                return true;
+                return satisfies_left_hand_side;
             }
         }
     }

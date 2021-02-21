@@ -1,5 +1,7 @@
 #include "ParserPql.h"
 #include "ParserLib.h"
+#include "QueryMap.h"
+#include <algorithm>
 #include <functional>
 #include <iostream>
 #include <vector>
@@ -45,18 +47,22 @@ std::string factor(State &state) {
 }
 
 // stmtRef: synonym | ‘_’ | INTEGER
-std::string stmt_ref(State &state) {
+PayLoad stmt_ref(State &state) {
   State so(state);
   try {
-    return synonym(state);
+    return PayLoad(SINGLE, Single::SYNONYM,
+                   std::vector<std::string>{synonym(state)},
+                   std::vector<bool>{true});
   } catch (ParseException &e) {
     state.assign(so);
     try {
-      return integer(state);
+      return PayLoad(SINGLE, Single::INTEGER,
+                     std::vector<std::string>{integer(state)});
     } catch (ParseException &e) {
       state.assign(so);
       try {
-        return wildcard(state);
+        return PayLoad(SINGLE, Single::WILDCARD,
+                       std::vector<std::string>{wildcard(state)});
       } catch (ParseException &e) {
         state.excps.push_back(e);
         throw ParseException(so.i, state.i, "stmt_ref", "");
@@ -66,10 +72,12 @@ std::string stmt_ref(State &state) {
 }
 
 // entRef: synonym | ‘_’ | ‘"’ IDENT ‘"’
-std::string ent_ref(State &state) {
+PayLoad ent_ref(State &state) {
   State so(state);
   try {
-    return synonym(state);
+    return PayLoad(SINGLE, Single::SYNONYM,
+                   std::vector<std::string>{synonym(state)},
+                   std::vector<bool>{true});
   } catch (ParseException &e) {
     state.assign(so);
     try {
@@ -82,11 +90,13 @@ std::string ent_ref(State &state) {
       std::string dbl_quotes_2 = double_quotes(state);
       whitespace(state);
 
-      return val;
+      return PayLoad(SINGLE, Single::DOUBLE_QUOTE_IDENT,
+                     std::vector<std::string>{val});
     } catch (ParseException &e) {
       state.assign(so);
       try {
-        return wildcard(state);
+        return PayLoad(SINGLE, Single::WILDCARD,
+                       std::vector<std::string>{wildcard(state)});
       } catch (ParseException &e) {
         state.excps.push_back(e);
         throw ParseException(so.i, state.i, "ent_ref", "");
@@ -96,7 +106,7 @@ std::string ent_ref(State &state) {
 }
 
 // expression-spec: ‘_’ ‘"’ factor ‘"’ ‘_’ | ‘_’
-std::string expr_spec(State &state) {
+PayLoad expr_spec(State &state) {
   State so(state);
   try {
     std::string any_val_1 = wildcard(state);
@@ -114,11 +124,13 @@ std::string expr_spec(State &state) {
     std::string any_val_2 = wildcard(state);
     whitespace(state);
 
-    return any_val_1 + dbl_quotes_1 + value + dbl_quotes_2 + any_val_2;
+    return PayLoad(SINGLE, Single::U_DQ_FACTOR,
+                   std::vector<std::string>{any_val_1 + value + any_val_2});
   } catch (ParseException &e) {
     state.assign(so);
     try {
-      return wildcard(state);
+      return PayLoad(SINGLE, Single::WILDCARD,
+                     std::vector<std::string>{wildcard(state)});
     } catch (ParseException &e) {
       state.excps.push_back(e);
       throw ParseException(so.i, state.i, "expr_spec", "");
@@ -128,89 +140,88 @@ std::string expr_spec(State &state) {
 
 // TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent, ent
 // and expr ‘(’ stmtRef ‘,’ stmtRef ‘)’
-std::vector<std::string> stmt_and_stmt_ref(State &state) {
-  std::vector<std::string> values;
+std::vector<PayLoad> stmt_and_stmt_ref(State &state) {
+  std::vector<PayLoad> refs;
   State so(state);
   try {
     stringMatch(state, "(");
     whitespace(state);
 
-    values.push_back(stmt_ref(state));
+    refs.push_back(stmt_ref(state));
     whitespace(state);
 
     stringMatch(state, ",");
     whitespace(state);
 
-    values.push_back(stmt_ref(state));
+    refs.push_back(stmt_ref(state));
+    whitespace(state);
+
     whitespace(state);
 
     stringMatch(state, ")");
     whitespace(state);
 
-    return values;
+    return refs;
   } catch (ParseException &e) {
     state.excps.push_back(e);
     throw ParseException(so.i, state.i, "stmt_and_stmt_ref", "");
   }
-  return values;
 }
 
 // TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent, ent
 // and expr ‘(’ stmtRef ‘,’ entRef ‘)’
-std::vector<std::string> stmt_and_ent_ref(State &state) {
-  std::vector<std::string> values;
+std::vector<PayLoad> stmt_and_ent_ref(State &state) {
+  std::vector<PayLoad> refs;
   State so(state);
   try {
     stringMatch(state, "(");
     whitespace(state);
 
-    values.push_back(stmt_ref(state));
+    refs.push_back(stmt_ref(state));
     whitespace(state);
 
     stringMatch(state, ",");
     whitespace(state);
 
-    values.push_back(ent_ref(state));
+    refs.push_back(ent_ref(state));
     whitespace(state);
 
     stringMatch(state, ")");
     whitespace(state);
 
-    return values;
+    return refs;
   } catch (ParseException &e) {
     state.excps.push_back(e);
     throw ParseException(so.i, state.i, "stmt_and_ent_ref", "");
   }
-  return values;
 }
 
 // TODO(zs): To refactor allowing stmt and stmt, stmt and ent, ent and ent, ent
 // and expr ‘(‘entRef ’,’ expression-spec ’)’
-std::vector<std::string> ent_and_expr_spec(State &state) {
-  std::vector<std::string> values;
+std::vector<PayLoad> ent_and_expr_spec(State &state) {
+  std::vector<PayLoad> refs;
   State so(state);
   try {
     stringMatch(state, "(");
     whitespace(state);
 
-    values.push_back(ent_ref(state));
+    refs.push_back(ent_ref(state));
     whitespace(state);
 
     stringMatch(state, ",");
     whitespace(state);
 
-    values.push_back(expr_spec(state));
+    refs.push_back(expr_spec(state));
     whitespace(state);
 
     stringMatch(state, ")");
     whitespace(state);
 
-    return values;
+    return refs;
   } catch (ParseException &e) {
     state.excps.push_back(e);
     throw ParseException(so.i, state.i, "ent_and_expr_spec", "");
   }
-  return values;
 }
 
 // -------------------- Declaration Clause -------------------- //
@@ -331,7 +342,8 @@ std::vector<PayLoad> declaration_cl(State &state) {
                                           procedure_decl.begin(),
                                           procedure_decl.end());
                     } catch (ParseException &e) {
-                      throw e;
+                      state.excps.push_back(e);
+                      throw ParseException(so.i, state.i, "declaration_cl", "");
                     }
                   }
                 }
@@ -358,7 +370,7 @@ PayLoad select(State &state, Single load_type) {
     values.push_back(synonym(state));
     whitespace(state);
 
-    return PayLoad(SINGLE, load_type, values);
+    return PayLoad(SINGLE, load_type, values, std::vector<bool>{true});
   } catch (ParseException &e) {
     state.excps.push_back(e);
     throw ParseException(so.i, state.i, "select", "");
@@ -379,11 +391,34 @@ std::vector<PayLoad> select_cl(State &state) {
 }
 
 // -------------------- Such That Clause -------------------- //
+std::vector<std::string> payloads_to_values(std::vector<PayLoad> payloads) {
+  std::vector<std::string> values;
+  for (auto it = payloads.begin(); it != payloads.end(); ++it) {
+    std::string val = (*it).getValue()[0];
+    values.push_back(val);
+  }
+  return values;
+}
+
+std::vector<bool> payloads_to_flags(std::vector<PayLoad> payloads) {
+  std::vector<bool> flags;
+  for (auto it = payloads.begin(); it != payloads.end(); ++it) {
+    LoadType type = (*it).getType();
+    if (type.single == Single::SYNONYM) {
+      flags.push_back(true);
+    } else {
+      flags.push_back(false);
+    }
+  }
+  return flags;
+}
 
 // relRef : Follows | FollowsT | Parent | ParentT | UsesS | UsesP | ModifiesS
 // | ModifiesP
 PayLoad rel_ref(State &state, std::string design_relation, Pair load_type) {
   std::vector<std::string> values;
+  std::vector<bool> flags;
+
   State so(state);
   try {
     stringMatch(state, design_relation);
@@ -391,13 +426,17 @@ PayLoad rel_ref(State &state, std::string design_relation, Pair load_type) {
 
     if (load_type == PARENT || load_type == PARENTT || load_type == FOLLOWS ||
         load_type == FOLLOWST) {
-      values = stmt_and_stmt_ref(state);
+      std::vector<PayLoad> pair_1 = stmt_and_stmt_ref(state);
+      values = payloads_to_values(pair_1);
+      flags = payloads_to_flags(pair_1);
     }
     if (load_type == MODIFIES || load_type == USES) {
-      values = stmt_and_ent_ref(state);
+      std::vector<PayLoad> pair_2 = stmt_and_ent_ref(state);
+      values = payloads_to_values(pair_2);
+      flags = payloads_to_flags(pair_2);
     }
 
-    return PayLoad(PAIR, load_type, values);
+    return PayLoad(PAIR, load_type, values, flags);
   } catch (ParseException &e) {
     state.excps.push_back(e);
     throw ParseException(so.i, state.i, "stmt_and_stmt_ref", "");
@@ -520,18 +559,22 @@ PayLoad suchthat_cl(State &state) {
 // -------------------- Pattern Clause -------------------- //
 
 PayLoad syn_assign(State &state) {
-  std::vector<std::string> values;
+  std::vector<PayLoad> args;
+
   State so(state);
   try {
-    std::string val = synonym(state);
-    values.push_back(val);
+    args.push_back(PayLoad(SINGLE, Single::SYNONYM,
+                           std::vector<std::string>{synonym(state)},
+                           std::vector<bool>{true}));
     whitespace(state);
 
-    std::vector<std::string> vals = ent_and_expr_spec(state);
-    values.insert(values.end(), vals.begin(), vals.end());
+    std::vector<PayLoad> pair = ent_and_expr_spec(state);
+    args.insert(args.end(), pair.begin(), pair.end());
+    std::vector<std::string> values = payloads_to_values(args);
+    std::vector<bool> flags = payloads_to_flags(args);
     whitespace(state);
 
-    return PayLoad(TRIPLE, SYN_ASSIGN, values);
+    return PayLoad(TRIPLE, SYN_ASSIGN, values, flags);
   } catch (ParseException &e) {
     state.excps.push_back(e);
     throw ParseException(so.i, state.i, "syn_assign", "");
@@ -566,17 +609,17 @@ PayLoad pattern_cl(State &state) {
   }
 }
 
-QueryMap pql_query(std::string query) {
+QueryMap pql_query(State &state) {
   QueryMap queryMap;
   std::vector<PayLoad> declarations;
   std::vector<PayLoad> selects;
   std::vector<PayLoad> suchthats;
   std::vector<PayLoad> patterns;
 
-  State state(&query);
   State so(state);
   // declaration*
   try {
+    whitespace(state);
     while (true) {
       std::vector<PayLoad> single_ent_declarations = declaration_cl(state);
       declarations.insert(declarations.end(), single_ent_declarations.begin(),
@@ -611,10 +654,175 @@ QueryMap pql_query(std::string query) {
     state.assign(so);
   }
 
-  whitespace(state);
   if (state.i != (*state.source).size()) {
     throw ParseException(so.i, state.i, "pql_query", "");
   }
 
   return QueryMap(declarations, selects, suchthats, patterns);
+}
+
+// TODO(zs): Optimise comparison
+// Returns true if payload is in vector.
+bool is_payload_in(std::vector<PayLoad> payloads, PayLoad target) {
+  for (auto it_dcl = payloads.begin(); it_dcl != payloads.end(); ++it_dcl) {
+    PayLoad current = (*it_dcl);
+    if (current == target) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// TODO(zs): Optimise comparison
+// Returns true if string is in first item of payload's vector
+bool is_value_in_declarations(std::vector<PayLoad> payloads,
+                              std::string target) {
+  for (auto it = payloads.begin(); it != payloads.end(); ++it) {
+    std::string current = (*it).getValue()[0];
+    if (current == target) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool is_synonym_unique(std::vector<PayLoad> declarations) {
+  std::vector<std::string> synonyms;
+  for (auto it = declarations.begin(); it != declarations.end(); ++it) {
+    synonyms.push_back((*it).getValue()[0]);
+  }
+  sort(synonyms.begin(), synonyms.end());
+  auto it = std::unique(synonyms.begin(), synonyms.end());
+  return (it == synonyms.end());
+}
+
+bool is_synonym_declared(std::vector<PayLoad> declarations, PayLoad target) {
+  std::vector<std::string> values = target.getValue();
+  std::vector<bool> flags = target.get_flag();
+
+  int idx = 0;
+  for (auto it = flags.begin(); it != flags.end(); ++it) {
+    bool is_synonym = (*it);
+    if (is_synonym) {
+      if (!is_value_in_declarations(declarations, values[idx])) {
+        return false;
+      }
+    }
+    idx++;
+  }
+  return true;
+}
+
+// Returns true if synonyms are unique
+bool is_declaration_clause_valid(QueryMap table) {
+  std::vector<PayLoad> declarations = table.getList(ClauseType::DECLARATION);
+  return is_synonym_unique(declarations);
+}
+
+// Returns true if 1 synonym is selected and
+// synonym declared
+bool is_select_clause_valid(QueryMap table) {
+  std::vector<PayLoad> selections = table.getList(ClauseType::SELECT);
+  if (selections.size() == 0) {
+    return false;
+  }
+
+  std::vector<PayLoad> declarations = table.getList(ClauseType::DECLARATION);
+  PayLoad target_synonym = selections[0];
+  return is_synonym_declared(declarations, target_synonym);
+}
+
+// Returns true is wildcard is not the first argument
+bool is_modifies_valid(PayLoad target) {
+  if (target.getType().pair == MODIFIES && target.getValue()[0] == "_") {
+    return false;
+  }
+  return true;
+}
+
+// Returns true is wildcard is not the first argument
+bool is_uses_valid(PayLoad target) {
+  if (target.getType().pair == USES && target.getValue()[0] == "_") {
+    return false;
+  }
+  return true;
+}
+
+// synonyms declared
+// wildcard does not exist as first argument of Uses/ Modifies
+bool is_suchthat_clause_valid(QueryMap table) {
+  std::vector<PayLoad> declarations = table.getList(ClauseType::DECLARATION);
+  std::vector<PayLoad> suchthats = table.getList(ClauseType::SUCHTHAT);
+
+  // optional suchthat-cl absent
+  if (suchthats.size() == 0) {
+    return true;
+  }
+
+  for (auto it = suchthats.begin(); it != suchthats.end(); ++it) {
+    PayLoad target = (*it);
+    if (!is_synonym_declared(declarations, target)) {
+      return false;
+    }
+
+    if (!is_modifies_valid(target)) {
+      return false;
+    }
+
+    if (!is_uses_valid(target)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// synonyms declared
+// syn_assign synonym is of assign design entity
+bool is_pattern_clause_valid(QueryMap table) {
+  std::vector<PayLoad> declarations = table.getList(ClauseType::DECLARATION);
+  std::vector<PayLoad> patterns = table.getList(ClauseType::PATTERN);
+
+  // optional pattern absent
+  if (patterns.size() == 0) {
+    return true;
+  }
+
+  for (auto it = patterns.begin(); it != patterns.end(); ++it) {
+    PayLoad current_clause = (*it);
+    std::string current_synonym = current_clause.getValue()[0];
+    if (!is_synonym_declared(declarations, current_clause)) {
+      return false;
+    }
+
+    if (current_clause.getType().triple == SYN_ASSIGN) {
+      PayLoad target(SINGLE, Single::ASSIGN,
+                     std::vector<std::string>{current_synonym});
+      if (!is_payload_in(declarations, target)) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+QueryMap pql_validate(QueryMap query) {
+  if (query.is_empty()) {
+    throw prettyPrintValidation("Empty query.");
+  }
+
+  if (!is_declaration_clause_valid(query)) {
+    throw prettyPrintValidation("Invalid declaration clause.");
+  }
+  if (!is_select_clause_valid(query)) {
+    throw prettyPrintValidation("Invalid select clause.");
+  }
+  if (!is_suchthat_clause_valid(query)) {
+    throw prettyPrintValidation("Invalid such that clause.");
+  }
+  if (!is_pattern_clause_valid(query)) {
+    throw prettyPrintValidation("Invalid pattern clause.");
+  }
+
+  return query;
 }

@@ -31,7 +31,7 @@ enum arg_pos {
 typedef int assign_ref;
 
 // Integer value of the constant
-typedef int const_value;
+typedef std::string const_value;
 
 // Statement number, note that we use NULL_STMT_REF to represent a null statement reference
 typedef int stmt_ref;

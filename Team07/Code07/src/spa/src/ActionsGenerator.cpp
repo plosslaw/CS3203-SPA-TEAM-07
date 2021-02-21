@@ -48,6 +48,9 @@ void ActionsGenerator::set_Query_Map(QueryMap mapQuery) {
     
 }
 
+std::vector<PayLoad> ActionsGenerator::get_patternList() {
+    return suchThatList;
+}
 std::unordered_map<Single, 
         std::unordered_map<std::string, std::vector<std::string>>> ActionsGenerator::preprocess() {
     // preprocessing - retrieval of queryMap clauses
@@ -114,7 +117,7 @@ std::unordered_map<Single,
             vector<constant> constant_lst = executor.get_all_constants();
             vector<string> constant_lst_string;
             for(auto cnst : constant_lst) {
-                constant_lst_string.push_back(to_string(cnst));
+                constant_lst_string.push_back(cnst);
             }
             constantStorage[declaration_name] = constant_lst_string;   
         } else if (s == Single::VARIABLE) {
@@ -151,7 +154,8 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
 
     //SELECT
     if(selectList.empty()) {
-        return vector<string>{"Invalid"};
+        // return vector<string>{"Invalid"};
+        throw "Missing SELECT payload.";
     }
     PayLoad select_payload = selectList.at(0);
     
@@ -167,7 +171,7 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
 
     bool is_such_that_empty = suchThatList.empty();
     bool is_pattern_empty = patternList.empty();
-    if(is_such_that_empty && is_such_that_empty) {
+    if(is_such_that_empty && is_pattern_empty) {
         // There is no such that and pattern clause.
         return default_solution;
     }
@@ -189,7 +193,7 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
 
         vector<string> return_result = such_that_eval.one_such_that_zero_pattern(such_that_pay_load, select_value, select_type, is_select_val_in_suchthat);
         if (return_result.empty()) {
-                return vector<string> {"None"};
+                return vector<string> {};
         } else {
             if (is_select_val_in_suchthat.first || is_select_val_in_suchthat.second) {
                 return return_result;    
@@ -213,34 +217,56 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
         PatternEval pattern_eval(storeDeclaration, mapStorage, executor);
 
         vector<string> return_result = pattern_eval.zero_such_that_one_pattern(pattern_pay_load, select_value, select_type, is_select_val_in_pattern);
-        if (is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
-            //select a pattern a(v,_) or select v pattern a(v,_)
-            return return_result;
+        if (return_result.empty()) {
+                return vector<string> {};
         } else {
-            if (return_result.empty()) {
-                return vector<string> {"None"};
+            if (is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
+                return return_result;    
             } else {
                 return default_solution;
             }
         }
     } else {
         // there is both such that and pattern.
-        //todo
         PayLoad such_that_pay_load = suchThatList.at(0);
         PayLoad pattern_pay_load = patternList.at(0);
         SuchThatPatternEval such_that_pattern(storeDeclaration, mapStorage, executor);
-        vector<string> output = such_that_pattern.such_that_pattern_eval(such_that_pay_load, pattern_pay_load,select_value,select_type);
+        
+        vector<string> return_result = such_that_pattern.such_that_pattern_eval(such_that_pay_load, pattern_pay_load,select_value,select_type);
+        
+        string such_that_first_arg = such_that_pay_load.getValue()[0];
+        string such_that_second_arg = such_that_pay_load.getValue()[1];
+        string pattern_first_arg = pattern_pay_load.getValue()[0];
+        string pattern_second_arg = pattern_pay_load.getValue()[1];
+        pair<bool, bool> is_select_val_in_suchthat(false, false);  
+        if (such_that_first_arg == select_value) {
+            is_select_val_in_suchthat.first = true;
+        }
+        if (such_that_second_arg == select_value) {
+            is_select_val_in_suchthat.second = true;
+        }
+        pair<bool, bool> is_select_val_in_pattern(false, false);  
+        if (pattern_first_arg == select_value) {
+            is_select_val_in_pattern.first = true;
+        }
+        if (pattern_second_arg == select_value) {
+            is_select_val_in_pattern.second = true;
+        }
 
-        if(output.empty()){
-            return vector<string>{"None"};
+        if (return_result.empty()) {
+                return vector<string> {};
         } else {
-            return output;
+            if (is_select_val_in_suchthat.first || is_select_val_in_suchthat.second || is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
+                return return_result;    
+            } else {
+                return default_solution;
+            }
         }    
     }
     return default_solution;
 }
 
-   
+
 // utilities
 
 pair<bool,bool> ActionsGenerator::check_if_args_are_variable(std::string first_arg, std::string second_arg) {
