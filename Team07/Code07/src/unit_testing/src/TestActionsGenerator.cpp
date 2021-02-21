@@ -566,7 +566,6 @@ TEST_CASE("SELECT WITH SUCH THAT CLAUSE: Parent") {
         PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
         PayLoad st(PAIR, Pair::PARENT, std::vector<std::string>{"ifs1","s1"});
         vector<string> output = test_select_such_that_only(syn, st);
-        REQUIRE(output == vector<string>{"testing"}); //remove this
         REQUIRE(verify_stmts(output, correct_ans));
     }
 }

@@ -54,7 +54,7 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
                     if (arg_pairs.first) {
                         result = executor.get_all_stmts_follows(first_arg_stmt_type, arg_pos::FIRST_ARG, second_arg_stmt_type, IS_FOLLOWST);
                     } else {
-                        result = executor.get_all_stmts_follows(first_arg_stmt_type, arg_pos::SECOND_ARG, second_arg_stmt_type, IS_FOLLOWST);
+                        result = executor.get_all_stmts_follows(second_arg_stmt_type, arg_pos::SECOND_ARG, first_arg_stmt_type, IS_FOLLOWST);
                     }
                     return SuchThatEval::convert_lst_string_to_int(result);
                 } else {
@@ -121,7 +121,7 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
                     if (arg_pairs.first) {
                         result = executor.get_all_stmts_parent(first_arg_stmt_type, arg_pos::FIRST_ARG, second_arg_stmt_type, IS_PARENTT);
                     } else {
-                        result = executor.get_all_stmts_parent(first_arg_stmt_type, arg_pos::SECOND_ARG, second_arg_stmt_type, IS_PARENTT);
+                        result = executor.get_all_stmts_parent(second_arg_stmt_type, arg_pos::SECOND_ARG, first_arg_stmt_type, IS_PARENTT);
                     }
                     return SuchThatEval::convert_lst_string_to_int(result);
                 } else {
