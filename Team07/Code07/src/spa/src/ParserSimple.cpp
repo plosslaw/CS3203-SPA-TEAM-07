@@ -87,25 +87,30 @@ TNode stmtLst(State &s) {
 /** stmt :- read | print | call | while_stmt | if_stmt | assign */
 TNode stmt(State &s) {
   State so(s);
+  bool isPartial = false;
+  ParseException partial(0,0,"","");
   try {
     return read(s);
   } catch (ParseException &e) {
     if (e.args.compare("partial") == 0) {
-      throw e;
+      isPartial = true;
+      partial = e;
     }
     s.assign(so);
     try {
       return print(s);
     } catch (ParseException &e) {
       if (e.args.compare("partial") == 0) {
-        throw e;
+        isPartial = true;
+        partial = e;
       }
       s.assign(so);
       try {
         return call(s);
       } catch (ParseException &e) {
         if (e.args.compare("partial") == 0) {
-          throw e;
+          isPartial = true;
+          partial = e;
         }
         s.assign(so);
         try {
@@ -125,7 +130,7 @@ TNode stmt(State &s) {
             try {
               return assign(s);
             } catch (ParseException &e) {
-              throw e;
+              throw isPartial ? partial : e;
             }
           }
         }
