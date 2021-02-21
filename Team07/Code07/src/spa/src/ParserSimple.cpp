@@ -145,9 +145,9 @@ TNode unaryOp(State &s, std::string op, stmt_type typ, bool nest_variable = fals
   bool partial = false;
   try {
     stringMatch(s, op);
-    partial = true;
-    // :- 'read'
+    // :- '<op>'
     stringMatch(s, " ");
+    partial = true;
     // compulsory whitespace
     whitespace(s);
     int var_i = s.i;

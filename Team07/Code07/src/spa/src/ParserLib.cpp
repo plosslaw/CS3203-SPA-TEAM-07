@@ -47,13 +47,11 @@ const char *ParseException::what() const throw() {
 }
 
 std::string prettyPrintValidation(std::string msg) {
-	std::string outputstr("ValidationError");
-	outputstr += "  " + msg + "\n";
-	return outputstr;
+	return "ValidationError " + msg + "\n";
 }
 
 std::string prettyPrintValidation(ParserMapper &map, int pos, std::string msg) {
-	std::string outputstr("ValidationError");
+	std::string outputstr("ValidationError ");
 	outputstr += map.get_pos_print(pos) + "\n";
 	outputstr += map.get_line_caret(pos, 2);
 	outputstr += "  " + msg + "\n";
@@ -64,7 +62,7 @@ std::string prettyPrintException(ParserMapper &map, State &s, bool show_stack) {
 	std::vector<ParseException> e = s.excps;
 	int pos = e[0].at;
 
-	std::string outputstr("ParseError");
+	std::string outputstr("ParseError ");
 	outputstr += map.get_pos_print(pos) + "\n";
 	outputstr += map.get_line_caret(pos, 2);
 	if(show_stack) {
