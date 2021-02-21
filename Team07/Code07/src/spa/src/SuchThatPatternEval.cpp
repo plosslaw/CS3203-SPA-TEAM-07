@@ -41,7 +41,7 @@ vector<string> SuchThatPatternEval::zero_common_synonym(PayLoad such_that_pay_lo
     string such_that_second_arg = such_that_pay_load.getValue()[1];
     string pattern_first_arg = pattern_pay_load.getValue()[0];
     string pattern_second_arg = pattern_pay_load.getValue()[1];
-
+    
     SuchThatEval such_that_eval(storeDeclaration, mapStorage,executor);
     PatternEval pattern_eval(storeDeclaration, mapStorage,executor);
     pair<bool, bool> is_select_val_in_suchthat(false, false);  
@@ -200,7 +200,7 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
         
         if(such_that_type == Pair::FOLLOWS || such_that_type == Pair::FOLLOWST || such_that_type == Pair::PARENT || such_that_type == Pair::PARENTT) {
             // determine if assignment is in first or second arg of such that clause.
-        
+
             bool is_assign_first_arg_st = is_first_arg_common_such_that;
             pair<bool, bool> arg_pairs(false,false);
             vector<string> such_that_result;
@@ -515,3 +515,6 @@ vector<string> SuchThatPatternEval::convert_lst_string_to_int(vector<int> lstA) 
     return output;
 }
 
+bool SuchThatPatternEval::is_pattern_variable_is_constant(std::string pattern_variable_value) {
+    return(pattern_variable_value.at(0) == '"' && pattern_variable_value.at(pattern_variable_value.size()-1) == '"');
+}

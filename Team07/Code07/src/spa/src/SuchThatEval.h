@@ -20,6 +20,7 @@ class SuchThatEval {
         bool is_element_inside_vectorA(string element, vector<string> vectorA);
         vector<string> convert_lst_string_to_int(vector<int> lstA);
         stmt_type convert_single_to_stmt_type(Single s);
+        bool is_pattern_variable_is_constant(std::string pattern_variable_value);
     
     public:
         SuchThatEval(unordered_map<string, Single> declaration_store, unordered_map<Single, 
