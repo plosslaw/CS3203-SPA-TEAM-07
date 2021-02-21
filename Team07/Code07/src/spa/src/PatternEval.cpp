@@ -56,7 +56,7 @@ vector<string> PatternEval::zero_such_that_one_pattern(PayLoad pattern_pay_load,
 pair<bool,bool> PatternEval::check_if_args_are_variable(std::string first_arg, std::string second_arg) {
     bool is_first_arg_variable = false;
     bool is_second_arg_variable = false;
-
+    
     //check if string is in the storedeclaration.
     if(storeDeclaration.find(first_arg) != storeDeclaration.end()) {
         is_first_arg_variable = true;

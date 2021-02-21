@@ -3,7 +3,6 @@
 #include "../../spa/src/ActionsGenerator.h"
 #include "../../spa/src/PKBBuilder.hpp"
 #include "catch.hpp"
-#include <iostream>
 #include <vector>
 
 using namespace std;
