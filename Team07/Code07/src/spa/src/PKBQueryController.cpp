@@ -61,6 +61,11 @@ bool PKBQueryController::procedureModifies(proc_ref p, var_ref v) {
 bool PKBQueryController::satisfiesPattern(assign_ref a, pattern p) {
     if (pkb.assignments.find(a) == pkb.assignments.end()) return false;
     std::string pattern_string = p.rvalue;
+    // need to check if the assignment modifies a variable on left hand side
+    // assignment is also a statement
+    if (pattern_string == "_") {
+        return PKBQueryController::statementModifies(a, p.lvalue);
+    }
     int initial_pattern_length = pattern_string.length();
     std::string substring;
     // 0 wildcardleft
