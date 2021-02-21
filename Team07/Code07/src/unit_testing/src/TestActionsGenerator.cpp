@@ -1024,7 +1024,7 @@ TEST_CASE("SELECT VALUE WITH BOTH SUCH THAT AND PATTERN") {
     }
     SECTION("Select a2 uses(a1,v1) pattern a2(v2,_)") {
         vector<string> correct_ans{"4","6","7","8","10"};
-        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a2"});
         PayLoad st(PAIR, Pair::USES, std::vector<std::string>{"a1", "v1"});
         PayLoad pt(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a2","v2","_"});
         vector<string> output = test_select_such_that_pattern_only(syn,st,pt);
