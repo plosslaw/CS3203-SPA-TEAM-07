@@ -17,6 +17,29 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
     string such_that_first_arg = such_that_pay_load.getValue()[0];
     string such_that_second_arg = such_that_pay_load.getValue()[1];
     pair<bool, bool> bool_pairs_args = SuchThatEval::check_if_args_are_variable(such_that_first_arg, such_that_second_arg); //which of the two param is/are variables?
+    if(!bool_pairs_args.first && !bool_pairs_args.second) {
+        //both are not variable check if they are constants
+        if(SuchThatEval::is_pattern_variable_is_constant(such_that_first_arg)) {
+            such_that_first_arg.erase(such_that_first_arg.begin());
+            such_that_first_arg.pop_back();
+        }
+        if(SuchThatEval::is_pattern_variable_is_constant(such_that_second_arg)) {
+            such_that_second_arg.erase(such_that_second_arg.begin());
+            such_that_second_arg.pop_back();
+        }   
+    }
+    if(!bool_pairs_args.first && bool_pairs_args.second) {
+        if(SuchThatEval::is_pattern_variable_is_constant(such_that_first_arg)) {
+            such_that_first_arg.erase(such_that_first_arg.begin());
+            such_that_first_arg.pop_back();
+        }
+    } 
+    if(bool_pairs_args.first && !bool_pairs_args.second) {
+        if(SuchThatEval::is_pattern_variable_is_constant(such_that_second_arg)) {
+            such_that_second_arg.erase(such_that_second_arg.begin());
+            such_that_second_arg.pop_back();
+        }  
+    } 
     Pair such_that_type = such_that_pay_load.getType().pair;
     //stmt_type select_stmt_type = SuchThatEval::convert_single_to_stmt_type(select_type);
 
@@ -542,4 +565,8 @@ vector<string> SuchThatEval::convert_lst_string_to_int(vector<int> lstA) {
         output.push_back(to_string(i));
     }
     return output;
+}
+
+bool SuchThatEval::is_pattern_variable_is_constant(std::string pattern_variable_value) {
+    return(pattern_variable_value.at(0) == '"' && pattern_variable_value.at(pattern_variable_value.size()-1) == '"');
 }

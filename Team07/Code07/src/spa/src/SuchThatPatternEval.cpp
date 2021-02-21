@@ -41,6 +41,7 @@ vector<string> SuchThatPatternEval::zero_common_synonym(PayLoad such_that_pay_lo
     string such_that_second_arg = such_that_pay_load.getValue()[1];
     string pattern_first_arg = pattern_pay_load.getValue()[0];
     string pattern_second_arg = pattern_pay_load.getValue()[1];
+    
 
     SuchThatEval such_that_eval(storeDeclaration, mapStorage,executor);
     PatternEval pattern_eval(storeDeclaration, mapStorage,executor);
@@ -509,3 +510,6 @@ vector<string> SuchThatPatternEval::convert_lst_string_to_int(vector<int> lstA) 
     return output;
 }
 
+bool SuchThatPatternEval::is_pattern_variable_is_constant(std::string pattern_variable_value) {
+    return(pattern_variable_value.at(0) == '"' && pattern_variable_value.at(pattern_variable_value.size()-1) == '"');
+}

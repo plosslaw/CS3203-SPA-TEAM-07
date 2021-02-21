@@ -29,6 +29,8 @@ class SuchThatPatternEval {
         vector<string> inner_join(vector<string> lstA, vector<string> lstB);
         vector<pair<string,string>> crossproduct(vector<string> first_arg_lst, vector<string> second_arg_lst);
         vector<string> convert_lst_string_to_int(vector<int> lstA);
+        bool is_pattern_variable_is_constant(std::string pattern_variable_value);
+        
     public:
         SuchThatPatternEval(unordered_map<string, Single> declaration_store, unordered_map<Single, 
             unordered_map<string, vector<string>>> map_storage, ActionsExecutor executor_);
