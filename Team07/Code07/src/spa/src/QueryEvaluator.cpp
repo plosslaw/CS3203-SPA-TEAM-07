@@ -4,11 +4,11 @@ using namespace std;
 
 QueryEvaluator::QueryEvaluator() {
     PKBQueryController emptyPKBQueryController = PKBQueryController();
-    this->actionsExecutor = ActionsExecutor(PKBQueryController());
+    this->actions_executor = ActionsExecutor(PKBQueryController());
 }
 
 QueryEvaluator::QueryEvaluator(PKBQueryController pkb_query_controller) {
-    this->actionsExecutor = ActionsExecutor(pkb_query_controller);
+    this->actions_executor = ActionsExecutor(pkb_query_controller);
 }
 
 vector<string> QueryEvaluator::QERunQuery(QueryMap query_map) {
@@ -17,9 +17,8 @@ vector<string> QueryEvaluator::QERunQuery(QueryMap query_map) {
 }
 
 vector<string> QueryEvaluator::QEGenerateActions(QueryMap query_map) {
-    //skeleton code
-    vector<string> results;
-    return results;
+    ActionsGenerator actions_generator = ActionsGenerator(query_map, this->actions_executor);
+    return actions_generator.TraverseQueryMap();
 }
 
 vector<string> QueryEvaluator::QERenderResults (vector<string> queryResults) {

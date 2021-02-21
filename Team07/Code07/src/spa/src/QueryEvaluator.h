@@ -13,14 +13,14 @@
 class QueryEvaluator {
 public:
     explicit QueryEvaluator();
-    explicit QueryEvaluator(PKBQueryController pkbQueryController);
+    explicit QueryEvaluator(PKBQueryController pkb_query_controller);
     std::vector<std::string> QERunQuery(QueryMap query_map);
 
 private:
     std::vector<std::string> QEGenerateActions(QueryMap query_map);
     std::vector<std::string> QERenderResults(std::vector<std::string> queryResults);
 
-    ActionsExecutor actionsExecutor;
+    ActionsExecutor actions_executor;
 
 };
 
