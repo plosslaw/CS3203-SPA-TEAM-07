@@ -48,13 +48,13 @@ void TestWrapper::evaluate(std::string query, std::list<std::string> &results) {
     QueryMap parsed_query = parse_pql(query);
 
     // evaluate the query
-    auto evaluationResults = evaluator.QERunQuery(parsed_query);
+    auto evaluation_results = evaluator.run_query(parsed_query);
 
     // set value of results list
-    results = std::list<std::string> (evaluationResults.begin(), evaluationResults.end());
+    results = std::list<std::string> (evaluation_results.begin(), evaluation_results.end());
 
     // print results to stdout
-    for (auto item: evaluationResults) {
+    for (auto item: evaluation_results) {
       std::cout << item << " ";
     }
     std::cout << std::endl;
