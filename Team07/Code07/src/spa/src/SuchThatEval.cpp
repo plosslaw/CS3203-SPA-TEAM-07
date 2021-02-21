@@ -454,7 +454,6 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
             if (bool_pairs_args.first && !bool_pairs_args.second) {
                 // first parameter is a variable and second parameter is a constant.
                 Single first_arg_type  = storeDeclaration[such_that_first_arg];
-
                 if(first_arg_type == Single::PROCEDURE) {
                     if(such_that_second_arg == "_") {
                         vector<proc_ref> result = executor.get_all_procedures_uses();
@@ -555,5 +554,6 @@ vector<string> SuchThatEval::convert_lst_string_to_int(vector<int> lstA) {
 }
 
 bool SuchThatEval::is_pattern_variable_is_constant(std::string pattern_variable_value) {
-    return(pattern_variable_value.at(0) == '"' && pattern_variable_value.at(pattern_variable_value.size()-1) == '"');
+    bool query = (pattern_variable_value.at(0) == '"' && pattern_variable_value.at(pattern_variable_value.size()-1) == '"');     
+    return query;
 }

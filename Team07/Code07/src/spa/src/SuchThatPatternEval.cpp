@@ -4,7 +4,8 @@
 #include "StringUtil.h"
 #include "ActionsExecutor.h"
 #include "ActionsGenerator.h"
-
+#include <iostream>
+#include <set>
 //constructor
 SuchThatPatternEval::SuchThatPatternEval(unordered_map<string, Single> declaration_store, unordered_map<Single, 
             unordered_map<string, vector<string>>> map_storage, ActionsExecutor executor_) {
@@ -15,13 +16,17 @@ SuchThatPatternEval::SuchThatPatternEval(unordered_map<string, Single> declarati
 
 //method
 vector<string> SuchThatPatternEval::such_that_pattern_eval(PayLoad such_that_pay_load, PayLoad pattern_pay_load,string select_value, Single select_type) {
+    
     vector<string> such_that_values = such_that_pay_load.getValue();
     vector<string> pattern_values = pattern_pay_load.getValue();
+    
     int common_link = 0; // 0 common link represents such that and pattern has no similar variable names
     for(int such_that_value = 0; such_that_value < such_that_values.size(); such_that_value++) {
         for(int pattern_value = 0; pattern_value < pattern_values.size()-1; pattern_value++) {
             if(such_that_values[such_that_value] == pattern_values[pattern_value]) {
-                common_link++;
+                if(!SuchThatPatternEval::is_pattern_variable_is_constant(such_that_values[such_that_value])) {
+                    common_link++;
+                }
             }
         }
     }
