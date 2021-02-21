@@ -759,7 +759,7 @@ bool is_pattern_clause_valid(QueryMap table) {
   std::vector<PayLoad> declarations = table.getList(ClauseType::DECLARATION);
   std::vector<PayLoad> patterns = table.getList(ClauseType::PATTERN);
 
-  // optional suchthat-cl absent
+  // optional pattern absent
   if (patterns.size() == 0) {
     return true;
   }
