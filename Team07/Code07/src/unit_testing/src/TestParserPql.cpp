@@ -1213,6 +1213,40 @@ TEST_CASE("Validate such that clause") {
 
     REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
   }
+
+  SECTION("Fails wildcard as first argument of modifies") {
+    // stmt s; Select s such that Modifies(_, s)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"s"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, MODIFIES,
+                              std::vector<std::string>{"_", "s1"},
+                              std::vector<bool>{false, true}));
+
+    REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
+  }
+
+  SECTION("Fails wildcard as first argument of uses") {
+    // stmt s; Select s such that Uses(_, s)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"s"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, USES,
+                              std::vector<std::string>{"_", "s1"},
+                              std::vector<bool>{false, true}));
+
+    REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
+  }
 }
 
 TEST_CASE("Validate pattern clause") {

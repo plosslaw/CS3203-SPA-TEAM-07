@@ -90,9 +90,8 @@ PayLoad ent_ref(State &state) {
       std::string dbl_quotes_2 = double_quotes(state);
       whitespace(state);
 
-      return PayLoad(
-          SINGLE, Single::DOUBLE_QUOTE_IDENT,
-          std::vector<std::string>{val});
+      return PayLoad(SINGLE, Single::DOUBLE_QUOTE_IDENT,
+                     std::vector<std::string>{val});
     } catch (ParseException &e) {
       state.assign(so);
       try {
@@ -733,6 +732,22 @@ bool is_select_clause_valid(QueryMap table) {
   return is_synonym_declared(declarations, target_synonym);
 }
 
+// Returns true is wildcard is not the first argument
+bool is_modifies_valid(PayLoad target) {
+  if (target.getType().pair == MODIFIES && target.getValue()[0] == "_") {
+    return false;
+  }
+  return true;
+}
+
+// Returns true is wildcard is not the first argument
+bool is_uses_valid(PayLoad target) {
+  if (target.getType().pair == USES && target.getValue()[0] == "_") {
+    return false;
+  }
+  return true;
+}
+
 // synonyms declared
 // wildcard does not exist as first argument of Uses/ Modifies
 bool is_suchthat_clause_valid(QueryMap table) {
@@ -747,6 +762,14 @@ bool is_suchthat_clause_valid(QueryMap table) {
   for (auto it = suchthats.begin(); it != suchthats.end(); ++it) {
     PayLoad target = (*it);
     if (!is_synonym_declared(declarations, target)) {
+      return false;
+    }
+
+    if (!is_modifies_valid(target)) {
+      return false;
+    }
+
+    if (!is_uses_valid(target)) {
       return false;
     }
   }
