@@ -55,6 +55,7 @@ class ActionsGenerator {
         bool is_element_inside_vectorA(string element, vector<string> vectorA);
         vector<string> inner_join_A(vector<string> lstA, vector<string> lstB);//check if elements in lstA is present in lstB
     public:
+        std::vector<PayLoad> get_patternList();
         ActionsGenerator();
         ActionsGenerator(QueryMap mapQuery, ActionsExecutor executorActions);
         std::unordered_map<Single, 

@@ -1,0 +1,52 @@
+procedure main {
+    print main;
+    read procedure;
+    procedure = procedure + 1;
+
+    if (procedure == w - x * y + z) then {
+        print main;
+        read procedure;
+        procedure = procedure + 1;
+
+        if (procedure >= w - x * y + z) then {
+            while (x >= y) {
+                read w;
+                x = x - w * 2 - z;
+                print x;
+            }
+        } else {
+            read z;
+            procedure = procedure + z;
+        }
+    } else {
+        main = 2;
+    }
+
+    read x;
+    read y;
+    print y;
+
+    z = (x * 2) + y / y;
+    z = z / 42;
+
+    t = (g + o + o + n) / 0;
+
+    if (t < 1 / 2) then {
+        t = z * 10000000000;
+    } else {
+        while (t < 1000) {
+            z = z * 2;
+            z = (z + x / 4 + y / 5) % main;
+            read procedure;
+            z = z * procedure;
+            z = (z + 2) % 52;
+            t = (t + 30 * z) % 1002;
+            if (t < 100) then {
+                t = t + o + main;
+            } else {
+                t = t;
+            }
+        }
+    }
+    print t;
+}

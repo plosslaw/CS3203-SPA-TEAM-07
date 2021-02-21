@@ -135,7 +135,7 @@ TNode stmt(State &s) {
 }
 
 /** X :- <X> name ';' */
-TNode unaryOp(State &s, std::string op, stmt_type typ) {
+TNode unaryOp(State &s, std::string op, stmt_type typ, bool nest_variable = false) {
   int init = s.i;
   bool partial = false;
   try {
@@ -145,13 +145,21 @@ TNode unaryOp(State &s, std::string op, stmt_type typ) {
     stringMatch(s, " ");
     // compulsory whitespace
     whitespace(s);
+    int var_i = s.i;
     std::string n = name(s);
     // :- name
     whitespace(s);
     stringMatch(s, ";");
     // :- ';'
     whitespace(s);
-    return TNode(s.advCurStmtNum(), n, typ, init);
+    if (nest_variable) {
+      TNode stmtNode = TNode(s.advCurStmtNum(), "", typ, init);
+      TNode varNode = TNode(n, VARIABLE, var_i);
+      stmtNode.addChild(varNode);
+      return stmtNode;
+    } else {
+      return TNode(s.advCurStmtNum(), n, typ, init);
+    }
   } catch (ParseException &e) {
     s.excps.push_back(e);
     throw ParseException(init, s.i, op, partial ? "partial" : "");
@@ -159,10 +167,10 @@ TNode unaryOp(State &s, std::string op, stmt_type typ) {
 }
 
 /** read :- 'read' name ';' */
-TNode read(State &s) { return unaryOp(s, "read", READ); }
+TNode read(State &s) { return unaryOp(s, "read", READ, true); }
 
 /** print :- 'print' name ';' */
-TNode print(State &s) { return unaryOp(s, "print", PRINT); }
+TNode print(State &s) { return unaryOp(s, "print", PRINT, true); }
 
 /** call :- 'call' name ';' */
 TNode call(State &s) { return unaryOp(s, "call", CALL); }

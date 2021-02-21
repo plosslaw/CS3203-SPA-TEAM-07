@@ -192,6 +192,43 @@ stmt_ref computeParentAndFollows(
     return return_value;
 }
 
+// Utility function for converting an expression's tree into text that can be used in pattern matching
+std::string makeMatchableStringFromAST(TNode cur_node) {
+    std::string buffer;
+    switch (cur_node.getType())
+    {
+    case VARIABLE:
+    case CONSTANT:
+        return cur_node.getValue();
+    case EXPR:
+    case OPERATOR:
+        buffer = buffer + "(";
+        buffer = buffer + makeMatchableStringFromAST(cur_node.getChildren()[0]);
+        buffer = buffer + cur_node.getValue();
+        buffer = buffer + makeMatchableStringFromAST(cur_node.getChildren()[1]);
+        buffer = buffer + ")";
+        return buffer;
+    default:
+        throw "malformed statement tree";
+        break;
+    }
+}
+
+void populateAssignmentArray(PKB &pkb) {
+    for (auto statement: pkb.statements) {
+        if (statement.second.type == ASSIGN) {
+            TNode rvalue = statement.second.ast.getChildren()[1];
+
+            stmt_ref stmt_no = statement.first;
+            std::string value = makeMatchableStringFromAST(rvalue);
+            
+            // note that we do not need the full statement specifications for the assignment table
+            pkb.assignments[stmt_no] = {value};
+            
+        }
+    }
+}
+
 void extractDesignEntities(TNode cur_node, PKB &pkb) {
     stmt_type type = cur_node.getType();
     procedure p;
@@ -227,7 +264,7 @@ void extractDesignEntities(TNode cur_node, PKB &pkb) {
             }
             break;
         case CONSTANT:
-            c = std::stoi(cur_node.getValue());
+            c = cur_node.getValue();
             pkb.constants.emplace(c);
             break;
         case VARIABLE:
@@ -251,10 +288,14 @@ void computePKB(PKB &pkb) {
         std::vector<stmt_ref>(),
         pkb.statements
     );
+    
     for (auto proc: pkb.procedures) {
         computeModifies(proc.second.ast, pkb);
         computeUses(proc.second.ast, pkb);
     }
+
+    // populate the extra assignment array used in pattern computation
+    populateAssignmentArray(pkb);
 }
 
 PKBBuilder::PKBBuilder(TNode root) {
