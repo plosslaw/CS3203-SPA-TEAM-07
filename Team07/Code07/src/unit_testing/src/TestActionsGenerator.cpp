@@ -1286,3 +1286,18 @@ TEST_CASE("WILD CARDS IN SUCH THAT CLAUSE") {
         REQUIRE(verify_stmts(output, correct_ans));
     }
 }
+
+
+TEST_CASE("more test") {
+    vector<string> stmt_lst{"1","2","3","4","5","6","7","8","9","10","11"};
+    vector<string> read_lst{"1"};
+    vector<string> assignment_lst{"4","6","7","8","10"};
+    vector<string> constant_lst{"1","2","42"};
+    vector<string> if_lst{"5"};
+    vector<string> print_lst{"2","11"};
+    vector<string> procedure_lst{"main"};
+    vector<string> variable_lst{"a","b","x","y","z","v","w"};
+    vector<string> while_lst{"3","9"};
+    vector<string> call_lst({});
+    
+}
