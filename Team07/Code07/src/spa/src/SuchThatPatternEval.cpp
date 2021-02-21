@@ -63,11 +63,9 @@ vector<string> SuchThatPatternEval::zero_common_synonym(PayLoad such_that_pay_lo
     if(such_that_lst.empty() || pattern_lst.empty()) {
         return vector<string>();
     }
-    if (is_select_val_in_suchthat.first || is_select_val_in_suchthat.second) {
-        return such_that_lst;
-    } else if (is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
-        return pattern_lst;
-    }  else {
+    if (is_select_val_in_suchthat.first || is_select_val_in_suchthat.second || is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
+        return (mapStorage[select_type])[select_value];
+    } else {
         return vector<string>();
     }
 }
@@ -99,7 +97,7 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
         such_that_or_pattern.first = true;
     }
     if (select_value == pattern_first_arg || select_value == pattern_second_arg) {
-        such_that_or_pattern.first = true;
+        such_that_or_pattern.second = true;
     }
 
     Single common_type;
@@ -173,11 +171,7 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                         }
                     }    
                 }
-                vector <string> result2;
-                for (auto i : result) {
-                    result2.push_back(to_string(i));
-                }
-                return result2;
+                return SuchThatPatternEval::convert_lst_string_to_int(result);
             } 
         } else if (!such_that_or_pattern.first && such_that_or_pattern.second) {
             // select value appears in pattern
@@ -192,11 +186,7 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                     }
                 }
             }
-            vector<string> output;
-            for (auto i : result ) {
-                output.push_back(to_string(i));
-            }
-            return output;
+            return SuchThatPatternEval::convert_lst_string_to_int(result);
         } else {
             // select value appears neither in such that or pattern
             return vector<string>{};       
@@ -224,7 +214,7 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
             vector<string> pattern_result = pattern_eval.zero_such_that_one_pattern(pattern_pay_load, pattern_first_arg, Single::ASSIGN,arg_pairs);
             vector<string> inner_join_lst = SuchThatPatternEval::inner_join(such_that_result, pattern_result);
             if(inner_join_lst.empty()) {
-            return vector<string>{};
+                return vector<string>{};
             }
             if(select_type == Single::ASSIGN) {
                 return inner_join_lst;
@@ -251,11 +241,7 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                             }
                         }
                     }
-                    vector<string> result_final;
-                    for(auto i : temp) {
-                        result_final.push_back(to_string(i));
-                    }
-                    return result_final;
+                    return SuchThatPatternEval::convert_lst_string_to_int(temp);
                 } else {
                     // PARENT or PARENTT
                     vector<stmt_ref> temp;
@@ -275,11 +261,7 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                             }
                         }
                     }
-                    vector<string> result_final;
-                    for(auto i : temp) {
-                        result_final.push_back(to_string(i));
-                    }
-                    return result_final;
+                    return SuchThatPatternEval::convert_lst_string_to_int(temp);
                 }
             } else if (!such_that_or_pattern.first && such_that_or_pattern.second) {
                 // select values appear in pattern clause
@@ -437,17 +419,6 @@ vector<string> SuchThatPatternEval::more_than_one_common_synonym(PayLoad such_th
     }
     vector<string> v3(result3.begin(), result3.end());
     vector<string> v4(result4.begin(), result4.end());
-    pair<bool, bool> such_that_or_pattern(false, false);
-    if(select_value == such_that_first_arg || select_value == such_that_second_arg) {
-        such_that_or_pattern.first = true;
-    }
-    if (select_value == pattern_first_arg || select_value == pattern_second_arg) {
-        such_that_or_pattern.first = true;
-    }
-    // if(!such_that_or_pattern.first && !such_that_or_pattern.second) {
-    //     //select value does not appear in either such that and pattern.
-    //     return SuchThatPatternEval::is_result_empty_yes_none_no_default_soln(v3.empty() || v4.empty(), select_type, select_value);
-    // }
     map<string,vector<string>> output2; output2[pattern_first_arg] = v3; output2[pattern_second_arg] = v4;
     return output2[select_value];
 }
