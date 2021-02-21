@@ -4,6 +4,7 @@
 #include "StringUtil.h"
 #include "ActionsExecutor.h"
 #include "ActionsGenerator.h"
+#include <iostream>
 
 //constructor
 SuchThatPatternEval::SuchThatPatternEval(unordered_map<string, Single> declaration_store, unordered_map<Single, 
@@ -21,11 +22,13 @@ vector<string> SuchThatPatternEval::such_that_pattern_eval(PayLoad such_that_pay
     int common_link = 0; // 0 common link represents such that and pattern has no similar variable names
     for(int such_that_value = 0; such_that_value < such_that_values.size(); such_that_value++) {
         for(int pattern_value = 0; pattern_value < pattern_values.size()-1; pattern_value++) {
-            if(such_that_values[such_that_value] == pattern_values[pattern_value] && such_that_values[such_that_value] != "_") {
+            if(such_that_values[such_that_value] == pattern_values[pattern_value] && storeDeclaration.find(such_that_values[such_that_value]) != storeDeclaration.end()) {
                 common_link++;
+                
             }
         }
     }
+
     vector<string> result;
     if(common_link == 0) {
         result = SuchThatPatternEval::zero_common_synonym(such_that_pay_load, pattern_pay_load,select_value,select_type);
@@ -77,10 +80,16 @@ vector<string> SuchThatPatternEval::zero_common_synonym(PayLoad such_that_pay_lo
 //select a such that uses(a,v) pattern a(v2,_);
 vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_load, PayLoad pattern_pay_load,string select_value, Single select_type) {
     string such_that_first_arg = such_that_pay_load.getValue()[0];
-    Single such_that_first_type = storeDeclaration[such_that_first_arg];
+    Single such_that_first_type = Single::STATEMENT;
+    if (storeDeclaration.find(such_that_first_arg) != storeDeclaration.end()) {
+        such_that_first_type = storeDeclaration[such_that_first_arg];
+    }
 
     string such_that_second_arg = such_that_pay_load.getValue()[1];
-    Single such_that_second_type = storeDeclaration[such_that_second_arg];
+    Single such_that_second_type = Single::STATEMENT;
+    if (storeDeclaration.find(such_that_second_arg) != storeDeclaration.end()) {
+        such_that_second_type = storeDeclaration[such_that_second_arg];
+    }
 
     string pattern_first_arg = pattern_pay_load.getValue()[0];
     string pattern_second_arg = pattern_pay_load.getValue()[1];
@@ -299,9 +308,10 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
             //evaluate pattern
             vector<string> pattern_result = pattern_eval.zero_such_that_one_pattern(pattern_pay_load, such_that_first_arg, Single::ASSIGN,arg_pairs);
             vector<string> inner_join_lst = SuchThatPatternEval::inner_join(such_that_result, pattern_result);
+
             //inner_join_lst is list of assignments statements.
             if(inner_join_lst.empty()) {
-            return vector<string>{};
+                return vector<string>{};
             }
             if(select_type == Single::ASSIGN) {
                 return inner_join_lst;
