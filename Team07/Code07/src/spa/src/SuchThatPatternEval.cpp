@@ -69,16 +69,16 @@ vector<string> SuchThatPatternEval::zero_common_synonym(PayLoad such_that_pay_lo
             is_select_val_in_pattern.second = true;
         }
     vector<string> pattern_lst =  pattern_eval.zero_such_that_one_pattern(pattern_pay_load, select_value, select_type, is_select_val_in_pattern);
-    if(is_select_val_in_suchthat.first || is_select_val_in_suchthat.second) {
+    
+
+    if(such_that_lst.empty() || pattern_lst.empty()) {
+        return vector<string>();
+    } else if(is_select_val_in_suchthat.first || is_select_val_in_suchthat.second) {
         return such_that_lst;
     } else if (is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
         return pattern_lst;
     } else {
-        if(such_that_lst.empty() || pattern_lst.empty()) {
-            return vector<string>();
-        } else {
-            return (mapStorage[select_type])[select_value];
-        }
+        return (mapStorage[select_type])[select_value];
     }
 }
 
@@ -100,8 +100,8 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
     SuchThatEval such_that_eval(storeDeclaration, mapStorage,executor);
     PatternEval pattern_eval(storeDeclaration, mapStorage,executor);
 
-    bool is_first_arg_common_such_that = such_that_first_arg == pattern_first_arg || such_that_first_arg == pattern_second_arg;
-    bool is_first_arg_common_pattern = pattern_first_arg == such_that_first_arg|| pattern_first_arg == such_that_second_arg;
+    bool is_first_arg_common_such_that = (such_that_first_arg != "_") && (such_that_first_arg == pattern_first_arg || such_that_first_arg == pattern_second_arg);
+    bool is_first_arg_common_pattern = (pattern_first_arg != "_") && (pattern_first_arg == such_that_first_arg || pattern_first_arg == such_that_second_arg);
     
     // check if select value appears in such that or pattern
     pair<bool, bool> such_that_or_pattern(false, false);
@@ -226,7 +226,6 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
             arg_pairs.first = true;
             arg_pairs.second = false;
             vector<string> pattern_result = pattern_eval.zero_such_that_one_pattern(pattern_pay_load, pattern_first_arg, Single::ASSIGN,arg_pairs);
-
             vector<string> inner_join_lst = SuchThatPatternEval::inner_join(such_that_result, pattern_result);
 
             if(inner_join_lst.empty()) {
