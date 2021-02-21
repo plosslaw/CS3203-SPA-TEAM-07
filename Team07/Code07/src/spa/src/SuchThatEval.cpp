@@ -32,6 +32,9 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
 
     if (such_that_type == Pair::FOLLOWS || such_that_type == Pair::FOLLOWST) {
         bool IS_FOLLOWST = such_that_type == Pair::FOLLOWST;
+        if(such_that_first_arg == such_that_second_arg && such_that_first_arg!="_" && such_that_second_arg!="_") {
+            return vector<string>{};
+        }
         if(bool_pairs_args.first && bool_pairs_args.second) {
             // both are variables. both are types of statements (statement, read, while etc...)
             Single first_arg_type  = storeDeclaration[such_that_first_arg];
@@ -158,6 +161,9 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
         }
     } else if (such_that_type == Pair::PARENT || such_that_type == Pair::PARENTT) {
         bool IS_PARENTT = such_that_type == Pair::PARENTT;
+        if(such_that_first_arg == such_that_second_arg && such_that_first_arg!="_" && such_that_second_arg!="_") {
+            return vector<string>{};
+        }
         if(bool_pairs_args.first && bool_pairs_args.second) {
             // both are variables. both are types of statements (statement, read, while etc...)
             Single first_arg_type  = storeDeclaration[such_that_first_arg];
