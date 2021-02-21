@@ -970,45 +970,38 @@ TEST_CASE("SELECT WITH SUCH THAT CLAUSE: Pattern") {
         PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
         PayLoad pt(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","x","_"});
         vector<string> output = test_select_pattern_only(syn, pt);
-        REQUIRE(output == vector<string>{});//remove
         REQUIRE(verify_stmts(output, correct_ans));
     }
     SECTION("Select a1 pattern a1(\"w\",_)") {
+        vector<string> correct_ans{"8"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
+        PayLoad pt(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","y","_"});
+        vector<string> output = test_select_pattern_only(syn, pt);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select a1 pattern a1(_,_* 2)") {
         vector<string> correct_ans{"6"};
         PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
-        PayLoad pt(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","\"y\"","_"});
+        PayLoad pt(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","_","_* 2"});
         vector<string> output = test_select_pattern_only(syn, pt);
         
         REQUIRE(output == vector<string>{});//remove
         REQUIRE(verify_stmts(output, correct_ans));
     }
-    // SECTION("Select a1 pattern a1(_,_* 2)") {
-    //     vector<string> correct_ans{"6"};
-    //     PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
-    //     PayLoad pt(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","_","_* 2"});
-    //     vector<string> output = test_select_pattern_only(syn, pt);
-        
-    //     REQUIRE(output == vector<string>{});//remove
-    //     REQUIRE(verify_stmts(output, correct_ans));
-    // }
-    // SECTION("Select a1 pattern a1(_,_*2)") {
-    //     vector<string> correct_ans{"6"};
-    //     PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
-    //     PayLoad pt(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","v1","_*2"});
-    //     vector<string> output = test_select_pattern_only(syn, pt);
-        
-    //     REQUIRE(output == vector<string>{});//remove
-    //     REQUIRE(verify_stmts(output, correct_ans));
-    // }
-    // SECTION("Select a1 pattern a1(_,_*2)") {
-    //     vector<string> correct_ans{"6"};
-    //     PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
-    //     PayLoad pt(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","w","y*2"});
-    //     vector<string> output = test_select_pattern_only(syn, pt);
-        
-    //     REQUIRE(output == vector<string>{"AAA"});//remove
-    //     REQUIRE(verify_stmts(output, correct_ans));
-    // }
+    SECTION("Select a1 pattern a1(_,_*2)") {
+        vector<string> correct_ans{"6"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
+        PayLoad pt(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","v1","_*2"});
+        vector<string> output = test_select_pattern_only(syn, pt);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select a1 pattern a1(_,_*2)") {
+        vector<string> correct_ans{"6"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
+        PayLoad pt(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","w","y*2"});
+        vector<string> output = test_select_pattern_only(syn, pt);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
 }
 
 
