@@ -361,8 +361,8 @@ TEST_CASE("single_pattern_clause") {
             executor.get_all_stmts_pattern(trial_pattern),
             ans_vector_assign_x__));
 
-        trial_pattern.lvalue = "_";
-        trial_pattern.rvalue = "v - 1";
+        trial_pattern.lvalue = "v";
+        trial_pattern.rvalue = "v-1";
 
         // REQUIRE(verify_stmt_vector(
         //     executor.get_all_stmts_pattern(trial_pattern),
