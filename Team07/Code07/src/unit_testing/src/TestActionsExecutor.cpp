@@ -357,19 +357,21 @@ TEST_CASE("single_pattern_clause") {
         trial_pattern.lvalue = "x";
         trial_pattern.rvalue = "_";
 
-        // REQUIRE(verify_stmt_vector(
-        //     executor.get_all_stmts_pattern(trial_pattern),
-        //     ans_vector_assign_x__));
-
-        REQUIRE(executor.satisfies_pattern(6, trial_pattern) == false);
-
+        REQUIRE(verify_stmt_vector(
+            executor.get_all_stmts_pattern(trial_pattern),
+            ans_vector_assign_x__));
 
         trial_pattern.lvalue = "_";
         trial_pattern.rvalue = "v - 1";
 
-        REQUIRE(verify_stmt_vector(
-            executor.get_all_stmts_pattern(trial_pattern),
-            ans_vector_assign___v_minus_1));
+        // REQUIRE(verify_stmt_vector(
+        //     executor.get_all_stmts_pattern(trial_pattern),
+        //     ans_vector_assign___v_minus_1));
+
+        REQUIRE(executor.satisfies_pattern(10, trial_pattern) == true);
+        REQUIRE(
+            executor.get_all_stmts_pattern(trial_pattern) ==
+            ans_vector_assign___v_minus_1);
 
         trial_pattern.lvalue = "_";
         trial_pattern.rvalue = "_y_";
