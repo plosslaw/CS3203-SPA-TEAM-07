@@ -125,7 +125,6 @@ TNode getMockAST() {
     main_stmt_list.addChild(stmt_2);
     main_stmt_list.addChild(stmt_3);
     main_stmt_list.addChild(stmt_5);
-    main_stmt_list.addChild(stmt_9);
     main_stmt_list.addChild(stmt_11);
 
     TNode proc = TNode("main", PROCEDURE);

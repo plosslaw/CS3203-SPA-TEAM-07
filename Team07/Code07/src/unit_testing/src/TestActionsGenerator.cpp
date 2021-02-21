@@ -287,7 +287,6 @@ TEST_CASE("SELECT WITH SUCH THAT CLAUSE: FOLLOWS") {
         PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
         PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"s1","a1"});
         vector<string> output = test_select_such_that_only(syn, st);
-        REQUIRE(output == vector<string>{"test"}); //remove this
         REQUIRE(verify_stmts(output, correct_ans));
     }
     SECTION("Select s1 follows(s1,w1") {
@@ -401,7 +400,6 @@ TEST_CASE("SELECT WITH SUCH THAT CLAUSE: FOLLOWS*") {
         PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s2"});
         PayLoad st(PAIR, Pair::FOLLOWST, std::vector<std::string>{"w1","s2"});
         vector<string> output = test_select_such_that_only(syn, st);
-        REQUIRE(output == vector<string>{});
         REQUIRE(verify_stmts(output, correct_ans));
     }
     SECTION("Select s2 follows*(ifs1,s2") {
@@ -410,7 +408,6 @@ TEST_CASE("SELECT WITH SUCH THAT CLAUSE: FOLLOWS*") {
         PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s2"});
         PayLoad st(PAIR, Pair::FOLLOWST, std::vector<std::string>{"ifs1","s2"});
         vector<string> output = test_select_such_that_only(syn, st);
-        REQUIRE(output == vector<string>{});
         REQUIRE(verify_stmts(output, correct_ans));
     }
     SECTION("Select s1 follows*(s1,5") {
