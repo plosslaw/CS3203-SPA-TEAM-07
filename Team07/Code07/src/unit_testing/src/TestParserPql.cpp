@@ -1251,20 +1251,20 @@ TEST_CASE("Validate such that clause") {
 
 TEST_CASE("Validate pattern clause") {
   SECTION("Passes synonyms declared") {
-    // assign a; stmt s; Select s pattern a(s, _)
+    // assign a; variable v; Select s pattern a(v, _)
     QueryMap query_map;
     query_map.addItem(
         ClauseType::DECLARATION,
         PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
     query_map.addItem(
         ClauseType::DECLARATION,
-        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+        PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"v"}));
     query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
-                                                  std::vector<std::string>{"s"},
+                                                  std::vector<std::string>{"v"},
                                                   std::vector<bool>{true}));
     query_map.addItem(ClauseType::PATTERN,
                       PayLoad(TRIPLE, SYN_ASSIGN,
-                              std::vector<std::string>{"a", "s", "_"},
+                              std::vector<std::string>{"a", "v", "_"},
                               std::vector<bool>{true, true, false}));
 
     REQUIRE(is_pattern_clause_valid(query_map));
@@ -1309,15 +1309,36 @@ TEST_CASE("Validate pattern clause") {
 
     REQUIRE_FALSE(is_pattern_clause_valid(query_map));
   }
+
   SECTION("Fails syn-assign is not type assign") {
-    // assign s; stmt a; Select s pattern a(s, _)
+    // assign s; variable a; Select s pattern a(s, _)
     QueryMap query_map;
     query_map.addItem(
         ClauseType::DECLARATION,
         PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"s"}));
     query_map.addItem(
         ClauseType::DECLARATION,
-        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"a"}));
+        PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"a"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"s"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::PATTERN,
+                      PayLoad(TRIPLE, SYN_ASSIGN,
+                              std::vector<std::string>{"a", "s", "_"},
+                              std::vector<bool>{true, true, false}));
+
+    REQUIRE_FALSE(is_pattern_clause_valid(query_map));
+  }
+
+  SECTION("Fails ent ref is not type variable") {
+    // assign a; stmt s; Select s pattern a(s, _)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
     query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
                                                   std::vector<std::string>{"s"},
                                                   std::vector<bool>{true}));
