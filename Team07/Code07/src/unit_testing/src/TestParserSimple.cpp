@@ -240,7 +240,8 @@ TEST_CASE("TNode parsers") {
 
   SECTION("print") {
     REQUIRE(checkTNodeParse("print f;", &print).eq(
-      TNode(1, "f", PRINT, 0)
+      TNode(1, "", PRINT, 0).addChild(
+        TNode("f", VARIABLE, 6))
     ));
     REQUIRE_THROWS(checkTNodeParse("print f", &print));
     REQUIRE_THROWS(checkTNodeParse("prin f;", &print));
@@ -250,7 +251,8 @@ TEST_CASE("TNode parsers") {
 
   SECTION("read") {
     REQUIRE(checkTNodeParse("read f;", &read).eq(
-      TNode(1, "f", READ, 0)
+      TNode(1, "", READ, 0).addChild(
+        TNode("f", VARIABLE, 5))
     ));
     REQUIRE_THROWS(checkTNodeParse("read f", &read));
     REQUIRE_THROWS(checkTNodeParse("rea f;", &read));
@@ -260,10 +262,12 @@ TEST_CASE("TNode parsers") {
 
   SECTION("stmt") {
     REQUIRE(checkTNodeParse("read f;", &stmt).eq(
-      TNode(1, "f", READ, 0)
+      TNode(1, "", READ, 0).addChild(
+        TNode("f", VARIABLE, 5))
     ));
     REQUIRE(checkTNodeParse("print f;", &stmt).eq(
-      TNode(1, "f", PRINT, 0)
+      TNode(1, "", PRINT, 0).addChild(
+        TNode("f", VARIABLE, 6))
     ));
     REQUIRE(checkTNodeParse("call f;", &stmt).eq(
       TNode(1, "f", CALL, 0)
@@ -305,12 +309,15 @@ TEST_CASE("TNode parsers") {
   SECTION("stmtLst") {
     REQUIRE(checkTNodeParse("read f; }", &stmtLst).eq(
       TNode("", STATEMENTLIST, 0).addChild(
-        TNode(1, "f", READ, 0))
+        TNode(1, "", READ, 0).addChild(
+          TNode("f", VARIABLE, 5)))
     ));
     REQUIRE(checkTNodeParse("read f; read f; }", &stmtLst).eq(
       TNode("", STATEMENTLIST, 0).addChild(
-        TNode(1, "f", READ, 0)).addChild(
-        TNode(2, "f", READ, 8))
+        TNode(1, "", READ, 0).addChild(
+          TNode("f", VARIABLE, 5))).addChild(
+        TNode(2, "", READ, 8).addChild(
+          TNode("f", VARIABLE, 13)))
     ));
     REQUIRE_THROWS(checkTNodeParse("}", &stmtLst));
   }
@@ -319,7 +326,8 @@ TEST_CASE("TNode parsers") {
     REQUIRE(checkTNodeParse("procedure p { read f; }", &procedure).eq(
       TNode("p", PROCEDURE, 0).addChild(
         TNode("", STATEMENTLIST, 14).addChild(
-          TNode(1, "f", READ, 14)))
+          TNode(1, "", READ, 14).addChild(
+            TNode("f", VARIABLE, 19))))
     ));
     REQUIRE_THROWS(checkTNodeParse("procedure p read f; }", &procedure));
     REQUIRE_THROWS(checkTNodeParse("procedure { read f; }", &procedure));

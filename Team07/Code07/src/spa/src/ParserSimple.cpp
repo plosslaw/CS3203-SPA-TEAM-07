@@ -145,6 +145,7 @@ TNode unaryOp(State &s, std::string op, stmt_type typ, bool nest_variable = fals
     stringMatch(s, " ");
     // compulsory whitespace
     whitespace(s);
+    int var_i = s.i;
     std::string n = name(s);
     // :- name
     whitespace(s);
@@ -153,7 +154,7 @@ TNode unaryOp(State &s, std::string op, stmt_type typ, bool nest_variable = fals
     whitespace(s);
     if (nest_variable) {
       TNode stmtNode = TNode(s.advCurStmtNum(), "", typ, init);
-      TNode varNode = TNode(n, VARIABLE);
+      TNode varNode = TNode(n, VARIABLE, var_i);
       stmtNode.addChild(varNode);
       return stmtNode;
     } else {

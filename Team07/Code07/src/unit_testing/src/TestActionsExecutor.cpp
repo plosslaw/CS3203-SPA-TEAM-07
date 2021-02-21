@@ -99,7 +99,7 @@ TEST_CASE("get_all_entities") {
     vector<stmt_ref> ans_vector_stmts_while {3,9};
 
     // answer vectors - consts
-    vector<const_value> ans_vector_consts {1,2,42};
+    vector<const_value> ans_vector_consts {"1","2","42"};
 
     // answer vectors - procedures
     vector<proc_ref> ans_vector_procs {"main"};

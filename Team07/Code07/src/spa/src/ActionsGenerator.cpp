@@ -117,7 +117,7 @@ std::unordered_map<Single,
             vector<constant> constant_lst = executor.get_all_constants();
             vector<string> constant_lst_string;
             for(auto cnst : constant_lst) {
-                constant_lst_string.push_back(to_string(cnst));
+                constant_lst_string.push_back(cnst);
             }
             constantStorage[declaration_name] = constant_lst_string;   
         } else if (s == Single::VARIABLE) {
