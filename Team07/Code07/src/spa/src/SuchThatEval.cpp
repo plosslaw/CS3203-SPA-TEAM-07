@@ -16,39 +16,17 @@ SuchThatEval::SuchThatEval(unordered_map<string, Single> declaration_store, unor
 vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_load, string select_value, Single select_type, pair<bool,bool> arg_pairs) {
     string such_that_first_arg = such_that_pay_load.getValue()[0];
     string such_that_second_arg = such_that_pay_load.getValue()[1];
-    cout<<such_that_second_arg;
     pair<bool, bool> bool_pairs_args = SuchThatEval::check_if_args_are_variable(such_that_first_arg, such_that_second_arg); //which of the two param is/are variables?
-    cout<<bool_pairs_args.second<<" A"<<endl;
-    if(!bool_pairs_args.first && !bool_pairs_args.second) {
-        
-cout<<"Hereaassasssasssa"<<endl; //remove
-        //both are not variable check if they are constants
-        if(SuchThatEval::is_pattern_variable_is_constant(such_that_first_arg)) {
+    if(SuchThatEval::is_pattern_variable_is_constant(such_that_first_arg)) {
             such_that_first_arg.erase(such_that_first_arg.begin());
             such_that_first_arg.pop_back();
-        }
-        if(SuchThatEval::is_pattern_variable_is_constant(such_that_second_arg)) {
-            such_that_second_arg.erase(such_that_second_arg.begin());
-            such_that_second_arg.pop_back();
-        }   
+            bool_pairs_args.first =false;
     }
-    if(!bool_pairs_args.first && bool_pairs_args.second) {
-        
-cout<<"Hereaasssssa"<<endl; //remove
-        if(SuchThatEval::is_pattern_variable_is_constant(such_that_first_arg)) {
-            such_that_first_arg.erase(such_that_first_arg.begin());
-            such_that_first_arg.pop_back();
-        }
-    } 
-    if(bool_pairs_args.first && !bool_pairs_args.second) {
-
-        
-cout<<"Hereaaa"<<endl; //remove
-        if(SuchThatEval::is_pattern_variable_is_constant(such_that_second_arg)) {
+    if(SuchThatEval::is_pattern_variable_is_constant(such_that_second_arg)) {
             such_that_second_arg.erase(such_that_second_arg.begin());
             such_that_second_arg.pop_back();
-        }  
-    } 
+            bool_pairs_args.second =false;
+    }
     Pair such_that_type = such_that_pay_load.getType().pair;
     //stmt_type select_stmt_type = SuchThatEval::convert_single_to_stmt_type(select_type);
 
@@ -530,7 +508,6 @@ pair<bool,bool> SuchThatEval::check_if_args_are_variable(std::string first_arg, 
         is_first_arg_variable = true;
     }
     if(storeDeclaration.find(second_arg) != storeDeclaration.end()) {
-        cout<<"CANNOT BE";
         is_second_arg_variable = true;
     }
     std::pair<bool, bool> pairArgs;

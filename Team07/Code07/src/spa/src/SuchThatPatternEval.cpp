@@ -43,7 +43,6 @@ vector<string> SuchThatPatternEval::zero_common_synonym(PayLoad such_that_pay_lo
     string pattern_first_arg = pattern_pay_load.getValue()[0];
     string pattern_second_arg = pattern_pay_load.getValue()[1];
     
-
     SuchThatEval such_that_eval(storeDeclaration, mapStorage,executor);
     PatternEval pattern_eval(storeDeclaration, mapStorage,executor);
     pair<bool, bool> is_select_val_in_suchthat(false, false);  
