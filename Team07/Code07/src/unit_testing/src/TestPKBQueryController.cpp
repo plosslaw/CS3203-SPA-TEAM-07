@@ -220,6 +220,9 @@ TEST_CASE("One") {
         pattern p13 = {"v", "_a % b_"};
         pattern p14 = {"v", "a"};
         pattern p15 = {"v", "_a + c_"};
+        pattern p16 = {"_", "_"};
+        pattern p17 = {"_", "a % b"};
+        pattern p18 = {"_", "_a + c_"};
         REQUIRE(pkbQueryController.satisfiesPattern(a, p1) == true);
         REQUIRE(pkbQueryController.satisfiesPattern(a, p2) == true);
         REQUIRE(pkbQueryController.satisfiesPattern(a, p3) == true);
@@ -234,7 +237,10 @@ TEST_CASE("One") {
         REQUIRE(pkbQueryController.satisfiesPattern(a, p12) == false);
         REQUIRE(pkbQueryController.satisfiesPattern(a, p13) == false);
         REQUIRE(pkbQueryController.satisfiesPattern(a, p14) == false);
-        REQUIRE(pkbQueryController.satisfiesPattern(a, p10) == false);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p15) == false);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p16) == true);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p17) == true);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p18) == false);
     }
     // implement the rest in iteration/v1.3
 
@@ -246,9 +252,5 @@ TEST_CASE("One") {
         REQUIRE(pkbQueryController.getStatementsOfType(w).size() == 1);
         REQUIRE(pkbQueryController.getStatementsOfType(r).size() == 2);  
     }
-
-}
-
-TEST_CASE("TWO") {
 
 }
