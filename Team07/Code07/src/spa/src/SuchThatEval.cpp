@@ -432,7 +432,7 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
                 // first parameter is a constant and second parameter is a variable.
                 // second parameter has to be variable type
                 if(such_that_first_arg == "_") {
-                    vector<var_ref> result = executor.get_all_variables_uses(such_that_first_arg);
+                    vector<var_ref> result = executor.get_all_variables_uses(such_that_second_arg);
                     return result;
                 }
                 else if (StringUtil::is_number(such_that_first_arg)) {
