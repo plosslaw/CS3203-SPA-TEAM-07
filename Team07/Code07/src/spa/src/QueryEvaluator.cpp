@@ -22,7 +22,6 @@ vector<string> QueryEvaluator::generate_actions(QueryMap query_map) {
 }
 
 vector<string> QueryEvaluator::render_results (vector<string> query_results) {
-    //skeleton code
-    return query_results;
+    return this->response_renderer.render_results(query_results);
 }
 

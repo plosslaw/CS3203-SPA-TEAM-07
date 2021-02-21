@@ -21,7 +21,7 @@ private:
     std::vector<std::string> render_results(std::vector<std::string> query_results);
 
     ActionsExecutor actions_executor;
-
+    ResponseRenderer response_renderer;
 };
 
 

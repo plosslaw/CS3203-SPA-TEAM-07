@@ -318,14 +318,14 @@ TEST_CASE("SELECT WITH SUCH THAT CLAUSE: FOLLOWS") {
         REQUIRE(verify_stmts(output, correct_ans));
     }
     SECTION("Select s1 follows(s1,4") {
-        vector<string> correct_ans{"None"};
+        vector<string> correct_ans{};
         PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
         PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"s1","4"});
         vector<string> output = test_select_such_that_only(syn, st);
         REQUIRE(verify_stmts(output, correct_ans));
     }
     SECTION("Select s1 follows(4,s1") {
-        vector<string> correct_ans{"None"};
+        vector<string> correct_ans{};
         PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
         PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"4","s1"});
         vector<string> output = test_select_such_that_only(syn, st);
@@ -439,7 +439,7 @@ TEST_CASE("SELECT WITH SUCH THAT CLAUSE: FOLLOWS*") {
         REQUIRE(verify_stmts(output, correct_ans));
     }
     SECTION("Select a1 follows*(1,4") {
-        vector<string> correct_ans{"None"};
+        vector<string> correct_ans{};
         PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
         PayLoad st(PAIR, Pair::FOLLOWST, std::vector<std::string>{"1","4"});
         vector<string> output = test_select_such_that_only(syn, st);
@@ -523,7 +523,7 @@ TEST_CASE("SELECT WITH SUCH THAT CLAUSE: Parent") {
         REQUIRE(verify_stmts(output, correct_ans));
     }
     SECTION("Select s1 parent(1,3)") {
-        vector<string> correct_ans{"None"};
+        vector<string> correct_ans{};
         PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
         PayLoad st(PAIR, Pair::PARENT, std::vector<std::string>{"1","3"});
         vector<string> output = test_select_such_that_only(syn, st);
@@ -537,7 +537,7 @@ TEST_CASE("SELECT WITH SUCH THAT CLAUSE: Parent") {
         REQUIRE(verify_stmts(output, correct_ans));
     }
     SECTION("Select s1 parent(1,6)") {
-        vector<string> correct_ans{"None"};
+        vector<string> correct_ans{};
         PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
         PayLoad st(PAIR, Pair::PARENT, std::vector<std::string>{"1","6"});
         vector<string> output = test_select_such_that_only(syn, st);
@@ -601,7 +601,7 @@ TEST_CASE("SELECT WITH SUCH THAT CLAUSE: Parent*") {
         REQUIRE(verify_stmts(output, correct_ans));
     }
     SECTION("Select a1 parent*(a1,s1)") {
-        vector<string> correct_ans{"None"};
+        vector<string> correct_ans{};
         PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
         PayLoad st(PAIR, Pair::PARENTT, std::vector<std::string>{"a1","s1"});
         vector<string> output = test_select_such_that_only(syn, st);
@@ -622,7 +622,7 @@ TEST_CASE("SELECT WITH SUCH THAT CLAUSE: Parent*") {
         REQUIRE(verify_stmts(output, correct_ans));
     }
     SECTION("Select s1 parent*(7,s1)") {
-        vector<string> correct_ans{"None"};
+        vector<string> correct_ans{};
         PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
         PayLoad st(PAIR, Pair::PARENTT, std::vector<std::string>{"7","s1"});
         vector<string> output = test_select_such_that_only(syn, st);
@@ -734,7 +734,7 @@ TEST_CASE("SELECT WITH SUCH THAT CLAUSE: USES") {
         REQUIRE(verify_stmts(output, correct_ans));
     }
     SECTION("Select w1 uses(a1,\"z\"") {
-        vector<string> correct_ans{"None"};
+        vector<string> correct_ans{};
         PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"w1"});
         PayLoad st(PAIR, Pair::USES, std::vector<std::string>{"a1","z"});
         vector<string> output = test_select_such_that_only(syn, st);
@@ -896,7 +896,7 @@ TEST_CASE("SELECT WITH SUCH THAT CLAUSE: MODIFIES") {
         REQUIRE(verify_stmts(output, correct_ans));
     }     
     SECTION("Select s1 modifies(s1,\"z") {
-        vector<string> correct_ans{"None"};
+        vector<string> correct_ans{};
         PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
         PayLoad st(PAIR, Pair::MODIFIES, std::vector<std::string>{"s1","z"});
         vector<string> output = test_select_such_that_only(syn, st);
@@ -1049,7 +1049,7 @@ TEST_CASE("SELECT VALUE WITH BOTH SUCH THAT AND PATTERN") {
     }
        
     SECTION("Select a1 parent*(a1,a2) pattern a1(v1,_)") {
-        vector<string> correct_ans{"None"};
+        vector<string> correct_ans{};
         PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
         PayLoad st(PAIR, Pair::PARENTT, std::vector<std::string>{"a1", "a2"});
         PayLoad pt(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","v1","_"});
