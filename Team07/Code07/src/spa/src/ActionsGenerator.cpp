@@ -193,7 +193,7 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
 
         vector<string> return_result = such_that_eval.one_such_that_zero_pattern(such_that_pay_load, select_value, select_type, is_select_val_in_suchthat);
         if (return_result.empty()) {
-                return vector<string> {"None"};
+                return vector<string> {};
         } else {
             if (is_select_val_in_suchthat.first || is_select_val_in_suchthat.second) {
                 return return_result;    
@@ -218,7 +218,7 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
 
         vector<string> return_result = pattern_eval.zero_such_that_one_pattern(pattern_pay_load, select_value, select_type, is_select_val_in_pattern);
         if (return_result.empty()) {
-                return vector<string> {"None"};
+                return vector<string> {};
         } else {
             if (is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
                 return return_result;    
@@ -254,7 +254,7 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
         }
 
         if (return_result.empty()) {
-                return vector<string> {"None"};
+                return vector<string> {};
         } else {
             if (is_select_val_in_suchthat.first || is_select_val_in_suchthat.second || is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
                 return return_result;    
