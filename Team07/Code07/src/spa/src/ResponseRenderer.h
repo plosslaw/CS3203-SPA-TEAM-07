@@ -1,5 +1,7 @@
 #pragma once
 
+#include "StringUtil.h"
+
 #include <algorithm>
 #include <string>
 #include <unordered_set>
@@ -13,6 +15,4 @@ public:
 
 private:
     static bool compare_int_strings(std::string s1, std::string s2);
-    static bool check_is_number(std::string s);
-    std::unordered_set<int> digits_set;
 };
