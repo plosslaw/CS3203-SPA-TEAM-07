@@ -191,7 +191,7 @@ Select a pattern a(_, _"a"_)
 39 - select assignments with pattern no wildcard
 assign a;
 Select a pattern a(_, "a")
-4
+
 5000
 40 - select assignments with wildcard + partial name of variable
 assign a;
