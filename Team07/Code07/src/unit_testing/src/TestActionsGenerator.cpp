@@ -924,7 +924,7 @@ TEST_CASE("SELECT WITH SUCH THAT CLAUSE: Pattern") {
         REQUIRE(verify_stmts(output, correct_ans));
     }
     SECTION("Select v1 pattern a1(v1,_)") {
-        vector<string> correct_ans{"w", "v", "b", "a", "z", "x", "y"};
+        vector<string> correct_ans{"w", "v","x","y"};
         PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"v1"});
         PayLoad pt(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","v1","_"});
         vector<string> output = test_select_pattern_only(syn, pt);
