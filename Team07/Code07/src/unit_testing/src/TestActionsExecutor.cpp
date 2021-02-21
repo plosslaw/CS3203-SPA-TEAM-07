@@ -196,11 +196,11 @@ TEST_CASE("single_such_that_clause") {
             ans_vector_follows_assign_second_non_starred));
 
         REQUIRE(verify_stmt_vector(
-            executor.get_all_stmts_follows(stmt_type::STATEMENT, arg_pos::SECOND_ARG, 3, true),
+            executor.get_all_stmts_follows_ref(stmt_type::STATEMENT, arg_pos::SECOND_ARG, 3, true),
             ans_vector_follows_stmt_second_3_starred));
 
         REQUIRE(verify_stmt_vector(
-            executor.get_all_stmts_follows(stmt_type::WHILE, arg_pos::FIRST_ARG, stmt_type::STATEMENT, false),
+            executor.get_all_stmts_follows_type(stmt_type::WHILE, arg_pos::FIRST_ARG, stmt_type::STATEMENT, false),
             ans_vector_follows_while_first_stmt_non_starred));
     }
 
@@ -214,11 +214,11 @@ TEST_CASE("single_such_that_clause") {
             ans_vector_parent_if_first_non_starred));
 
         REQUIRE(verify_stmt_vector(
-            executor.get_all_stmts_parent(stmt_type::STATEMENT, arg_pos::SECOND_ARG, 9, true),
+            executor.get_all_stmts_parent_ref(stmt_type::STATEMENT, arg_pos::SECOND_ARG, 9, true),
             ans_vector_parent_stmt_second_9_starred));
 
         REQUIRE(verify_stmt_vector(
-            executor.get_all_stmts_parent(stmt_type::WHILE, arg_pos::FIRST_ARG, stmt_type::STATEMENT, false),
+            executor.get_all_stmts_parent_type(stmt_type::WHILE, arg_pos::FIRST_ARG, stmt_type::STATEMENT, false),
             ans_vector_parent_while_first_stmt_non_starred));
     }
 
@@ -262,11 +262,11 @@ TEST_CASE("single_such_that_clause") {
         //     ans_vector_var_modifies_proc_main));
         
         REQUIRE(verify_var_vector(
-            executor.get_all_variables_modifies(5),
+            executor.get_all_variables_modifies_ref(5),
             ans_vector_var_modifies_stmt_5));
         
         REQUIRE(verify_var_vector(
-            executor.get_all_variables_modifies(stmt_type::WHILE),
+            executor.get_all_variables_modifies_type(stmt_type::WHILE),
             ans_vector_var_modifies_while));
 
     }
@@ -309,11 +309,11 @@ TEST_CASE("single_such_that_clause") {
         //     ans_vector_var_uses_proc_main));
         
         REQUIRE(verify_var_vector(
-            executor.get_all_variables_uses(5),
+            executor.get_all_variables_uses_ref(5),
             ans_vector_var_uses_stmt_5));
         
         REQUIRE(verify_var_vector(
-            executor.get_all_variables_uses(stmt_type::WHILE),
+            executor.get_all_variables_uses_type(stmt_type::WHILE),
             ans_vector_var_uses_while));
 
     }

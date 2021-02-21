@@ -1,0 +1,18 @@
+procedure main {
+    read a;
+    print b;
+    while (x < y) {
+        x = x - 1;
+    }
+
+    if (z + y >= x) then {
+        w = y * 2;
+    } else {
+        x = 42;
+        y = 2;
+        while (v != 2) {
+            v = v - 1;
+        }
+      }
+    print x;
+}
