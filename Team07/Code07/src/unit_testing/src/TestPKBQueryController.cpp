@@ -205,15 +205,21 @@ TEST_CASE("One") {
 
     SECTION("check_satisfies_pattern") {
         assign_ref a = 4;
-        pattern p1 = {"v", "a % b"};
-        pattern p2 = {"v", "_a % b"};
-        pattern p3 = {"v", "a % b_"};
-        pattern p4 = {"v", "_a % b_"};
-        pattern p5 = {"v", "b"};
-        pattern p6 = {"v", "a"};
-        pattern p7 = {"v", "_a + c_"};
+        pattern p1 = {"temp", "a % b"};
+        pattern p2 = {"temp", "_a % b"};
+        pattern p3 = {"temp", "a % b_"};
+        pattern p4 = {"temp", "_a % b_"};
+        pattern p5 = {"temp", "b"};
+        pattern p6 = {"temp", "a"};
+        pattern p7 = {"temp", "_a + c_"};
         pattern p8 = {"temp", "_temp_"};
         pattern p9 = {"temp", "_"};
+        pattern p10 = {"not_modified_var", "a % b"};
+        pattern p11 = {"v", "_a % b"};
+        pattern p12 = {"v", "a % b_"};
+        pattern p13 = {"v", "_a % b_"};
+        pattern p14 = {"v", "a"};
+        pattern p15 = {"v", "_a + c_"};
         REQUIRE(pkbQueryController.satisfiesPattern(a, p1) == true);
         REQUIRE(pkbQueryController.satisfiesPattern(a, p2) == true);
         REQUIRE(pkbQueryController.satisfiesPattern(a, p3) == true);
@@ -223,6 +229,12 @@ TEST_CASE("One") {
         REQUIRE(pkbQueryController.satisfiesPattern(a, p7) == false);
         REQUIRE(pkbQueryController.satisfiesPattern(a, p8) == false);
         REQUIRE(pkbQueryController.satisfiesPattern(a, p9) == true);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p10) == false);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p11) == false);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p12) == false);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p13) == false);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p14) == false);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p10) == false);
     }
     // implement the rest in iteration/v1.3
 
