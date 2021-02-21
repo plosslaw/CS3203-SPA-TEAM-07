@@ -114,7 +114,7 @@ std::string expr_spec(State &state) {
     std::string any_val_2 = wildcard(state);
     whitespace(state);
 
-    return any_val_1 + dbl_quotes_1 + value + dbl_quotes_2 + any_val_2;
+    return any_val_1 + value + any_val_2;
   } catch (ParseException &e) {
     state.assign(so);
     try {

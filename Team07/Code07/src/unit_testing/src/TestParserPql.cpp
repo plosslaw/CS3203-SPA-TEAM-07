@@ -526,7 +526,7 @@ TEST_CASE("one pattern syn_assign, ent_ref and expr_spec ") {
     expectedQueryMap.addItem(
         ClauseType::PATTERN,
         PayLoad(TRIPLE, SYN_ASSIGN,
-                std::vector<std::string>{"a", "s", "_\"var\"_"}));
+                std::vector<std::string>{"a", "s", "_var_"}));
 
     QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
@@ -644,7 +644,7 @@ TEST_CASE("one such that and one pattern") {
     expectedQueryMap.addItem(
         ClauseType::PATTERN,
         PayLoad(TRIPLE, SYN_ASSIGN,
-                std::vector<std::string>{"a", "s", "_\"123\"_"}));
+                std::vector<std::string>{"a", "s", "_123_"}));
 
     QueryMap actualQueryMap = pql_query(query);
     REQUIRE(expectedQueryMap == actualQueryMap);
