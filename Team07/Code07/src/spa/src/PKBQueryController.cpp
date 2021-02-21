@@ -89,6 +89,7 @@ bool PKBQueryController::satisfiesPattern(assign_ref a, pattern p) {
     }
     assignment asmt = pkb.assignments.at(a);
     std::string text = asmt.rightValue;
+    substring = "(" + substring + ")";
     int m = text.length();
     int n = substring.length();
     int pointer_idx[n];
