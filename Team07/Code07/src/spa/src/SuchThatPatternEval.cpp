@@ -1,3 +1,4 @@
+#include <iostream>
 #include "SuchThatPatternEval.h"
 #include "SuchThatEval.h"
 #include "PatternEval.h"
@@ -201,7 +202,7 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
         
         if(such_that_type == Pair::FOLLOWS || such_that_type == Pair::FOLLOWST || such_that_type == Pair::PARENT || such_that_type == Pair::PARENTT) {
             // determine if assignment is in first or second arg of such that clause.
-        
+
             bool is_assign_first_arg_st = is_first_arg_common_such_that;
             pair<bool, bool> arg_pairs(false,false);
             vector<string> such_that_result;
