@@ -26,6 +26,9 @@ bool ResponseRenderer::compare_int_strings(string s1, string s2) {
     if (s1.size() != s2.size()) {
         return s1.size() < s2.size();
     }
+    if (s1.size() <= 20) {
+        return stol(s1) < stol(s2);
+    }
     int a, b;
     for (int i = 0; i < s1.size(); i++) {
         a = stoi(s1.substr(i,1));
