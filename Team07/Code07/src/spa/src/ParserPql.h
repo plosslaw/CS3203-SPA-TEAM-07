@@ -3,11 +3,16 @@
 #include <string.h>
 
 QueryMap pql_query(State &state);
-QueryMap pql_validate(QueryMap query);
 std::vector<PayLoad> declaration_cl(State &state);
 std::vector<PayLoad> select_cl(State &state);
 PayLoad suchthat_cl(State &state);
 PayLoad pattern_cl(State &state);
+
+QueryMap pql_validate(QueryMap query);
+bool is_declaration_clause_valid(QueryMap query);
+bool is_select_clause_valid(QueryMap query);
+bool is_suchthat_clause_valid(QueryMap query);
+bool is_pattern_clause_valid(QueryMap query);
 
 /*
 // low level abstractions

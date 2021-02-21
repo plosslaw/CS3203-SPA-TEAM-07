@@ -1040,13 +1040,268 @@ TEST_CASE("Parse PQL with declaration, select, such that and pattern clause") {
   }
 }
 
-TEST_CASE("Validate declaration clause") {}
-TEST_CASE("Validate select clause") {}
-TEST_CASE("Validate such that clause") {}
-TEST_CASE("Validate pattern clause") {}
-TEST_CASE("Validate declaration and select clause") {}
-TEST_CASE("Validate declaration and such that clause") {}
-TEST_CASE("Validate declaration and pattern clause") {}
-TEST_CASE("Validate declaration, select and such that clause") {}
-TEST_CASE("Validate declaration, select and pattern clause") {}
-TEST_CASE("Validate declaration, select, such that and pattern clause") {}
+TEST_CASE("Validate declaration clause") {
+  SECTION("Passes unique synonyms") {
+    // stmt s1 s2; while w1, w2
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s1"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s2"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::WHILE, std::vector<std::string>{"w1"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::WHILE, std::vector<std::string>{"w2"}));
+
+    REQUIRE(is_declaration_clause_valid(query_map));
+  }
+
+  SECTION("Fails duplicate synonyms in single entity declaration") {
+    // stmt s1 s1;
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s1"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s1"}));
+
+    REQUIRE_FALSE(is_declaration_clause_valid(query_map));
+  }
+
+  SECTION("Fails duplicate synonyms in multiple entity declaration") {
+    // stmt s1; while s1
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s1"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::WHILE, std::vector<std::string>{"s1"}));
+
+    REQUIRE_FALSE(is_declaration_clause_valid(query_map));
+  }
+}
+
+TEST_CASE("Validate select clause") {
+  SECTION("Passes synonym declared") {
+    // stmt s; Select s
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"s"},
+                                                  std::vector<bool>{true}));
+
+    REQUIRE(is_select_clause_valid(query_map));
+  }
+
+  SECTION("Fails synonym undeclared") {
+    // stmt w; Select s
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"w"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"s"},
+                                                  std::vector<bool>{true}));
+
+    REQUIRE_FALSE(is_select_clause_valid(query_map));
+  }
+
+  SECTION("Fails no synonym selected") {
+    // stmt w; Select
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"w"}));
+
+    REQUIRE_FALSE(is_select_clause_valid(query_map));
+  }
+}
+
+TEST_CASE("Validate such that clause") {
+  SECTION("Passes left synonym declared") {
+    // stmt s; Select s such that Parent(s, _)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"s"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, PARENT, std::vector<std::string>{"s", "_"},
+                              std::vector<bool>{true, false}));
+
+    REQUIRE(is_suchthat_clause_valid(query_map));
+  }
+
+  SECTION("Passes right synonym declared") {
+    // stmt s; Select s such that Parent(_, s)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"s"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, PARENT, std::vector<std::string>{"_", "s"},
+                              std::vector<bool>{false, true}));
+
+    REQUIRE(is_suchthat_clause_valid(query_map));
+  }
+
+  SECTION("Passes both synonyms declared") {
+    // stmt s1, s2; Select s1 such that Parent(_, s)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s1"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s2"}));
+    query_map.addItem(ClauseType::SELECT,
+                      PayLoad(SINGLE, Single::SYNONYM,
+                              std::vector<std::string>{"s1"},
+                              std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, PARENT,
+                              std::vector<std::string>{"s1", "s2"},
+                              std::vector<bool>{true, true}));
+
+    REQUIRE(is_suchthat_clause_valid(query_map));
+  }
+
+  SECTION("Fails synonym undeclared") {
+    // stmt s1; Select s1 such that Parent(s1, s2)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s1"}));
+    query_map.addItem(ClauseType::SELECT,
+                      PayLoad(SINGLE, Single::SYNONYM,
+                              std::vector<std::string>{"s1"},
+                              std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, PARENT,
+                              std::vector<std::string>{"s1", "s2"},
+                              std::vector<bool>{true, true}));
+
+    REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
+  }
+
+  SECTION("Fails synonyms undeclared") {
+    // stmt s; Select s such that Parent(s1, s2)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"s"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, PARENT,
+                              std::vector<std::string>{"s1", "s2"},
+                              std::vector<bool>{true, true}));
+
+    REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
+  }
+}
+
+TEST_CASE("Validate pattern clause") {
+  SECTION("Passes synonyms declared") {
+    // assign a; stmt s; Select s pattern a(s, _)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"s"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::PATTERN,
+                      PayLoad(TRIPLE, SYN_ASSIGN,
+                              std::vector<std::string>{"a", "s", "_"},
+                              std::vector<bool>{true, true, false}));
+
+    REQUIRE(is_pattern_clause_valid(query_map));
+  }
+  
+  SECTION("Passes syn-assign is type assign") {
+    // assign a; stmt s; Select s pattern a(_, _)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"s"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::PATTERN,
+                      PayLoad(TRIPLE, SYN_ASSIGN,
+                              std::vector<std::string>{"a", "_", "_"},
+                              std::vector<bool>{true, false, false}));
+
+    REQUIRE(is_pattern_clause_valid(query_map));
+  }
+
+  SECTION("Fails synonym undeclared") {
+    // assign a; stmt s1; Select s pattern a(s, _)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s1"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"s"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::PATTERN,
+                      PayLoad(TRIPLE, SYN_ASSIGN,
+                              std::vector<std::string>{"a", "s", "_"},
+                              std::vector<bool>{true, true, false}));
+
+    REQUIRE_FALSE(is_pattern_clause_valid(query_map));
+  }
+  SECTION("Fails syn-assign is not type assign") {
+    // assign s; stmt a; Select s pattern a(s, _)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"s"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"a"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"s"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::PATTERN,
+                      PayLoad(TRIPLE, SYN_ASSIGN,
+                              std::vector<std::string>{"a", "s", "_"},
+                              std::vector<bool>{true, true, false}));
+
+    REQUIRE_FALSE(is_pattern_clause_valid(query_map));
+  }
+}
+
+TEST_CASE("Validate empty clause") {
+  SECTION("Fails no query parsed") {
+    QueryMap input_query_map;
+    QueryMap expected_query_map;
+
+    REQUIRE_THROWS(pql_validate(input_query_map),
+                   throw prettyPrintValidation("Empty query."));
+  }
+}
