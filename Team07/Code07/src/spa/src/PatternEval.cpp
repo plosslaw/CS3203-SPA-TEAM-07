@@ -18,6 +18,12 @@ vector<string> PatternEval::zero_such_that_one_pattern(PayLoad pattern_pay_load,
     string third_arg = pattern_pay_load.getValue()[2]; //sub expression
     pair<bool, bool> bool_pairs_args = PatternEval::check_if_args_are_variable(first_arg, second_arg);
     //first arg has to be variable by convention.
+    if(!bool_pairs_args.second) {
+        if(PatternEval::is_pattern_variable_is_constant(second_arg)) {
+            second_arg.erase(second_arg.begin());
+            second_arg.pop_back();
+    }
+    }
     
     pattern p; p.rvalue = third_arg;
     if (bool_pairs_args.second) {
@@ -50,7 +56,7 @@ vector<string> PatternEval::zero_such_that_one_pattern(PayLoad pattern_pay_load,
 pair<bool,bool> PatternEval::check_if_args_are_variable(std::string first_arg, std::string second_arg) {
     bool is_first_arg_variable = false;
     bool is_second_arg_variable = false;
-
+    
     //check if string is in the storedeclaration.
     if(storeDeclaration.find(first_arg) != storeDeclaration.end()) {
         is_first_arg_variable = true;
@@ -100,4 +106,8 @@ vector<string> PatternEval::convert_lst_string_to_int(vector<int> lstA) {
         output.push_back(to_string(i));
     }
     return output;
+}
+
+bool PatternEval::is_pattern_variable_is_constant(std::string pattern_variable_value) {
+    return(pattern_variable_value.at(0) == '"' && pattern_variable_value.at(pattern_variable_value.size()-1) == '"');
 }

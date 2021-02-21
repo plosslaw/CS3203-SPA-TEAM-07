@@ -90,8 +90,9 @@ PayLoad ent_ref(State &state) {
       std::string dbl_quotes_2 = double_quotes(state);
       whitespace(state);
 
-      return PayLoad(SINGLE, Single::DOUBLE_QUOTE_IDENT,
-                     std::vector<std::string>{val});
+      return PayLoad(
+          SINGLE, Single::DOUBLE_QUOTE_IDENT,
+          std::vector<std::string>{dbl_quotes_1 + val + dbl_quotes_2});
     } catch (ParseException &e) {
       state.assign(so);
       try {
@@ -776,6 +777,34 @@ bool is_suchthat_clause_valid(QueryMap table) {
   return true;
 }
 
+bool is_value_variable(std::vector<PayLoad> declarations, PayLoad clause) {
+  std::string val_2 = clause.getValue()[1];
+  for (auto it = declarations.begin(); it != declarations.end(); ++it) {
+    LoadType decl_type = (*it).getType();
+    std::string decl_value = (*it).getValue()[0];
+
+    if (decl_type.single == Single::VARIABLE && decl_value == val_2) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool is_synonym(PayLoad clause, int index) { return clause.get_flag()[index]; }
+
+bool is_variable(PayLoad clause, std::vector<PayLoad> declarations) {
+  std::string val_2 = clause.getValue()[1];
+  for (auto it = declarations.begin(); it != declarations.end(); ++it) {
+    LoadType decl_type = (*it).getType();
+    std::string decl_value = (*it).getValue()[0];
+
+    if (decl_type.single == Single::VARIABLE && decl_value == val_2) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // synonyms declared
 // syn_assign synonym is of assign design entity
 bool is_pattern_clause_valid(QueryMap table) {
@@ -800,6 +829,11 @@ bool is_pattern_clause_valid(QueryMap table) {
       if (!is_payload_in(declarations, target)) {
         return false;
       }
+    }
+
+    if (is_synonym(current_clause, 1) &&
+        !is_variable(current_clause, declarations)) {
+      return false;
     }
   }
 

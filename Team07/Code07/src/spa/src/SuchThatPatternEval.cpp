@@ -41,7 +41,7 @@ vector<string> SuchThatPatternEval::zero_common_synonym(PayLoad such_that_pay_lo
     string such_that_second_arg = such_that_pay_load.getValue()[1];
     string pattern_first_arg = pattern_pay_load.getValue()[0];
     string pattern_second_arg = pattern_pay_load.getValue()[1];
-
+    
     SuchThatEval such_that_eval(storeDeclaration, mapStorage,executor);
     PatternEval pattern_eval(storeDeclaration, mapStorage,executor);
     pair<bool, bool> is_select_val_in_suchthat(false, false);  
@@ -197,9 +197,10 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
     } 
     else {
         //common type = ASSIGNMENT
-
+        
         if(such_that_type == Pair::FOLLOWS || such_that_type == Pair::FOLLOWST || such_that_type == Pair::PARENT || such_that_type == Pair::PARENTT) {
             // determine if assignment is in first or second arg of such that clause.
+
             bool is_assign_first_arg_st = is_first_arg_common_such_that;
             pair<bool, bool> arg_pairs(false,false);
             vector<string> such_that_result;
@@ -212,10 +213,13 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                 arg_pairs.second = true;
                 such_that_result = such_that_eval.one_such_that_zero_pattern(such_that_pay_load, such_that_second_arg, Single::ASSIGN,arg_pairs);
             }
+                
             arg_pairs.first = true;
             arg_pairs.second = false;
             vector<string> pattern_result = pattern_eval.zero_such_that_one_pattern(pattern_pay_load, pattern_first_arg, Single::ASSIGN,arg_pairs);
+
             vector<string> inner_join_lst = SuchThatPatternEval::inner_join(such_that_result, pattern_result);
+
             if(inner_join_lst.empty()) {
                 return vector<string>{};
             }
@@ -232,10 +236,11 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                         vector<stmt_ref> result;
                         if (is_assign_first_arg_st) {
                             stmt_type second_arg_stmt_type = SuchThatPatternEval::convert_single_to_stmt_type(such_that_second_type);
-                            result = executor.get_all_stmts_follows(second_arg_stmt_type,arg_pos::SECOND_ARG, stoi(i), IS_STAR);
+                            result = executor.get_all_stmts_follows_ref(second_arg_stmt_type,arg_pos::SECOND_ARG, stoi(i), IS_STAR);
                         } else {
+                            
                             stmt_type first_arg_stmt_type = SuchThatPatternEval::convert_single_to_stmt_type(such_that_first_type);
-                            result = executor.get_all_stmts_follows(first_arg_stmt_type,arg_pos::FIRST_ARG, stoi(i), IS_STAR);           
+                            result = executor.get_all_stmts_follows_ref(first_arg_stmt_type,arg_pos::FIRST_ARG, stoi(i), IS_STAR);           
                         }
                         for(auto j : result) {
                             bool is_present = SuchThatPatternEval::is_element_inside_vectorA_int(j, temp);
@@ -252,10 +257,10 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                         vector<stmt_ref> result;
                         if (is_assign_first_arg_st) {
                             stmt_type such_arg_stmt_type = SuchThatPatternEval::convert_single_to_stmt_type(such_that_second_type);
-                            result = executor.get_all_stmts_parent(such_arg_stmt_type,arg_pos::SECOND_ARG, stoi(i), IS_STAR);
+                            result = executor.get_all_stmts_parent_ref(such_arg_stmt_type,arg_pos::SECOND_ARG, stoi(i), IS_STAR);
                         } else {
                             stmt_type first_arg_stmt_type = SuchThatPatternEval::convert_single_to_stmt_type(such_that_first_type);
-                            result = executor.get_all_stmts_parent(first_arg_stmt_type,arg_pos::FIRST_ARG, stoi(i), IS_STAR);           
+                            result = executor.get_all_stmts_parent_ref(first_arg_stmt_type,arg_pos::FIRST_ARG, stoi(i), IS_STAR);           
                         }
                         for(auto j : result) {
                             bool is_present = SuchThatPatternEval::is_element_inside_vectorA_int(j, temp);
@@ -282,7 +287,8 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                 return result;
             } else {
                 //select appear neither in such that or pattern
-                return vector<string>{};                
+               
+                return inner_join_lst;                
             }
         } else {
             //such that uses and modifies
@@ -308,9 +314,9 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                 for(auto item : inner_join_lst) {
                     vector<var_ref> result2;
                     if (such_that_type == Pair::USES) {
-                        result2 =  executor.get_all_variables_uses(stoi(item));
+                        result2 =  executor.get_all_variables_uses_ref(stoi(item));
                     } else {
-                        result2 =  executor.get_all_variables_modifies(stoi(item));
+                        result2 =  executor.get_all_variables_modifies_ref(stoi(item));
                     }
                     for (auto item2 : result2) {
                         bool is_present = SuchThatPatternEval::is_element_inside_vectorA(item2, result);
@@ -335,7 +341,7 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                 return result;
             } else {
                 // select value appears neither in such that or pattern
-                return vector<string>{};
+                return inner_join_lst;
             }
         }
     }        
@@ -509,3 +515,6 @@ vector<string> SuchThatPatternEval::convert_lst_string_to_int(vector<int> lstA) 
     return output;
 }
 
+bool SuchThatPatternEval::is_pattern_variable_is_constant(std::string pattern_variable_value) {
+    return(pattern_variable_value.at(0) == '"' && pattern_variable_value.at(pattern_variable_value.size()-1) == '"');
+}

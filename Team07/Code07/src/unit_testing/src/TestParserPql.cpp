@@ -678,7 +678,7 @@ TEST_CASE("Parse such that Modifies clause") {
 
   SECTION("synonym and \"ident\"") {
     std::string query = "such that Modifies(s1, \"x\")";
-    PayLoad expected_clause(PAIR, MODIFIES, std::vector<std::string>{"s1", "x"},
+    PayLoad expected_clause(PAIR, MODIFIES, std::vector<std::string>{"s1", "\"x\""},
                             std::vector<bool>{true, false});
 
     State state(&query);
@@ -708,7 +708,7 @@ TEST_CASE("Parse such that Modifies clause") {
   SECTION("wildcard and \"ident\"") {
     std::string query = "such that Modifies(_, \"x1\")";
     PayLoad expected_clause(PAIR, MODIFIES,
-                            std::vector<std::string>{"_", "x1"});
+                            std::vector<std::string>{"_", "\"x1\""});
 
     State state(&query);
     PayLoad actual_clause = suchthat_cl(state);
@@ -736,7 +736,7 @@ TEST_CASE("Parse such that Modifies clause") {
 
   SECTION("integer and \"ident\"") {
     std::string query = "such that Modifies(1, \"x\")";
-    PayLoad expected_clause(PAIR, MODIFIES, std::vector<std::string>{"1", "x"});
+    PayLoad expected_clause(PAIR, MODIFIES, std::vector<std::string>{"1", "\"x\""});
 
     State state(&query);
     PayLoad actual_clause = suchthat_cl(state);
@@ -767,7 +767,7 @@ TEST_CASE("Parse such that Uses clause") {
 
   SECTION("synonym and \"ident\"") {
     std::string query = "such that Uses(s1, \"x\")";
-    PayLoad expected_clause(PAIR, USES, std::vector<std::string>{"s1", "x"},
+    PayLoad expected_clause(PAIR, USES, std::vector<std::string>{"s1", "\"x\""},
                             std::vector<bool>{true, false});
 
     State state(&query);
@@ -796,7 +796,7 @@ TEST_CASE("Parse such that Uses clause") {
 
   SECTION("wildcard and \"ident\"") {
     std::string query = "such that Uses(_, \"x1\")";
-    PayLoad expected_clause(PAIR, USES, std::vector<std::string>{"_", "x1"});
+    PayLoad expected_clause(PAIR, USES, std::vector<std::string>{"_", "\"x1\""});
 
     State state(&query);
     PayLoad actual_clause = suchthat_cl(state);
@@ -824,7 +824,7 @@ TEST_CASE("Parse such that Uses clause") {
 
   SECTION("integer and \"ident\"") {
     std::string query = "such that Uses(1, \"x\")";
-    PayLoad expected_clause(PAIR, USES, std::vector<std::string>{"1", "x"});
+    PayLoad expected_clause(PAIR, USES, std::vector<std::string>{"1", "\"x\""});
 
     State state(&query);
     PayLoad actual_clause = suchthat_cl(state);
@@ -880,7 +880,7 @@ TEST_CASE("Parse pattern syn-assign clause") {
   SECTION("\"ident\" and _factor_") {
     std::string query = "pattern a(\"s\", _\"var\"_)";
     PayLoad expected_clause(TRIPLE, SYN_ASSIGN,
-                            std::vector<std::string>{"a", "s", "_var_"},
+                            std::vector<std::string>{"a", "\"s\"", "_var_"},
                             std::vector<bool>{true, false, false});
 
     State state(&query);
@@ -891,7 +891,7 @@ TEST_CASE("Parse pattern syn-assign clause") {
   SECTION("\"ident\" and _") {
     std::string query = "pattern a(\"s\", _)";
     PayLoad expected_clause(TRIPLE, SYN_ASSIGN,
-                            std::vector<std::string>{"a", "s", "_"},
+                            std::vector<std::string>{"a", "\"s\"", "_"},
                             std::vector<bool>{true, false, false});
 
     State state(&query);
@@ -1251,20 +1251,20 @@ TEST_CASE("Validate such that clause") {
 
 TEST_CASE("Validate pattern clause") {
   SECTION("Passes synonyms declared") {
-    // assign a; stmt s; Select s pattern a(s, _)
+    // assign a; variable v; Select s pattern a(v, _)
     QueryMap query_map;
     query_map.addItem(
         ClauseType::DECLARATION,
         PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
     query_map.addItem(
         ClauseType::DECLARATION,
-        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+        PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"v"}));
     query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
-                                                  std::vector<std::string>{"s"},
+                                                  std::vector<std::string>{"v"},
                                                   std::vector<bool>{true}));
     query_map.addItem(ClauseType::PATTERN,
                       PayLoad(TRIPLE, SYN_ASSIGN,
-                              std::vector<std::string>{"a", "s", "_"},
+                              std::vector<std::string>{"a", "v", "_"},
                               std::vector<bool>{true, true, false}));
 
     REQUIRE(is_pattern_clause_valid(query_map));
@@ -1309,15 +1309,36 @@ TEST_CASE("Validate pattern clause") {
 
     REQUIRE_FALSE(is_pattern_clause_valid(query_map));
   }
+
   SECTION("Fails syn-assign is not type assign") {
-    // assign s; stmt a; Select s pattern a(s, _)
+    // assign s; variable a; Select s pattern a(s, _)
     QueryMap query_map;
     query_map.addItem(
         ClauseType::DECLARATION,
         PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"s"}));
     query_map.addItem(
         ClauseType::DECLARATION,
-        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"a"}));
+        PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"a"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"s"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::PATTERN,
+                      PayLoad(TRIPLE, SYN_ASSIGN,
+                              std::vector<std::string>{"a", "s", "_"},
+                              std::vector<bool>{true, true, false}));
+
+    REQUIRE_FALSE(is_pattern_clause_valid(query_map));
+  }
+
+  SECTION("Fails ent ref is not type variable") {
+    // assign a; stmt s; Select s pattern a(s, _)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::ASSIGN, std::vector<std::string>{"a"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
     query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
                                                   std::vector<std::string>{"s"},
                                                   std::vector<bool>{true}));
