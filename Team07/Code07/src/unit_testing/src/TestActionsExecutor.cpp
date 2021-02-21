@@ -141,7 +141,7 @@ TEST_CASE("single_such_that_clause") {
 
     // TODO(plosslaw): add more test cases
     // answer vectors - follows
-    vector<stmt_ref> ans_vector_follows_stmt_first_starred {1,2,3,5,7,8,9};
+    vector<stmt_ref> ans_vector_follows_stmt_first_starred {1,2,3,5,7,8};
     vector<stmt_ref> ans_vector_follows_assign_second_non_starred {8};
     vector<stmt_ref> ans_vector_follows_stmt_second_3_starred {5,11};
     vector<stmt_ref> ans_vector_follows_while_first_stmt_non_starred {3};
@@ -181,15 +181,15 @@ TEST_CASE("single_such_that_clause") {
 
 
     SECTION("follows") {
-        // REQUIRE(verify_stmt_vector(
-        //     executor.get_all_stmts_follows(stmt_type::STATEMENT, arg_pos::FIRST_ARG, true),
-        //     ans_vector_follows_stmt_first_starred));
+        REQUIRE(verify_stmt_vector(
+            executor.get_all_stmts_follows(stmt_type::STATEMENT, arg_pos::FIRST_ARG, true),
+            ans_vector_follows_stmt_first_starred));
 
-        REQUIRE(executor.is_follows(9, 11, false)==false);
+        // REQUIRE(executor.is_follows(9, 10, false)==false);
 
-        REQUIRE(
-            executor.get_all_stmts_follows(stmt_type::STATEMENT, arg_pos::FIRST_ARG, true) == 
-            ans_vector_follows_stmt_first_starred);
+        // REQUIRE(
+        //     executor.get_all_stmts_follows(stmt_type::STATEMENT, arg_pos::FIRST_ARG, true) == 
+        //     ans_vector_follows_stmt_first_starred);
 
         REQUIRE(verify_stmt_vector(
             executor.get_all_stmts_follows(stmt_type::ASSIGN, arg_pos::SECOND_ARG, false),
@@ -205,11 +205,6 @@ TEST_CASE("single_such_that_clause") {
     }
 
     SECTION("parent") {
-
-        REQUIRE(
-            executor.get_all_stmts_parent(stmt_type::STATEMENT, arg_pos::SECOND_ARG, stmt_type::IF, false) == 
-            vector<stmt_ref>{8,7,6});
-
         REQUIRE(verify_stmt_vector(
             executor.get_all_stmts_parent(stmt_type::STATEMENT, arg_pos::FIRST_ARG, true),
             ans_vector_parent_stmt_first_starred));
