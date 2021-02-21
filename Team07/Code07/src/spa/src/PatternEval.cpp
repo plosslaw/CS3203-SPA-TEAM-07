@@ -18,6 +18,11 @@ vector<string> PatternEval::zero_such_that_one_pattern(PayLoad pattern_pay_load,
     string third_arg = pattern_pay_load.getValue()[2]; //sub expression
     pair<bool, bool> bool_pairs_args = PatternEval::check_if_args_are_variable(first_arg, second_arg);
     //first arg has to be variable by convention.
+    if(PatternEval::is_pattern_variable_is_constant(second_arg)) {
+        bool_pairs_args.second = false;
+        second_arg.erase(second_arg.begin());
+        second_arg.pop_back();
+    }
     
     pattern p; p.rvalue = third_arg;
     if (bool_pairs_args.second) {
@@ -100,4 +105,8 @@ vector<string> PatternEval::convert_lst_string_to_int(vector<int> lstA) {
         output.push_back(to_string(i));
     }
     return output;
+}
+
+bool PatternEval::is_pattern_variable_is_constant(std::string pattern_variable_value) {
+    return(pattern_variable_value.at(0) == '"' && pattern_variable_value.at(pattern_variable_value.size()-1) == '"');
 }
