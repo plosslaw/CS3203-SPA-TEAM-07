@@ -198,9 +198,10 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
     } 
     else {
         //common type = ASSIGNMENT
-
+        
         if(such_that_type == Pair::FOLLOWS || such_that_type == Pair::FOLLOWST || such_that_type == Pair::PARENT || such_that_type == Pair::PARENTT) {
             // determine if assignment is in first or second arg of such that clause.
+        
             bool is_assign_first_arg_st = is_first_arg_common_such_that;
             pair<bool, bool> arg_pairs(false,false);
             vector<string> such_that_result;
@@ -213,10 +214,13 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                 arg_pairs.second = true;
                 such_that_result = such_that_eval.one_such_that_zero_pattern(such_that_pay_load, such_that_second_arg, Single::ASSIGN,arg_pairs);
             }
+                
             arg_pairs.first = true;
             arg_pairs.second = false;
             vector<string> pattern_result = pattern_eval.zero_such_that_one_pattern(pattern_pay_load, pattern_first_arg, Single::ASSIGN,arg_pairs);
+
             vector<string> inner_join_lst = SuchThatPatternEval::inner_join(such_that_result, pattern_result);
+
             if(inner_join_lst.empty()) {
                 return vector<string>{};
             }
@@ -235,6 +239,7 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                             stmt_type second_arg_stmt_type = SuchThatPatternEval::convert_single_to_stmt_type(such_that_second_type);
                             result = executor.get_all_stmts_follows_ref(second_arg_stmt_type,arg_pos::SECOND_ARG, stoi(i), IS_STAR);
                         } else {
+                            
                             stmt_type first_arg_stmt_type = SuchThatPatternEval::convert_single_to_stmt_type(such_that_first_type);
                             result = executor.get_all_stmts_follows_ref(first_arg_stmt_type,arg_pos::FIRST_ARG, stoi(i), IS_STAR);           
                         }
@@ -283,7 +288,8 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                 return result;
             } else {
                 //select appear neither in such that or pattern
-                return vector<string>{};                
+               
+                return inner_join_lst;                
             }
         } else {
             //such that uses and modifies
@@ -336,7 +342,7 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                 return result;
             } else {
                 // select value appears neither in such that or pattern
-                return vector<string>{};
+                return inner_join_lst;
             }
         }
     }        
