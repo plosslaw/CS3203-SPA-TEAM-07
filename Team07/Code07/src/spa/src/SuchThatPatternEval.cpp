@@ -61,16 +61,16 @@ vector<string> SuchThatPatternEval::zero_common_synonym(PayLoad such_that_pay_lo
             is_select_val_in_pattern.second = true;
         }
     vector<string> pattern_lst =  pattern_eval.zero_such_that_one_pattern(pattern_pay_load, select_value, select_type, is_select_val_in_pattern);
-    if(is_select_val_in_suchthat.first || is_select_val_in_suchthat.second) {
+    
+
+    if(such_that_lst.empty() || pattern_lst.empty()) {
+        return vector<string>();
+    } else if(is_select_val_in_suchthat.first || is_select_val_in_suchthat.second) {
         return such_that_lst;
     } else if (is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
         return pattern_lst;
     } else {
-        if(such_that_lst.empty() || pattern_lst.empty()) {
-            return vector<string>();
-        } else {
-            return (mapStorage[select_type])[select_value];
-        }
+        return (mapStorage[select_type])[select_value];
     }
 }
 
