@@ -1,4 +1,3 @@
-#include <iostream>
 #include "SuchThatPatternEval.h"
 #include "SuchThatEval.h"
 #include "PatternEval.h"
