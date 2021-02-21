@@ -25,7 +25,11 @@ vector<string> SuchThatPatternEval::such_that_pattern_eval(PayLoad such_that_pay
         for(int pattern_value = 0; pattern_value < pattern_values.size()-1; pattern_value++) {
             if(such_that_values[such_that_value] == pattern_values[pattern_value]) {
                 if(!SuchThatPatternEval::is_pattern_variable_is_constant(such_that_values[such_that_value])) {
+                    if(such_that_values[such_that_value] != "_" && pattern_values[pattern_value] !="_")
+                    {
                     common_link++;
+
+                    }
                 }
             }
         }
