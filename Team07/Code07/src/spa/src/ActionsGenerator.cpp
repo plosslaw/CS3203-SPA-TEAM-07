@@ -154,7 +154,8 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
 
     //SELECT
     if(selectList.empty()) {
-        return vector<string>{"Invalid"};
+        // return vector<string>{"Invalid"};
+        throw "Missing SELECT payload.";
     }
     PayLoad select_payload = selectList.at(0);
     
@@ -265,7 +266,7 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
     return default_solution;
 }
 
-   
+
 // utilities
 
 pair<bool,bool> ActionsGenerator::check_if_args_are_variable(std::string first_arg, std::string second_arg) {
