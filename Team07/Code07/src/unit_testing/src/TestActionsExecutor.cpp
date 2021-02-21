@@ -153,10 +153,10 @@ TEST_CASE("single_such_that_clause") {
     vector<stmt_ref> ans_vector_parent_while_first_stmt_non_starred {3,9};
 
     // answer vectors - modifies
-    vector<stmt_ref> ans_vector_modifies_stmt {1,4,6,7,8,10};
+    vector<stmt_ref> ans_vector_modifies_stmt {1,3,4,5,6,7,8,9,10};
     vector<stmt_ref> ans_vector_modifies_assign {4,6,7,8,10};
     vector<stmt_ref> ans_vector_modifies_while {3,9};
-    vector<stmt_ref> ans_vector_modifies_stmt_x {3,7};
+    vector<stmt_ref> ans_vector_modifies_stmt_x {3,4,5,7};
     // vector<proc_ref> ans_vector_proc_modifies {"main"};
     // vector<proc_ref> ans_vector_proc_modifies_x {"main"};
     // vector<proc_ref> ans_vector_proc_modifies_j {};
@@ -206,7 +206,9 @@ TEST_CASE("single_such_that_clause") {
 
     SECTION("parent") {
 
-        REQUIRE(executor.get_all_stmts_parent(stmt_type::STATEMENT, arg_pos::SECOND_ARG, stmt_type::IF, false)==vector<stmt_ref>{});
+        REQUIRE(
+            executor.get_all_stmts_parent(stmt_type::STATEMENT, arg_pos::SECOND_ARG, stmt_type::IF, false) == 
+            vector<stmt_ref>{8,7,6});
 
         REQUIRE(verify_stmt_vector(
             executor.get_all_stmts_parent(stmt_type::STATEMENT, arg_pos::FIRST_ARG, true),
@@ -226,11 +228,11 @@ TEST_CASE("single_such_that_clause") {
     }
 
     SECTION("modifies") {
-        // REQUIRE(verify_stmt_vector(
-        //     executor.get_all_stmts_modifies(stmt_type::STATEMENT),
-        //     ans_vector_modifies_stmt));
+        // REQUIRE(executor.get_all_stmts_modifies(stmt_type::STATEMENT) == ans_vector_modifies_stmt);
 
-        REQUIRE(executor.get_all_stmts_modifies(stmt_type::STATEMENT) == ans_vector_modifies_stmt);
+        REQUIRE(verify_stmt_vector(
+            executor.get_all_stmts_modifies(stmt_type::STATEMENT),
+            ans_vector_modifies_stmt));
 
         REQUIRE(verify_stmt_vector(
             executor.get_all_stmts_modifies(stmt_type::ASSIGN),
@@ -387,8 +389,8 @@ TEST_CASE("single_pattern_clause") {
         //     ans_vector_var_y_times_2));
 
         pattern trial_pattern;
-        trial_pattern.lvalue = "x";
-        trial_pattern.rvalue = "y * 2";
+        trial_pattern.lvalue = "_";
+        trial_pattern.rvalue = "y*2";
         REQUIRE(executor.satisfies_pattern(6, trial_pattern) == true);
 
         REQUIRE(verify_var_vector(
