@@ -173,3 +173,28 @@ variable v; stmt s;
 Select v such that Uses(s, _)
 a, b, temp
 5000
+36 - select assignments with a pattern wildcard
+assign a;
+Select a pattern a(_, _)
+5, 6, 7
+5000
+37 - select all statements
+assign a; stmt s;
+Select s pattern a(_, _)
+1, 2, 3, 4, 5, 6, 7
+5000
+38 - select assigments with a pattern wildcard + var
+assign a;
+Select a pattern a(_, _"a"_)
+4
+5000
+39 - select assignments with pattern no wildcard
+assign a;
+Select a pattern a(_, "a")
+4
+5000
+40 - select assignments with wildcard + partial name of variable
+assign a;
+Select a pattern a(_, _"te"_)
+
+5000
