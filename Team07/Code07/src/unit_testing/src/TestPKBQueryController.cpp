@@ -159,7 +159,7 @@ TEST_CASE("One") {
     variables.insert(std::make_pair("temp", temp));
 
     // store constants
-    constants.insert(0);
+    constants.insert("0");
 
     //initialise pkb
     TNode root;
