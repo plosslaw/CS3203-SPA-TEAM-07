@@ -386,7 +386,7 @@ TEST_CASE("Select s1 follows(s1,s2" ) {
     PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
     PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"s1","s2"});
     vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
-    REQUIRE(output == vector<string>{"9", "8", "5", "7", "1", "2", "3"});
+    REQUIRE(output == vector<string>{"8", "5", "7", "1", "2", "3"});
 }
 TEST_CASE("Select s2 follows(s1,s2)" ) {
     PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s2"});
@@ -491,7 +491,7 @@ TEST_CASE("Select s2 parent(s1,s2)") {
     PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s2"});
     PayLoad st(PAIR, Pair::PARENT, std::vector<std::string>{"s1","s2"});
     vector<string> output = such_that_using_mock_ast_mock_storage(syn, st);    
-    REQUIRE(output == vector<string>{"10", "4", "8", "7", "6"});
+    REQUIRE(output == vector<string>{"10", "4", "9", "8", "7", "6"});
 }
 TEST_CASE("Select s3 parent(s1,s2)") {
     PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s3"});
