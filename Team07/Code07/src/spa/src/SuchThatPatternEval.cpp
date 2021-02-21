@@ -232,10 +232,10 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                         vector<stmt_ref> result;
                         if (is_assign_first_arg_st) {
                             stmt_type second_arg_stmt_type = SuchThatPatternEval::convert_single_to_stmt_type(such_that_second_type);
-                            result = executor.get_all_stmts_follows(second_arg_stmt_type,arg_pos::SECOND_ARG, stoi(i), IS_STAR);
+                            result = executor.get_all_stmts_follows_ref(second_arg_stmt_type,arg_pos::SECOND_ARG, stoi(i), IS_STAR);
                         } else {
                             stmt_type first_arg_stmt_type = SuchThatPatternEval::convert_single_to_stmt_type(such_that_first_type);
-                            result = executor.get_all_stmts_follows(first_arg_stmt_type,arg_pos::FIRST_ARG, stoi(i), IS_STAR);           
+                            result = executor.get_all_stmts_follows_ref(first_arg_stmt_type,arg_pos::FIRST_ARG, stoi(i), IS_STAR);           
                         }
                         for(auto j : result) {
                             bool is_present = SuchThatPatternEval::is_element_inside_vectorA_int(j, temp);
@@ -252,10 +252,10 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                         vector<stmt_ref> result;
                         if (is_assign_first_arg_st) {
                             stmt_type such_arg_stmt_type = SuchThatPatternEval::convert_single_to_stmt_type(such_that_second_type);
-                            result = executor.get_all_stmts_parent(such_arg_stmt_type,arg_pos::SECOND_ARG, stoi(i), IS_STAR);
+                            result = executor.get_all_stmts_parent_ref(such_arg_stmt_type,arg_pos::SECOND_ARG, stoi(i), IS_STAR);
                         } else {
                             stmt_type first_arg_stmt_type = SuchThatPatternEval::convert_single_to_stmt_type(such_that_first_type);
-                            result = executor.get_all_stmts_parent(first_arg_stmt_type,arg_pos::FIRST_ARG, stoi(i), IS_STAR);           
+                            result = executor.get_all_stmts_parent_ref(first_arg_stmt_type,arg_pos::FIRST_ARG, stoi(i), IS_STAR);           
                         }
                         for(auto j : result) {
                             bool is_present = SuchThatPatternEval::is_element_inside_vectorA_int(j, temp);
@@ -308,9 +308,9 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
                 for(auto item : inner_join_lst) {
                     vector<var_ref> result2;
                     if (such_that_type == Pair::USES) {
-                        result2 =  executor.get_all_variables_uses(stoi(item));
+                        result2 =  executor.get_all_variables_uses_ref(stoi(item));
                     } else {
-                        result2 =  executor.get_all_variables_modifies(stoi(item));
+                        result2 =  executor.get_all_variables_modifies_ref(stoi(item));
                     }
                     for (auto item2 : result2) {
                         bool is_present = SuchThatPatternEval::is_element_inside_vectorA(item2, result);

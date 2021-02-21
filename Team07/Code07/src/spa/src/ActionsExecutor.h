@@ -59,12 +59,12 @@ public:
     // Such That Clauses
 
     std::vector<stmt_ref> get_all_stmts_follows(stmt_type type, arg_pos pos, bool is_starred); // wildcard operation
-    std::vector<stmt_ref> get_all_stmts_follows(stmt_type type, arg_pos pos, stmt_ref other_stmt, bool is_starred);
-    std::vector<stmt_ref> get_all_stmts_follows(stmt_type type, arg_pos pos, stmt_type other_stmt_type, bool is_starred);
+    std::vector<stmt_ref> get_all_stmts_follows_ref(stmt_type type, arg_pos pos, stmt_ref other_stmt, bool is_starred);
+    std::vector<stmt_ref> get_all_stmts_follows_type(stmt_type type, arg_pos pos, stmt_type other_stmt_type, bool is_starred);
     
     std::vector<stmt_ref> get_all_stmts_parent(stmt_type type, arg_pos pos, bool is_starred); // wildcard operation
-    std::vector<stmt_ref> get_all_stmts_parent(stmt_type type, arg_pos pos, stmt_ref other_stmt, bool is_starred);
-    std::vector<stmt_ref> get_all_stmts_parent(stmt_type type, arg_pos pos, stmt_type other_stmt_type, bool is_starred);
+    std::vector<stmt_ref> get_all_stmts_parent_ref(stmt_type type, arg_pos pos, stmt_ref other_stmt, bool is_starred);
+    std::vector<stmt_ref> get_all_stmts_parent_type(stmt_type type, arg_pos pos, stmt_type other_stmt_type, bool is_starred);
 
     std::vector<stmt_ref> get_all_stmts_modifies(stmt_type type); // wildcard operation
     std::vector<stmt_ref> get_all_stmts_modifies(stmt_type type, var_ref var);
@@ -78,13 +78,13 @@ public:
 
     std::vector<var_ref> get_all_variables_modifies(); // wildcard operation
     std::vector<var_ref> get_all_variables_modifies(proc_ref procedure);
-    std::vector<var_ref> get_all_variables_modifies(stmt_ref other_stmt);
-    std::vector<var_ref> get_all_variables_modifies(stmt_type other_stmt_type); // can pass PROCEDURE as stmt_type
+    std::vector<var_ref> get_all_variables_modifies_ref(stmt_ref other_stmt);
+    std::vector<var_ref> get_all_variables_modifies_type(stmt_type other_stmt_type); // can pass PROCEDURE as stmt_type
 
     std::vector<var_ref> get_all_variables_uses(); // wildcard operation
     std::vector<var_ref> get_all_variables_uses(proc_ref procedure);
-    std::vector<var_ref> get_all_variables_uses(stmt_ref other_stmt);
-    std::vector<var_ref> get_all_variables_uses(stmt_type other_stmt_type); // can pass PROCEDURE as stmt_type
+    std::vector<var_ref> get_all_variables_uses_ref(stmt_ref other_stmt);
+    std::vector<var_ref> get_all_variables_uses_type(stmt_type other_stmt_type); // can pass PROCEDURE as stmt_type
 
     // Pattern Clauses for Assign
 
