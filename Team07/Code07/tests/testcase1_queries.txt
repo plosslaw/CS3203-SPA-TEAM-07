@@ -1,5 +1,125 @@
-1 - comment
-while w;
-Select w
+1 - select with no conditions
+stmt s;
+Select s
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+5000
+2 - select with no conditions
+variable v;
+Select v
+a, b, w, v, x, y, z
+5000
+3 - select with no conditions
+constant c;
+Select c
+1, 2, 42
+5000
+4 - single clause parent
+stmt s;
+Select s such that Parent(5,s)
+6, 7, 8, 9
+5000
+5 - single clause parent*
+stmt s;
+Select s such that Parent*(s, 10)
+5, 9
+5000
+6 - single clause follows
+assign a1, a2;
+Select a1 such that Follows(a1, a2)
+7
+5000
+7 - single clause follows*
+if ifs;
+Select ifs such that Follows*(1,ifs)
+5
+5000
+8 - single clause uses
+stmt s; variable v1;
+Select s such that Uses(s, "x")
+3, 4, 5, 11
+5000
+8 - single clause modifies
+while w; variable v;
+Select w such that Modifies(w,v)
 3, 9
+5000
+9 - single clause uses with wildcard
+stmt s;
+Select s such that Uses(s, _)
+2, 3, 4, 5, 9, 10, 11
+5000
+10 - single clause modifies with wildcard
+read r;
+Select r such that Modifies(r, _)
+1
+5000
+11 - single clause follows* with wildcard
+while w;
+Select w such that Follows*(w, _)
+3
+5000
+12 - single clause parent* with wildcard
+assign a;
+Select a such that Parent*(_,a)
+4, 6, 7, 8, 10
+5000
+13 - single clause follows with wildcard
+stmt s;
+Select s such that Follows(_,s)
+2, 3, 5, 8, 9, 11
+5000
+14 - single pattern clause
+assign a; variable v;
+Select a pattern a(v,_)
+4, 6, 7, 8, 10
+5000
+15 - single pattern clause
+assign a;
+Select a pattern a(_,"42")
+7
+5000
+16 - 2 clause no common synonym
+assign a1, a2; variable v1;
+Select v1 such that Follows*(a1,a2) pattern a1(v1,_)
+x
+5000
+17 - 2 clause no common synonym
+assign a1, a2; variable v;
+Select a2 such that Uses(a1,_) pattern a2(v,_)
+4, 6, 7, 8, 10
+5000
+18 - 2 clause one common synonym
+assign a; variable v; print p;
+Select p such that Uses(p, v) pattern a(v, _"x"_)
+11
+5000
+19 - 2 clause one common synonym
+assign a; if ifs;
+Select a such that Parent*(ifs, a) pattern a(a, _"1"_)
+10
+5000
+20 - 2 clause two common synonym
+assign a; variable v;
+Select a such that Uses(a,v) pattern a(v,_)
+4, 10
+5000
+21 - 2 clause two common synonym
+assign a; variable v;
+Select v such that Modifies(a,v) pattern a(v, _"y"_)
+w
+5000
+22 - query with no valid answer
+stmt s; assign a;
+Select s pattern a(_,_"XD"_)
+none
+5000
+23 - query with no valid answer
+variable v; read r;
+Select v such Uses(r, v)
+none
+5000
+24 - invalid query
+variable v;
+Select a
+
 5000
