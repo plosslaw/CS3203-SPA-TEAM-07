@@ -19,7 +19,8 @@ class PatternEval {
         pair<bool,bool> check_if_args_are_variable(std::string first_arg, std::string second_arg);
         bool is_element_inside_vectorA(string element, vector<string> vectorA);
         stmt_type convert_single_to_stmt_type(Single s);
-       vector<string> convert_lst_string_to_int(vector<int> lstA);
+        vector<string> convert_lst_string_to_int(vector<int> lstA);
+        bool is_pattern_variable_is_constant(std::string pattern_variable_value);
     public:
         PatternEval(unordered_map<string, Single> declaration_store, unordered_map<Single, 
             unordered_map<string, vector<string>>> map_storage, ActionsExecutor executor_);
