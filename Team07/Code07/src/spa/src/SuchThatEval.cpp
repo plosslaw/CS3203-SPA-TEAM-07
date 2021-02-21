@@ -54,11 +54,11 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
                     if (arg_pairs.first) {
                         result = executor.get_all_stmts_follows(first_arg_stmt_type, arg_pos::FIRST_ARG, second_arg_stmt_type, IS_FOLLOWST);
                     } else {
-                        result = executor.get_all_stmts_follows(second_arg_stmt_type, arg_pos::SECOND_ARG, first_arg_stmt_type, IS_FOLLOWST);
+                        result = executor.get_all_stmts_follows_type(second_arg_stmt_type, arg_pos::SECOND_ARG, first_arg_stmt_type, IS_FOLLOWST);
                     }
                     return SuchThatEval::convert_lst_string_to_int(result);
                 } else {
-                    vector<stmt_ref> result = executor.get_all_stmts_follows(first_arg_stmt_type, arg_pos::FIRST_ARG, second_arg_stmt_type, IS_FOLLOWST);
+                    vector<stmt_ref> result = executor.get_all_stmts_follows_type(first_arg_stmt_type, arg_pos::FIRST_ARG, second_arg_stmt_type, IS_FOLLOWST);
                     return SuchThatEval::convert_lst_string_to_int(result);
                 }
             }    
@@ -178,13 +178,13 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
                 if(arg_pairs.first || arg_pairs.second) {
                     vector<stmt_ref> result;
                     if (arg_pairs.first) {
-                        result = executor.get_all_stmts_parent(first_arg_stmt_type, arg_pos::FIRST_ARG, second_arg_stmt_type, IS_PARENTT);
+                        result = executor.get_all_stmts_parent_type(first_arg_stmt_type, arg_pos::FIRST_ARG, second_arg_stmt_type, IS_PARENTT);
                     } else {
-                        result = executor.get_all_stmts_parent(second_arg_stmt_type, arg_pos::SECOND_ARG, first_arg_stmt_type, IS_PARENTT);
+                        result = executor.get_all_stmts_parent_type(second_arg_stmt_type, arg_pos::SECOND_ARG, first_arg_stmt_type, IS_PARENTT);
                     }
                     return SuchThatEval::convert_lst_string_to_int(result);
                 } else {
-                    vector<stmt_ref> result = executor.get_all_stmts_parent(first_arg_stmt_type, arg_pos::FIRST_ARG, second_arg_stmt_type, IS_PARENTT);
+                    vector<stmt_ref> result = executor.get_all_stmts_parent_type(first_arg_stmt_type, arg_pos::FIRST_ARG, second_arg_stmt_type, IS_PARENTT);
                     return SuchThatEval::convert_lst_string_to_int(result);
                 }
             }    
@@ -304,7 +304,7 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
                 // first_arg is statement. could be statement, read, while, if
                 stmt_type first_arg_stmt_type = SuchThatEval::convert_single_to_stmt_type(first_arg_type);
                 if (select_type == Single::VARIABLE) {
-                    vector<var_ref> result = executor.get_all_variables_modifies(first_arg_stmt_type);
+                    vector<var_ref> result = executor.get_all_variables_modifies_type(first_arg_stmt_type);
                     return result;
                 } else {
                     // select type is other than variable.
@@ -368,7 +368,7 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
                 }
                 else if (StringUtil::is_number(such_that_first_arg)) {
                     //statement first arg type
-                    vector<var_ref> result = executor.get_all_variables_modifies(stoi(such_that_first_arg));
+                    vector<var_ref> result = executor.get_all_variables_modifies_ref(stoi(such_that_first_arg));
                     return result;
                 } else {
                     //procedure first arg type
@@ -409,7 +409,7 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
                 // first_arg is statement. could be statement, read, while, if
                 stmt_type first_arg_stmt_type = SuchThatEval::convert_single_to_stmt_type(first_arg_type);
                 if (select_type == Single::VARIABLE) {
-                    vector<var_ref> result = executor.get_all_variables_uses(first_arg_stmt_type);
+                    vector<var_ref> result = executor.get_all_variables_uses_type(first_arg_stmt_type);
                     return result;
                 } else {
                     // select type is other than variable.
@@ -473,7 +473,7 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
                 }
                 else if (StringUtil::is_number(such_that_first_arg)) {
                     //statement first arg type
-                    vector<var_ref> result = executor.get_all_variables_uses(stoi(such_that_first_arg));
+                    vector<var_ref> result = executor.get_all_variables_uses_ref(stoi(such_that_first_arg));
                     return result;
                 } else {
                     //procedure first arg type

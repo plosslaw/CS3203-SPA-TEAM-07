@@ -200,7 +200,7 @@ std::vector<stmt_ref> ActionsExecutor::get_all_stmts_follows(stmt_type type, arg
     return results;
 }
 
-std::vector<stmt_ref> ActionsExecutor::get_all_stmts_follows(stmt_type type, arg_pos pos, stmt_ref other_stmt, bool is_starred) {
+std::vector<stmt_ref> ActionsExecutor::get_all_stmts_follows_ref(stmt_type type, arg_pos pos, stmt_ref other_stmt, bool is_starred) {
     vector<stmt_ref> stmts;
     vector<stmt_ref> results;
 
@@ -284,7 +284,7 @@ std::vector<stmt_ref> ActionsExecutor::get_all_stmts_follows(stmt_type type, arg
     return results;
 }
 
-std::vector<stmt_ref> ActionsExecutor::get_all_stmts_follows(stmt_type type, arg_pos pos, stmt_type other_stmt_type, bool is_starred) {
+std::vector<stmt_ref> ActionsExecutor::get_all_stmts_follows_type(stmt_type type, arg_pos pos, stmt_type other_stmt_type, bool is_starred) {
     vector<stmt_ref> stmts;
     vector<stmt_ref> stmts_wildcard = this->get_all_statements_of_type(other_stmt_type);
     vector<stmt_ref> results;
@@ -470,7 +470,7 @@ std::vector<stmt_ref> ActionsExecutor::get_all_stmts_parent(stmt_type type, arg_
     return results;
 }
 
-std::vector<stmt_ref> ActionsExecutor::get_all_stmts_parent(stmt_type type, arg_pos pos, stmt_ref other_stmt, bool is_starred) {
+std::vector<stmt_ref> ActionsExecutor::get_all_stmts_parent_ref(stmt_type type, arg_pos pos, stmt_ref other_stmt, bool is_starred) {
     vector<stmt_ref> stmts;
     vector<stmt_ref> results;
 
@@ -554,7 +554,7 @@ std::vector<stmt_ref> ActionsExecutor::get_all_stmts_parent(stmt_type type, arg_
     return results;
 }
 
-std::vector<stmt_ref> ActionsExecutor::get_all_stmts_parent(stmt_type type, arg_pos pos, stmt_type other_stmt_type, bool is_starred) {
+std::vector<stmt_ref> ActionsExecutor::get_all_stmts_parent_type(stmt_type type, arg_pos pos, stmt_type other_stmt_type, bool is_starred) {
     vector<stmt_ref> stmts;
     vector<stmt_ref> stmts_wildcard = this->get_all_statements_of_type(other_stmt_type);
     vector<stmt_ref> results;
@@ -994,7 +994,7 @@ std::vector<var_ref> ActionsExecutor::get_all_variables_modifies(proc_ref proced
     return results;
 }
 
-std::vector<var_ref> ActionsExecutor::get_all_variables_modifies(stmt_ref other_stmt) {
+std::vector<var_ref> ActionsExecutor::get_all_variables_modifies_ref(stmt_ref other_stmt) {
     vector<var_ref> results;
 
     unordered_set<var_ref> unique_set;
@@ -1012,7 +1012,7 @@ std::vector<var_ref> ActionsExecutor::get_all_variables_modifies(stmt_ref other_
     return results;
 }
 
-std::vector<var_ref> ActionsExecutor::get_all_variables_modifies(stmt_type other_stmt_type) {
+std::vector<var_ref> ActionsExecutor::get_all_variables_modifies_type(stmt_type other_stmt_type) {
     vector<var_ref> results;
 
     unordered_set<var_ref> unique_set;
@@ -1135,7 +1135,7 @@ std::vector<var_ref> ActionsExecutor::get_all_variables_uses(proc_ref procedure)
     return results;
 }
 
-std::vector<var_ref> ActionsExecutor::get_all_variables_uses(stmt_ref other_stmt) {
+std::vector<var_ref> ActionsExecutor::get_all_variables_uses_ref(stmt_ref other_stmt) {
     vector<var_ref> results;
 
     unordered_set<var_ref> unique_set;
@@ -1153,7 +1153,7 @@ std::vector<var_ref> ActionsExecutor::get_all_variables_uses(stmt_ref other_stmt
     return results;
 }
 
-std::vector<var_ref> ActionsExecutor::get_all_variables_uses(stmt_type other_stmt_type) {
+std::vector<var_ref> ActionsExecutor::get_all_variables_uses_type(stmt_type other_stmt_type) {
     vector<var_ref> results;
 
     unordered_set<var_ref> unique_set;
