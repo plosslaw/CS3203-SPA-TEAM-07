@@ -205,13 +205,31 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
                 }
                 return result1_converted;
             } else if(is_first_arg_wild && !is_second_arg_wild) {
-                //  first arg is wild only
-                vector<stmt_ref> result = executor.get_all_stmts_parent(stmt_type::STATEMENT,arg_pos::SECOND_ARG, IS_PARENTT);
-                return SuchThatEval::convert_lst_string_to_int(result); 
+                //second arg is wild only
+                vector<string> result;
+                vector<stmt_ref> stmt_lst = executor.get_all_statements();
+                for(auto i : stmt_lst) {
+                    bool query = executor.is_parent(i,stoi(such_that_second_arg),IS_PARENTT);
+                    if(query) {
+                        if(!SuchThatEval::is_element_inside_vectorA(to_string(i),result)) {
+                            result.push_back(to_string(i));
+                        }
+                    }
+                }
+                return result;
             } else if(!is_first_arg_wild && is_second_arg_wild) {
                 //second arg is wild only
-                vector<stmt_ref> result = executor.get_all_stmts_parent(stmt_type::STATEMENT,arg_pos::FIRST_ARG, IS_PARENTT);
-                return SuchThatEval::convert_lst_string_to_int(result);
+                vector<string> result;
+                vector<stmt_ref> stmt_lst = executor.get_all_statements();
+                for(auto i : stmt_lst) {
+                    bool query = executor.is_parent(stoi(such_that_first_arg), i, IS_PARENTT);
+                    if(query) {
+                        if(!SuchThatEval::is_element_inside_vectorA(to_string(i),result)) {
+                            result.push_back(to_string(i));
+                        }
+                    }
+                }
+                return result;
             } else {
                 bool query = executor.is_parent(stoi(such_that_first_arg), stoi(such_that_second_arg), IS_PARENTT);
                 if (query) {
