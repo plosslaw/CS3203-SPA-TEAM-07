@@ -95,7 +95,7 @@ Select p such that Uses(p, v) pattern a(v, _"x"_)
 5000
 19 - 2 clause one common synonym
 assign a; if ifs;
-Select a such that Parent*(ifs, a) pattern a(a, _"1"_)
+Select a such that Parent*(ifs, a) pattern a(_, _"1"_)
 10
 5000
 20 - 2 clause two common synonym
@@ -115,7 +115,7 @@ none
 5000
 23 - query with no valid answer
 variable v; read r;
-Select v such Uses(r, v)
+Select v such that Uses(r, v)
 none
 5000
 24 - invalid query
