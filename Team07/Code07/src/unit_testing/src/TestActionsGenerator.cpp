@@ -1036,7 +1036,6 @@ TEST_CASE("SELECT VALUE WITH BOTH SUCH THAT AND PATTERN") {
         PayLoad st(PAIR, Pair::USES, std::vector<std::string>{"a1", "v1"});
         PayLoad pt(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a2","v2","_"});
         vector<string> output = test_select_such_that_pattern_only(syn,st,pt);
-        REQUIRE(output == vector<string>{"TEST"}); //remove this
         REQUIRE(verify_stmts(output, correct_ans));
     }
     SECTION("Select a1 follows*(a1,a2) pattern a1(v1,_)") {
@@ -1094,7 +1093,6 @@ TEST_CASE("SELECT VALUE WITH BOTH SUCH THAT AND PATTERN") {
         PayLoad st(PAIR, Pair::USES, std::vector<std::string>{"w1", "v1"});
         PayLoad pt(TRIPLE, Triple::SYN_ASSIGN, std::vector<std::string>{"a1","v1","_"});
         vector<string> output = test_select_such_that_pattern_only(syn,st,pt);
-        REQUIRE(output == vector<string>{"TEST"}); //remove this
         REQUIRE(verify_stmts(output, correct_ans));
     }
     SECTION("Select v1 uses(w1,v1) pattern a1(v1,_)") {
