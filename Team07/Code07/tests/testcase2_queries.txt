@@ -1,0 +1,138 @@
+1 - select all while loops
+while w;
+Select w
+3
+5000
+2 - select all print statements
+print p;
+Select p
+7
+5000
+3 - select all read statements
+read r;
+Select r
+1, 2
+5000
+4 - select all assign statements
+assign a;
+Select a
+4, 5, 6
+5000
+5 - select all variables
+variable v;
+Select v
+a, b, temp
+5000
+6 - select all constants
+constant c;
+Select c
+0
+5000
+7 - select statement that parent statement 6
+stmt s;
+Select s such that Parent(s, 6)
+3
+5000
+8 - select statement that parent statement 2
+stmt s;
+Select s such that Parent(s, 2)
+
+5000
+9 - select statement that parent another statement
+stmt s1, s2;
+Select s1 such that Parent(s1, s2)
+3
+5000
+10 - select statements that are nested in other statements
+stmt s1, s2;
+Select s2 such that Parent(s1, s2)
+4, 5, 6
+5000
+11 - select statements that parent other assignments
+stmt s; assign a;
+Select s such that Parent(s, a)
+3
+5000
+12 - select statements that parent print statement
+stmt s; print p;
+Select s such that Parent(s, p)
+
+5000
+13 - select statements that follow statement 1
+stmt s;
+Select s such that Follows(1, s)
+2
+5000
+14 - select statements that follow statement 3
+stmt s;
+Select s such that Follows(3, s)
+7
+5000
+15 - select statements that follow statement 4
+stmt s;
+Select s such that Follows(4, s)
+5
+5000
+16 - select statements that follow statement 6
+stmt s;
+Select s such that Follows(6, s)
+
+5000
+17 - select statements that follow another statement
+stmt s1, s2;
+Select s2 such that Follows(s1, s2)
+2, 3, 5, 6, 7
+5000
+18 - select statements that are followed by some statement
+stmt s1, s2;
+Select s1 such that Follows(s1, s2)
+1, 2, 3, 4, 5
+5000
+19 - select statements that are followed by a while
+while w; stmt s;
+Select s such that Follows(s, w)
+2
+5000
+20 - select statements that follows a print
+print p; stmt s;
+Select s such that Follows(p, s)
+
+5000
+21 - select statements that are followed by a print
+print p; stmt s;
+Select s such that Follows(s, p)
+3
+5000
+22 - select statement that Parent* 2
+stmt s;
+Select s such that Parent*(s, 2)
+
+5000
+23 - select statement that Parent* 5
+stmt s;
+Select s such that Parent*(s, 5)
+3
+5000
+24 - select statement that Parent* some statement
+stmt s1, s2;
+Select s1 such that Parent*(s1, s2)
+3
+5000
+25 - select statement that Follows* 1
+stmt s;
+Select s such that Follows*(1, s)
+2, 3, 7
+5000
+26 - select statement  that Follows* 4
+stmt s;
+Select s such that Follows*(4, s)
+5, 6
+5000
+27 - select statement that Follows* another statement
+stmt s1, s2;
+Select s2 such that Follows*(s1, s2)
+2, 3, 5, 6, 7
+5000
+
+
+
