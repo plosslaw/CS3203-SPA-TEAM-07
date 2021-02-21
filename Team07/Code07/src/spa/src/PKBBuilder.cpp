@@ -199,7 +199,7 @@ std::string makeMatchableStringFromAST(TNode cur_node) {
     {
     case VARIABLE:
     case CONSTANT:
-        return cur_node.getValue();
+        return "(" + cur_node.getValue() + ")";
     case EXPR:
     case OPERATOR:
         buffer = buffer + "(";
