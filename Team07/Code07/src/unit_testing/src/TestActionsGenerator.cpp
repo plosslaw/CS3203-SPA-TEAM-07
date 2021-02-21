@@ -1003,7 +1003,6 @@ TEST_CASE("SELECT WITH SUCH THAT CLAUSE: Pattern") {
     }
 }
 
-
 TEST_CASE("SELECT VALUE WITH BOTH SUCH THAT AND PATTERN") {
 //test_select_such_that_pattern_only
     SECTION("Select a1 uses(a1,v1) pattern a1(v1,_)") {
