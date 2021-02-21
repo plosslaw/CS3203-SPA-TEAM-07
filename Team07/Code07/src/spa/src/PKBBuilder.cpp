@@ -264,7 +264,7 @@ void extractDesignEntities(TNode cur_node, PKB &pkb) {
             }
             break;
         case CONSTANT:
-            c = std::stoi(cur_node.getValue());
+            c = cur_node.getValue();
             pkb.constants.emplace(c);
             break;
         case VARIABLE:
