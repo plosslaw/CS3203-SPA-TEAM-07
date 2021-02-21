@@ -36,6 +36,7 @@ public:
   void assign(State &s);
 };
 
+std::string prettyPrintValidation(std::string msg);
 std::string prettyPrintValidation(ParserMapper &map, int pos, std::string msg);
 std::string prettyPrintException(ParserMapper &map, State &s, bool show_stack = true);
 
