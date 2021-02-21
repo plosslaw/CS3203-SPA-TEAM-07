@@ -126,8 +126,7 @@ PayLoad expr_spec(State &state) {
     whitespace(state);
 
     return PayLoad(SINGLE, Single::U_DQ_FACTOR,
-                   std::vector<std::string>{any_val_1 + dbl_quotes_1 + value +
-                                            dbl_quotes_2 + any_val_2});
+                   std::vector<std::string>{any_val_1 + value + any_val_2});
   } catch (ParseException &e) {
     state.assign(so);
     try {
