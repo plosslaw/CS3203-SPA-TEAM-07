@@ -151,7 +151,8 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
 
     //SELECT
     if(selectList.empty()) {
-        return vector<string>{"Invalid"};
+        // return vector<string>{"Invalid"};
+        throw "Missing SELECT payload.";
     }
     PayLoad select_payload = selectList.at(0);
     
@@ -189,7 +190,7 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
 
         vector<string> return_result = such_that_eval.one_such_that_zero_pattern(such_that_pay_load, select_value, select_type, is_select_val_in_suchthat);
         if (return_result.empty()) {
-                return vector<string> {"None"};
+                return vector<string> {};
         } else {
             if (is_select_val_in_suchthat.first || is_select_val_in_suchthat.second) {
                 return return_result;    
@@ -218,7 +219,7 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
             return return_result;
         } else {
             if (return_result.empty()) {
-                return vector<string> {"None"};
+                return vector<string> {};
             } else {
                 return default_solution;
             }
@@ -232,7 +233,7 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
         vector<string> output = such_that_pattern.such_that_pattern_eval(such_that_pay_load, pattern_pay_load,select_value,select_type);
 
         if(output.empty()){
-            return vector<string>{"None"};
+            return vector<string>{};
         } else {
             return output;
         }    
@@ -240,7 +241,7 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
     return default_solution;
 }
 
-   
+
 // utilities
 
 pair<bool,bool> ActionsGenerator::check_if_args_are_variable(std::string first_arg, std::string second_arg) {

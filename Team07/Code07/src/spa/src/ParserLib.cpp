@@ -46,6 +46,12 @@ const char *ParseException::what() const throw() {
   return str.c_str();
 }
 
+std::string prettyPrintValidation(std::string msg) {
+	std::string outputstr("ValidationError");
+	outputstr += "  " + msg + "\n";
+	return outputstr;
+}
+
 std::string prettyPrintValidation(ParserMapper &map, int pos, std::string msg) {
 	std::string outputstr("ValidationError");
 	outputstr += map.get_pos_print(pos) + "\n";
