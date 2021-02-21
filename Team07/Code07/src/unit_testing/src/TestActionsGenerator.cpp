@@ -260,6 +260,8 @@ TEST_CASE("SELECT WITH SUCH THAT CLAUSE: FOLLOWS") {
         PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
         PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"s1","s2"});
         vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+
     }
     SECTION("Select s2 follows(s1,s2") {
         vector<string> correct_ans{"2","3","5","8","9","11"};
@@ -1096,4 +1098,191 @@ TEST_CASE("SELECT VALUE WITH BOTH SUCH THAT AND PATTERN") {
         REQUIRE(verify_stmts(output, correct_ans));
     }
 
+}
+
+
+TEST_CASE("WILD CARDS IN SUCH THAT CLAUSE") {
+    vector<string> stmt_lst{"1","2","3","4","5","6","7","8","9","10","11"};
+    vector<string> read_lst{"1"};
+    vector<string> assignment_lst{"4","6","7","8","10"};
+    vector<string> constant_lst{"1","2","42"};
+    vector<string> if_lst{"5"};
+    vector<string> print_lst{"2","11"};
+    vector<string> procedure_lst{"main"};
+    vector<string> variable_lst{"a","b","x","y","z","v","w"};
+    vector<string> while_lst{"3","9"};
+    vector<string> call_lst({});
+    
+    SECTION("Select s1 follows(s1,_") {
+        vector<string> correct_ans{"1","2","3","5","7","8"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+        PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"s1","_"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select s2 follows(_,s2") {
+        vector<string> correct_ans{"2","3","5","8","9","11"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s2"});
+        PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"_","s2"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select s1 follows(_,_") {
+        vector<string> correct_ans = stmt_lst;
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+        PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"_","_"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select a1 follows(a1,_") {
+        vector<string> correct_ans{"7","8"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
+        PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"a1","_"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select a1 follows(_,a1") {
+        vector<string> correct_ans{"8"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
+        PayLoad st(PAIR, Pair::FOLLOWS, std::vector<std::string>{"_","a1"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select s1 followst(s1,_") {
+        vector<string> correct_ans{"1","2","3","5","7","8"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+        PayLoad st(PAIR, Pair::FOLLOWST, std::vector<std::string>{"s1","_"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select s2 followst(_,s2") {
+        vector<string> correct_ans{"2","3","5","8","9","11"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s2"});
+        PayLoad st(PAIR, Pair::FOLLOWST, std::vector<std::string>{"_","s2"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select s1 followst(_,_") {
+        vector<string> correct_ans = stmt_lst;
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+        PayLoad st(PAIR, Pair::FOLLOWST, std::vector<std::string>{"_","_"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select a1 followst(a1,_") {
+        vector<string> correct_ans{"7","8"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
+        PayLoad st(PAIR, Pair::FOLLOWST, std::vector<std::string>{"a1","_"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select a1 followst(_,a1") {
+        vector<string> correct_ans{"8"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
+        PayLoad st(PAIR, Pair::FOLLOWST, std::vector<std::string>{"_","a1"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    //PARENT
+    
+    SECTION("Select s1 parent(s1,_") {
+        vector<string> correct_ans{"3","5","9"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+        PayLoad st(PAIR, Pair::PARENT, std::vector<std::string>{"s1","_"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select s2 PARENT(_,s2") {
+        vector<string> correct_ans{"4","6","7","8","9","10"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s2"});
+        PayLoad st(PAIR, Pair::PARENT, std::vector<std::string>{"_","s2"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select s1 PARENT(_,_") {
+        vector<string> correct_ans = stmt_lst;
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+        PayLoad st(PAIR, Pair::PARENT, std::vector<std::string>{"_","_"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select a1 PARENT(a1,_") {
+        vector<string> correct_ans{};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
+        PayLoad st(PAIR, Pair::PARENT, std::vector<std::string>{"a1","_"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select a1 PARENT(_,a1") {
+        vector<string> correct_ans{"4","6","7","8","10"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
+        PayLoad st(PAIR, Pair::PARENT, std::vector<std::string>{"_","a1"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select s1 PARENTT(s1,_") {
+        vector<string> correct_ans{"3","5","9"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+        PayLoad st(PAIR, Pair::PARENTT, std::vector<std::string>{"s1","_"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select s2 PARENTT(_,s2") {
+        vector<string> correct_ans{"4","6","7","8","9","10"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s2"});
+        PayLoad st(PAIR, Pair::PARENTT, std::vector<std::string>{"_","s2"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select s1 PARENTT(_,_") {
+        vector<string> correct_ans = stmt_lst;
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+        PayLoad st(PAIR, Pair::PARENTT, std::vector<std::string>{"_","_"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select a1 PARENTT(a1,_") {
+        vector<string> correct_ans{};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
+        PayLoad st(PAIR, Pair::PARENTT, std::vector<std::string>{"a1","_"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select a1 PARENTT(_,a1") {
+        vector<string> correct_ans{"4","6","7","8","10"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
+        PayLoad st(PAIR, Pair::PARENTT, std::vector<std::string>{"_","a1"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    //USES
+    SECTION("Select s1 Uses(s1,_") {
+        vector<string> correct_ans{"2","3","4","5","6","9","10","11"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+        PayLoad st(PAIR, Pair::USES, std::vector<std::string>{"s1","_"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select a1 Uses(a1,") {
+        vector<string> correct_ans{"10","4","6"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
+        PayLoad st(PAIR, Pair::USES, std::vector<std::string>{"a1","_"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    //MODIFIES
+    SECTION("Select s1 MODIFIES(s1,_") {
+        vector<string> correct_ans{"1","3","5","6","7","8","9","4","10"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"s1"});
+        PayLoad st(PAIR, Pair::MODIFIES, std::vector<std::string>{"s1","_"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
+    SECTION("Select a1 MODIFIES(a1,") {
+        vector<string> correct_ans {"4","6","7","8","10"};
+        PayLoad syn(SINGLE, Single::SYNONYM, std::vector<std::string>{"a1"});
+        PayLoad st(PAIR, Pair::MODIFIES, std::vector<std::string>{"a1","_"});
+        vector<string> output = test_select_such_that_only(syn, st);
+        REQUIRE(verify_stmts(output, correct_ans));
+    }
 }
