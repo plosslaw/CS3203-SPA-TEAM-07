@@ -217,6 +217,7 @@ vector<string> ActionsGenerator::TraverseQueryMap() {
         PatternEval pattern_eval(storeDeclaration, mapStorage, executor);
 
         vector<string> return_result = pattern_eval.zero_such_that_one_pattern(pattern_pay_load, select_value, select_type, is_select_val_in_pattern);
+        
         if (return_result.empty()) {
                 return vector<string> {};
         } else {
