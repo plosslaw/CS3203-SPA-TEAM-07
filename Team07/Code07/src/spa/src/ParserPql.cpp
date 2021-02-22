@@ -688,7 +688,8 @@ bool is_value_in_declarations(std::vector<PayLoad> payloads,
 }
 
 // Returns true if the payload's value is of the specified type
-bool is_entity_type(PayLoad target, Single load_type, int index, std::vector<PayLoad> declarations) {
+bool is_entity_type(PayLoad target, Single load_type, int index,
+                    std::vector<PayLoad> declarations) {
   std::string value = target.getValue()[index];
   for (auto it = declarations.begin(); it != declarations.end(); ++it) {
     LoadType decl_type = (*it).getType();
@@ -701,8 +702,44 @@ bool is_entity_type(PayLoad target, Single load_type, int index, std::vector<Pay
   return false;
 }
 
-bool is_variable(PayLoad clause, std::vector<PayLoad> declarations) {
-  return is_entity_type(clause, Single::VARIABLE, 1, declarations);
+// Returns true if payload is of type variable
+bool is_variable(PayLoad clause, int index, std::vector<PayLoad> declarations) {
+  return is_entity_type(clause, Single::VARIABLE, index, declarations);
+}
+
+// Returns true if one of ‘stmt’ | ‘read’ | ‘print’ | ‘call’ | ‘while’ | ‘if’
+// | ‘assign’. Not the same as design entity stmt
+bool is_statement(PayLoad clause, int index,
+                  std::vector<PayLoad> declarations) {
+  if (is_entity_type(clause, Single::STATEMENT, index, declarations)) {
+    return true;
+  }
+
+  if (is_entity_type(clause, Single::READ, index, declarations)) {
+    return true;
+  }
+
+  if (is_entity_type(clause, Single::PRINT, index, declarations)) {
+    return true;
+  }
+
+  if (is_entity_type(clause, Single::CALL, index, declarations)) {
+    return true;
+  }
+
+  if (is_entity_type(clause, Single::WHILE, index, declarations)) {
+    return true;
+  }
+
+  if (is_entity_type(clause, Single::IF, index, declarations)) {
+    return true;
+  }
+
+  if (is_entity_type(clause, Single::ASSIGN, index, declarations)) {
+    return true;
+  }
+
+  return false;
 }
 
 bool is_synonym(PayLoad clause, int index) { return clause.get_flag()[index]; }
@@ -753,35 +790,91 @@ bool is_select_clause_valid(QueryMap table) {
   return is_synonym_declared(declarations, target_synonym);
 }
 
-bool is_parrent_valid(PayLoad target) {
+// Returns true if values of synonym is of type statement
+bool is_parrent_valid(PayLoad target, std::vector<PayLoad> declarations) {
+  if (target.getType().pair == PARENT && is_synonym(target, 0) && !is_statement(target, 0, declarations)) {
+    return false;
+  }
+  if (target.getType().pair == PARENT && is_synonym(target, 1) && !is_statement(target, 1, declarations)) {
+    return false;
+  }
+
   return true;
 }
 
-bool is_parrentt_valid(PayLoad target) {
+// Returns true if values of synonym is of type statement
+bool is_parrentt_valid(PayLoad target, std::vector<PayLoad> declarations) { 
+  if (target.getType().pair == PARENTT && is_synonym(target, 0) && !is_statement(target, 0, declarations)) {
+    return false;
+  }
+  if (target.getType().pair == PARENTT && is_synonym(target, 1) && !is_statement(target, 1, declarations)) {
+    return false;
+  }
+
   return true;
 }
 
-bool is_follows_valid(PayLoad target) {
+// Returns true if values of synonym is of type statement
+bool is_follows_valid(PayLoad target, std::vector<PayLoad> declarations) { 
+  if (target.getType().pair == FOLLOWS && is_synonym(target, 0) && !is_statement(target, 0, declarations)) {
+    return false;
+  }
+  if (target.getType().pair == FOLLOWS && is_synonym(target, 1) && !is_statement(target, 1, declarations)) {
+    return false;
+  }
+
   return true;
 }
 
-bool is_followst_valid(PayLoad target) {
+// Returns true if values of synonym is of type statement
+bool is_followst_valid(PayLoad target, std::vector<PayLoad> declarations) { 
+  if (target.getType().pair == FOLLOWST && is_synonym(target, 0) && !is_statement(target, 0, declarations)) {
+    return false;
+  }
+  if (target.getType().pair == FOLLOWST && is_synonym(target, 1) && !is_statement(target, 1, declarations)) {
+    return false;
+  }
+
   return true;
 }
 
 // Returns true is wildcard is not the first argument
-bool is_modifies_valid(PayLoad target) {
+bool is_modifies_valid(PayLoad target, std::vector<PayLoad> declarations) {
+  // first argument can't be wildcard
   if (target.getType().pair == MODIFIES && target.getValue()[0] == "_") {
     return false;
   }
-  return true;
+  
+  // stmtRef must be type statement
+  if (target.getType().pair == MODIFIES && is_synonym(target, 0) && !is_statement(target, 0, declarations)) {
+    return false;
+  }
+
+  // entRef must be type variable
+  if (target.getType().pair == MODIFIES && is_synonym(target, 1) && !is_variable(target, 1, declarations)) {
+    return false;
+  }
+
+  return true;  
 }
 
 // Returns true is wildcard is not the first argument
-bool is_uses_valid(PayLoad target) {
+bool is_uses_valid(PayLoad target, std::vector<PayLoad> declarations) {
+  // first argument can't be wildcard
   if (target.getType().pair == USES && target.getValue()[0] == "_") {
     return false;
   }
+
+  // stmtRef must be type statement
+  if (target.getType().pair == USES && is_synonym(target, 0) && !is_statement(target, 0, declarations)) {
+    return false;
+  }
+  
+  // entRef must be type variable
+  if (target.getType().pair == USES && is_synonym(target, 1) && !is_variable(target, 1, declarations)) {
+    return false;
+  }
+
   return true;
 }
 
@@ -802,30 +895,29 @@ bool is_suchthat_clause_valid(QueryMap table) {
       return false;
     }
 
-    if (!is_parrent_valid(target)) {
+    if (!is_parrent_valid(target, declarations)) {
       return false;
     }
 
-    if (!is_parrentt_valid(target)) {
+    if (!is_parrentt_valid(target, declarations)) {
       return false;
     }
 
-    if (!is_follows_valid(target)) {
+    if (!is_follows_valid(target, declarations)) {
       return false;
     }
 
-    if (!is_followst_valid(target)) {
+    if (!is_followst_valid(target, declarations)) {
       return false;
     }
 
-    if (!is_modifies_valid(target)) {
+    if (!is_modifies_valid(target, declarations)) {
       return false;
     }
 
-    if (!is_uses_valid(target)) {
+    if (!is_uses_valid(target, declarations)) {
       return false;
     }
-
   }
   return true;
 }
@@ -857,7 +949,7 @@ bool is_pattern_clause_valid(QueryMap table) {
     }
 
     if (is_synonym(current_clause, 1) &&
-        !is_variable(current_clause, declarations)) {
+        !is_variable(current_clause, 1, declarations)) {
       return false;
     }
   }
