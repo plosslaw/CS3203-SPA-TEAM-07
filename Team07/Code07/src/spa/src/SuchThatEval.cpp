@@ -16,6 +16,11 @@ SuchThatEval::SuchThatEval(unordered_map<string, Single> declaration_store, unor
 vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_load, string select_value, Single select_type, pair<bool,bool> arg_pairs) {
     string such_that_first_arg = such_that_pay_load.getValue()[0];
     string such_that_second_arg = such_that_pay_load.getValue()[1];
+
+    if (such_that_first_arg == such_that_second_arg && such_that_first_arg != "_") {
+        return vector<string>();
+    }
+
     pair<bool, bool> bool_pairs_args = SuchThatEval::check_if_args_are_variable(such_that_first_arg, such_that_second_arg); //which of the two param is/are variables?
     if(SuchThatEval::is_pattern_variable_is_constant(such_that_first_arg)) {
             such_that_first_arg.erase(such_that_first_arg.begin());

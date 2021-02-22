@@ -34,6 +34,7 @@ vector<string> SuchThatPatternEval::such_that_pattern_eval(PayLoad such_that_pay
             }
         }
     }
+
     vector<string> result;
     if(common_link == 0) {
         result = SuchThatPatternEval::zero_common_synonym(such_that_pay_load, pattern_pay_load,select_value,select_type);
@@ -316,9 +317,10 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
             //evaluate pattern
             vector<string> pattern_result = pattern_eval.zero_such_that_one_pattern(pattern_pay_load, such_that_first_arg, Single::ASSIGN,arg_pairs);
             vector<string> inner_join_lst = SuchThatPatternEval::inner_join(such_that_result, pattern_result);
+
             //inner_join_lst is list of assignments statements.
             if(inner_join_lst.empty()) {
-            return vector<string>{};
+                return vector<string>{};
             }
             if(select_type == Single::ASSIGN) {
                 return inner_join_lst;
