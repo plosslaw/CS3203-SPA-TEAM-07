@@ -17,7 +17,7 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
     string such_that_first_arg = such_that_pay_load.getValue()[0];
     string such_that_second_arg = such_that_pay_load.getValue()[1];
 
-    if (such_that_first_arg == such_that_second_arg) {
+    if (such_that_first_arg == such_that_second_arg && such_that_first_arg != "_") {
         return vector<string>();
     }
 
