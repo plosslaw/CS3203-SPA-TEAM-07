@@ -85,10 +85,19 @@ vector<string> SuchThatPatternEval::zero_common_synonym(PayLoad such_that_pay_lo
 //select a such that uses(a,v) pattern a(v2,_);
 vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_load, PayLoad pattern_pay_load,string select_value, Single select_type) {
     string such_that_first_arg = such_that_pay_load.getValue()[0];
-    Single such_that_first_type = storeDeclaration[such_that_first_arg];
-
+    Single such_that_first_type;
+    unordered_map<string, Single>::iterator it;
+    it = storeDeclaration.find(such_that_first_arg);
+    if( (it!=storeDeclaration.end())) {
+        such_that_first_type = storeDeclaration[such_that_first_arg];
+    } 
     string such_that_second_arg = such_that_pay_load.getValue()[1];
-    Single such_that_second_type = storeDeclaration[such_that_second_arg];
+    Single such_that_second_type;
+    unordered_map<string, Single>::iterator it2;
+    it2 = storeDeclaration.find(such_that_second_arg);
+    if( (it2!=storeDeclaration.end())) {
+        such_that_second_type = storeDeclaration[such_that_second_arg];
+    }
 
     string pattern_first_arg = pattern_pay_load.getValue()[0];
     string pattern_second_arg = pattern_pay_load.getValue()[1];
