@@ -4,7 +4,6 @@
 #include "StringUtil.h"
 #include "ActionsExecutor.h"
 #include "ActionsGenerator.h"
-#include <iostream>
 
 //constructor
 SuchThatPatternEval::SuchThatPatternEval(unordered_map<string, Single> declaration_store, unordered_map<Single, 
