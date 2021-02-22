@@ -17,14 +17,17 @@ SuchThatPatternEval::SuchThatPatternEval(unordered_map<string, Single> declarati
 vector<string> SuchThatPatternEval::such_that_pattern_eval(PayLoad such_that_pay_load, PayLoad pattern_pay_load,string select_value, Single select_type) {
     vector<string> such_that_values = such_that_pay_load.getValue();
     vector<string> pattern_values = pattern_pay_load.getValue();
+
     int common_link = 0; // 0 common link represents such that and pattern has no similar variable names
     for(int such_that_value = 0; such_that_value < such_that_values.size(); such_that_value++) {
         for(int pattern_value = 0; pattern_value < pattern_values.size()-1; pattern_value++) {
-            if(such_that_values[such_that_value] == pattern_values[pattern_value]) {
+            if(such_that_values[such_that_value] == pattern_values[pattern_value] && storeDeclaration.find(such_that_values[such_that_value]) != storeDeclaration.end()) {
                 common_link++;
+                
             }
         }
     }
+
     vector<string> result;
     if(common_link == 0) {
         result = SuchThatPatternEval::zero_common_synonym(such_that_pay_load, pattern_pay_load,select_value,select_type);
@@ -60,26 +63,32 @@ vector<string> SuchThatPatternEval::zero_common_synonym(PayLoad such_that_pay_lo
             is_select_val_in_pattern.second = true;
         }
     vector<string> pattern_lst =  pattern_eval.zero_such_that_one_pattern(pattern_pay_load, select_value, select_type, is_select_val_in_pattern);
-    if(is_select_val_in_suchthat.first || is_select_val_in_suchthat.second) {
+    
+
+    if(such_that_lst.empty() || pattern_lst.empty()) {
+        return vector<string>();
+    } else if(is_select_val_in_suchthat.first || is_select_val_in_suchthat.second) {
         return such_that_lst;
     } else if (is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
         return pattern_lst;
     } else {
-        if(such_that_lst.empty() || pattern_lst.empty()) {
-            return vector<string>();
-        } else {
-            return (mapStorage[select_type])[select_value];
-        }
+        return (mapStorage[select_type])[select_value];
     }
 }
 
 //select a such that uses(a,v) pattern a(v2,_);
 vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_load, PayLoad pattern_pay_load,string select_value, Single select_type) {
     string such_that_first_arg = such_that_pay_load.getValue()[0];
-    Single such_that_first_type = storeDeclaration[such_that_first_arg];
+    Single such_that_first_type = Single::STATEMENT;
+    if (storeDeclaration.find(such_that_first_arg) != storeDeclaration.end()) {
+        such_that_first_type = storeDeclaration[such_that_first_arg];
+    }
 
     string such_that_second_arg = such_that_pay_load.getValue()[1];
-    Single such_that_second_type = storeDeclaration[such_that_second_arg];
+    Single such_that_second_type = Single::STATEMENT;
+    if (storeDeclaration.find(such_that_second_arg) != storeDeclaration.end()) {
+        such_that_second_type = storeDeclaration[such_that_second_arg];
+    }
 
     string pattern_first_arg = pattern_pay_load.getValue()[0];
     string pattern_second_arg = pattern_pay_load.getValue()[1];
@@ -91,8 +100,8 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
     SuchThatEval such_that_eval(storeDeclaration, mapStorage,executor);
     PatternEval pattern_eval(storeDeclaration, mapStorage,executor);
 
-    bool is_first_arg_common_such_that = such_that_first_arg == pattern_first_arg || such_that_first_arg == pattern_second_arg;
-    bool is_first_arg_common_pattern = pattern_first_arg == such_that_first_arg|| pattern_first_arg == such_that_second_arg;
+    bool is_first_arg_common_such_that = (such_that_first_arg != "_") && (such_that_first_arg == pattern_first_arg || such_that_first_arg == pattern_second_arg);
+    bool is_first_arg_common_pattern = (pattern_first_arg != "_") && (pattern_first_arg == such_that_first_arg || pattern_first_arg == such_that_second_arg);
     
     // check if select value appears in such that or pattern
     pair<bool, bool> such_that_or_pattern(false, false);
@@ -217,7 +226,6 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
             arg_pairs.first = true;
             arg_pairs.second = false;
             vector<string> pattern_result = pattern_eval.zero_such_that_one_pattern(pattern_pay_load, pattern_first_arg, Single::ASSIGN,arg_pairs);
-
             vector<string> inner_join_lst = SuchThatPatternEval::inner_join(such_that_result, pattern_result);
 
             if(inner_join_lst.empty()) {
@@ -299,9 +307,10 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
             //evaluate pattern
             vector<string> pattern_result = pattern_eval.zero_such_that_one_pattern(pattern_pay_load, such_that_first_arg, Single::ASSIGN,arg_pairs);
             vector<string> inner_join_lst = SuchThatPatternEval::inner_join(such_that_result, pattern_result);
+
             //inner_join_lst is list of assignments statements.
             if(inner_join_lst.empty()) {
-            return vector<string>{};
+                return vector<string>{};
             }
             if(select_type == Single::ASSIGN) {
                 return inner_join_lst;
@@ -356,6 +365,7 @@ vector<string> SuchThatPatternEval::more_than_one_common_synonym(PayLoad such_th
     vector<string> second_arg_lst = mapStorage[storeDeclaration[such_that_second_arg]][such_that_second_arg];
     vector<pair<string,string>> arg_lst = SuchThatPatternEval::crossproduct(first_arg_lst, second_arg_lst);
     Pair such_that_type = such_that_pay_load.getType().pair;
+    vector<pair<string,string>> combined_pattern_lst;
 
     unordered_set<string> result;
     unordered_set<string> result2;
@@ -366,54 +376,51 @@ vector<string> SuchThatPatternEval::more_than_one_common_synonym(PayLoad such_th
             bool query = executor.is_follows(stoi(first_arg), stoi(second_arg), false);
                 if (query) {
                     //if element is not added, add now
-                    result.insert(first_arg);
-                    result2.insert(second_arg);
+                    combined_pattern_lst.push_back(make_pair(first_arg, second_arg));
                 }
         } else if (such_that_type == Pair::FOLLOWST) {
             bool query = executor.is_follows(stoi(first_arg), stoi(second_arg), true);
                 if (query) {
-                    result.insert(first_arg);
-                    result2.insert(second_arg);
+                    combined_pattern_lst.push_back(make_pair(first_arg, second_arg));
                 }
         } else if (such_that_type == Pair::PARENT) {
             bool query = executor.is_parent(stoi(first_arg), stoi(second_arg), false);
                 if (query) {
-                    result.insert(first_arg);
-                    result2.insert(second_arg);
+                    combined_pattern_lst.push_back(make_pair(first_arg, second_arg));
                 }
                 break;
         } else if (such_that_type == Pair::PARENTT) {
             bool query = executor.is_parent(stoi(first_arg), stoi(second_arg), true);
                 if (query) {
-                    result.insert(first_arg);
-                    result2.insert(second_arg);
+                    combined_pattern_lst.push_back(make_pair(first_arg, second_arg));
                 }
         } else if (such_that_type == Pair::MODIFIES) {
             bool query = executor.statement_modifies(stoi(first_arg), second_arg);
                 if (query) {
-                    result.insert(first_arg);
-                    result2.insert(second_arg);
+                    combined_pattern_lst.push_back(make_pair(first_arg, second_arg));
                 }
         } else if (such_that_type == Pair::USES) {
                     bool query = executor.statement_uses(stoi(first_arg), second_arg);
                 if (query) {
-                    result.insert(first_arg);
-                    result2.insert(second_arg);
+                    combined_pattern_lst.push_back(make_pair(first_arg, second_arg));
                 }
         }
     }
+    /*
     vector<string> v1(result.begin(), result.end());
     vector<string> v2(result2.begin(), result2.end());
     map<string,vector<string>> output; output[such_that_first_arg] = v1; output[such_that_second_arg] = v2;
+    */
 
     //pattern
     string pattern_first_arg = pattern_pay_load.getValue()[0];
     string pattern_second_arg = pattern_pay_load.getValue()[1];
     string pattern_third_arg = pattern_pay_load.getValue()[2]; //subexpression
     //retrieve lists from output
-    vector<string> pattern_first_lst = output[pattern_first_arg]; //assign
-    vector<string> pattern_second_lst = output[pattern_second_arg]; //variable
-    vector<pair<string,string>> combined_pattern_lst = SuchThatPatternEval::crossproduct(pattern_first_lst, pattern_second_lst);
+    //vector<string> pattern_first_lst = output[pattern_first_arg]; //assign
+    //vector<string> pattern_second_lst = output[pattern_second_arg]; //variable
+    //vector<pair<string,string>> combined_pattern_lst;// = SuchThatPatternEval::crossproduct(pattern_first_lst, pattern_second_lst);
+
     unordered_set<string> result3;
     unordered_set<string> result4;
     for(int i = 0;i<combined_pattern_lst.size();i++) {
