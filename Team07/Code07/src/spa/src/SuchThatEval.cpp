@@ -16,6 +16,11 @@ SuchThatEval::SuchThatEval(unordered_map<string, Single> declaration_store, unor
 vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_load, string select_value, Single select_type, pair<bool,bool> arg_pairs) {
     string such_that_first_arg = such_that_pay_load.getValue()[0];
     string such_that_second_arg = such_that_pay_load.getValue()[1];
+
+    if (such_that_first_arg == such_that_second_arg && such_that_first_arg != "_") {
+        return vector<string>();
+    }
+
     pair<bool, bool> bool_pairs_args = SuchThatEval::check_if_args_are_variable(such_that_first_arg, such_that_second_arg); //which of the two param is/are variables?
     if(SuchThatEval::is_pattern_variable_is_constant(such_that_first_arg)) {
             such_that_first_arg.erase(such_that_first_arg.begin());
@@ -32,6 +37,9 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
 
     if (such_that_type == Pair::FOLLOWS || such_that_type == Pair::FOLLOWST) {
         bool IS_FOLLOWST = such_that_type == Pair::FOLLOWST;
+        if(such_that_first_arg == such_that_second_arg && such_that_first_arg!="_" && such_that_second_arg!="_") {
+            return vector<string>{};
+        }
         if(bool_pairs_args.first && bool_pairs_args.second) {
             // both are variables. both are types of statements (statement, read, while etc...)
             Single first_arg_type  = storeDeclaration[such_that_first_arg];
@@ -158,6 +166,9 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
         }
     } else if (such_that_type == Pair::PARENT || such_that_type == Pair::PARENTT) {
         bool IS_PARENTT = such_that_type == Pair::PARENTT;
+        if(such_that_first_arg == such_that_second_arg && such_that_first_arg!="_" && such_that_second_arg!="_") {
+            return vector<string>{};
+        }
         if(bool_pairs_args.first && bool_pairs_args.second) {
             // both are variables. both are types of statements (statement, read, while etc...)
             Single first_arg_type  = storeDeclaration[such_that_first_arg];
@@ -454,7 +465,6 @@ vector<string> SuchThatEval::one_such_that_zero_pattern(PayLoad such_that_pay_lo
             if (bool_pairs_args.first && !bool_pairs_args.second) {
                 // first parameter is a variable and second parameter is a constant.
                 Single first_arg_type  = storeDeclaration[such_that_first_arg];
-
                 if(first_arg_type == Single::PROCEDURE) {
                     if(such_that_second_arg == "_") {
                         vector<proc_ref> result = executor.get_all_procedures_uses();
@@ -555,5 +565,6 @@ vector<string> SuchThatEval::convert_lst_string_to_int(vector<int> lstA) {
 }
 
 bool SuchThatEval::is_pattern_variable_is_constant(std::string pattern_variable_value) {
-    return(pattern_variable_value.at(0) == '"' && pattern_variable_value.at(pattern_variable_value.size()-1) == '"');
+    bool query = (pattern_variable_value.at(0) == '"' && pattern_variable_value.at(pattern_variable_value.size()-1) == '"');     
+    return query;
 }

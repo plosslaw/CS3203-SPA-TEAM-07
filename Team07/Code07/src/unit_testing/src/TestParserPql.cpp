@@ -678,7 +678,8 @@ TEST_CASE("Parse such that Modifies clause") {
 
   SECTION("synonym and \"ident\"") {
     std::string query = "such that Modifies(s1, \"x\")";
-    PayLoad expected_clause(PAIR, MODIFIES, std::vector<std::string>{"s1", "\"x\""},
+    PayLoad expected_clause(PAIR, MODIFIES,
+                            std::vector<std::string>{"s1", "\"x\""},
                             std::vector<bool>{true, false});
 
     State state(&query);
@@ -736,7 +737,8 @@ TEST_CASE("Parse such that Modifies clause") {
 
   SECTION("integer and \"ident\"") {
     std::string query = "such that Modifies(1, \"x\")";
-    PayLoad expected_clause(PAIR, MODIFIES, std::vector<std::string>{"1", "\"x\""});
+    PayLoad expected_clause(PAIR, MODIFIES,
+                            std::vector<std::string>{"1", "\"x\""});
 
     State state(&query);
     PayLoad actual_clause = suchthat_cl(state);
@@ -796,7 +798,8 @@ TEST_CASE("Parse such that Uses clause") {
 
   SECTION("wildcard and \"ident\"") {
     std::string query = "such that Uses(_, \"x1\")";
-    PayLoad expected_clause(PAIR, USES, std::vector<std::string>{"_", "\"x1\""});
+    PayLoad expected_clause(PAIR, USES,
+                            std::vector<std::string>{"_", "\"x1\""});
 
     State state(&query);
     PayLoad actual_clause = suchthat_cl(state);
@@ -1126,7 +1129,7 @@ TEST_CASE("Validate select clause") {
 }
 
 TEST_CASE("Validate such that clause") {
-  SECTION("Passes left synonym declared") {
+  SECTION("Passes left synonym of type statement declared") {
     // stmt s; Select s such that Parent(s, _)
     QueryMap query_map;
     query_map.addItem(
@@ -1142,7 +1145,7 @@ TEST_CASE("Validate such that clause") {
     REQUIRE(is_suchthat_clause_valid(query_map));
   }
 
-  SECTION("Passes right synonym declared") {
+  SECTION("Passes right synonym of type statement declared") {
     // stmt s; Select s such that Parent(_, s)
     QueryMap query_map;
     query_map.addItem(
@@ -1158,8 +1161,81 @@ TEST_CASE("Validate such that clause") {
     REQUIRE(is_suchthat_clause_valid(query_map));
   }
 
-  SECTION("Passes both synonyms declared") {
-    // stmt s1, s2; Select s1 such that Parent(_, s)
+  SECTION("Passes left synonym of type statement declared, Modifies") {
+    // stmt s; Select s such that Modifies(s, _)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"s"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, MODIFIES,
+                              std::vector<std::string>{"s", "_"},
+                              std::vector<bool>{true, false}));
+
+    REQUIRE(is_suchthat_clause_valid(query_map));
+  }
+
+  SECTION("Passes right synonym of type variable declared, Modifies") {
+    // stmt s; variable v; Select v such that Modifies(s, v)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"v"}));
+    
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"v"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, MODIFIES, std::vector<std::string>{"s",
+                      "v"},
+                              std::vector<bool>{false, true}));
+
+    REQUIRE(is_suchthat_clause_valid(query_map));
+  }
+
+  SECTION("Passes left synonym of type statement declared, Uses") {
+    // stmt s; Select s such that Uses(s, _)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"s"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, USES, std::vector<std::string>{"s", "_"},
+                              std::vector<bool>{true, false}));
+
+    REQUIRE(is_suchthat_clause_valid(query_map));
+  }
+
+  SECTION("Passes right synonym of type variable declared, Uses") {
+    // stmt s; variable v; Select s such that Uses(s, v)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"v"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"s"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, USES, std::vector<std::string>{"s", "v"},
+                              std::vector<bool>{true, true}));
+
+    REQUIRE(is_suchthat_clause_valid(query_map));
+  }
+
+  SECTION("Passes both synonyms of type synonym declared") {
+    // stmt s1, s2; Select s1 such that Parent(s1, s2)
     QueryMap query_map;
     query_map.addItem(
         ClauseType::DECLARATION,
@@ -1214,6 +1290,129 @@ TEST_CASE("Validate such that clause") {
     REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
   }
 
+  SECTION("Fails left synonym not of type statement declared, Parent") {
+    // variable v; Select v such that Parent(v, _)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"v"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"v"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, PARENT, std::vector<std::string>{"v", "_"},
+                              std::vector<bool>{true, false}));
+
+    REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
+  }
+
+  SECTION("Fails right synonym not of type statement declared, Parent") {
+    // stmt s; variable v; Select v such that Parent(s, v)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"v"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"v"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, PARENT, std::vector<std::string>{"s", "v"},
+                              std::vector<bool>{true, true}));
+
+    REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
+  }
+
+  SECTION("Fails left synonym not of type statement declared, Parent*") {
+    // variable v; Select v such that Parent*(v, _)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"v"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"v"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, PARENTT, std::vector<std::string>{"v", "_"},
+                              std::vector<bool>{true, false}));
+
+    REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
+  }
+
+  SECTION("Fails right synonym not of type statement declared, Parent*") {
+    // stmt s; variable v; Select v such that Parent(s, v)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"v"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"v"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, PARENTT, std::vector<std::string>{"s", "v"},
+                              std::vector<bool>{true, true}));
+
+    REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
+  }
+
+  SECTION("Fails left synonym not of type statement declared, Follows") {
+    // variable v; Select v such that Follows(v, _)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"v"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"v"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, FOLLOWS, std::vector<std::string>{"v", "_"},
+                              std::vector<bool>{true, false}));
+
+    REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
+  }
+
+  SECTION("Fails right synonym not of type statement declared, Follows") {
+    // stmt s; variable v; Select v such that Parent(s, v)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"v"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"v"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, FOLLOWST,
+                              std::vector<std::string>{"s", "v"},
+                              std::vector<bool>{true, true}));
+
+    REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
+  }
+
+  SECTION("Fails left synonym not of type statement declared, Follows*") {
+    // variable v; Select v such that Follows*(v, _)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"v"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"v"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, FOLLOWST,
+                              std::vector<std::string>{"v", "_"},
+                              std::vector<bool>{true, false}));
+
+    REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
+  }
+
   SECTION("Fails wildcard as first argument of modifies") {
     // stmt s; Select s such that Modifies(_, s)
     QueryMap query_map;
@@ -1231,6 +1430,46 @@ TEST_CASE("Validate such that clause") {
     REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
   }
 
+  SECTION("Fails left synonym not of type statement declared, Modifies") {
+    // constant c; variable v; Select v such that Modifies(c, v)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::CONSTANT, std::vector<std::string>{"c"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"v"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"v"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, MODIFIES,
+                              std::vector<std::string>{"c", "v"},
+                              std::vector<bool>{true, true}));
+
+    REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
+  }
+
+  SECTION("Fails right synonym not of type variable declared, Modifies") {
+    // constant c; variable v; Select v such that Modifies(v, c)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::CONSTANT, std::vector<std::string>{"c"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"v"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"v"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, MODIFIES,
+                              std::vector<std::string>{"v", "c"},
+                              std::vector<bool>{true, true}));
+
+    REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
+  }
+
   SECTION("Fails wildcard as first argument of uses") {
     // stmt s; Select s such that Uses(_, s)
     QueryMap query_map;
@@ -1241,9 +1480,45 @@ TEST_CASE("Validate such that clause") {
                                                   std::vector<std::string>{"s"},
                                                   std::vector<bool>{true}));
     query_map.addItem(ClauseType::SUCHTHAT,
-                      PayLoad(PAIR, USES,
-                              std::vector<std::string>{"_", "s1"},
+                      PayLoad(PAIR, USES, std::vector<std::string>{"_", "s1"},
                               std::vector<bool>{false, true}));
+
+    REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
+  }
+
+  SECTION("Fails left synonym not of type statement declared, Uses") {
+    // variable v; Select v such that Uses(v, _)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::VARIABLE, std::vector<std::string>{"v"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"v"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, USES,
+                              std::vector<std::string>{"v", "_"},
+                              std::vector<bool>{true, true}));
+
+    REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
+  }
+
+  SECTION("Fails right synonym not of type variable declared, Uses") {
+    // stmt s; procdure p; Select p such that Uses(s, p)
+    QueryMap query_map;
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::STATEMENT, std::vector<std::string>{"s"}));
+    query_map.addItem(
+        ClauseType::DECLARATION,
+        PayLoad(SINGLE, Single::PROCEDURE, std::vector<std::string>{"p"}));
+    query_map.addItem(ClauseType::SELECT, PayLoad(SINGLE, Single::SYNONYM,
+                                                  std::vector<std::string>{"p"},
+                                                  std::vector<bool>{true}));
+    query_map.addItem(ClauseType::SUCHTHAT,
+                      PayLoad(PAIR, USES,
+                              std::vector<std::string>{"s", "p"},
+                              std::vector<bool>{true, true}));
 
     REQUIRE_FALSE(is_suchthat_clause_valid(query_map));
   }
@@ -1269,7 +1544,7 @@ TEST_CASE("Validate pattern clause") {
 
     REQUIRE(is_pattern_clause_valid(query_map));
   }
-  
+
   SECTION("Passes syn-assign is type assign") {
     // assign a; stmt s; Select s pattern a(_, _)
     QueryMap query_map;
