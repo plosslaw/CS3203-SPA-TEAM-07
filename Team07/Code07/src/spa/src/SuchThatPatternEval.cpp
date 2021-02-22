@@ -375,6 +375,7 @@ vector<string> SuchThatPatternEval::more_than_one_common_synonym(PayLoad such_th
     vector<string> second_arg_lst = mapStorage[storeDeclaration[such_that_second_arg]][such_that_second_arg];
     vector<pair<string,string>> arg_lst = SuchThatPatternEval::crossproduct(first_arg_lst, second_arg_lst);
     Pair such_that_type = such_that_pay_load.getType().pair;
+    vector<pair<string,string>> combined_pattern_lst;
 
     unordered_set<string> result;
     unordered_set<string> result2;
@@ -385,54 +386,51 @@ vector<string> SuchThatPatternEval::more_than_one_common_synonym(PayLoad such_th
             bool query = executor.is_follows(stoi(first_arg), stoi(second_arg), false);
                 if (query) {
                     //if element is not added, add now
-                    result.insert(first_arg);
-                    result2.insert(second_arg);
+                    combined_pattern_lst.push_back(make_pair(first_arg, second_arg));
                 }
         } else if (such_that_type == Pair::FOLLOWST) {
             bool query = executor.is_follows(stoi(first_arg), stoi(second_arg), true);
                 if (query) {
-                    result.insert(first_arg);
-                    result2.insert(second_arg);
+                    combined_pattern_lst.push_back(make_pair(first_arg, second_arg));
                 }
         } else if (such_that_type == Pair::PARENT) {
             bool query = executor.is_parent(stoi(first_arg), stoi(second_arg), false);
                 if (query) {
-                    result.insert(first_arg);
-                    result2.insert(second_arg);
+                    combined_pattern_lst.push_back(make_pair(first_arg, second_arg));
                 }
                 break;
         } else if (such_that_type == Pair::PARENTT) {
             bool query = executor.is_parent(stoi(first_arg), stoi(second_arg), true);
                 if (query) {
-                    result.insert(first_arg);
-                    result2.insert(second_arg);
+                    combined_pattern_lst.push_back(make_pair(first_arg, second_arg));
                 }
         } else if (such_that_type == Pair::MODIFIES) {
             bool query = executor.statement_modifies(stoi(first_arg), second_arg);
                 if (query) {
-                    result.insert(first_arg);
-                    result2.insert(second_arg);
+                    combined_pattern_lst.push_back(make_pair(first_arg, second_arg));
                 }
         } else if (such_that_type == Pair::USES) {
                     bool query = executor.statement_uses(stoi(first_arg), second_arg);
                 if (query) {
-                    result.insert(first_arg);
-                    result2.insert(second_arg);
+                    combined_pattern_lst.push_back(make_pair(first_arg, second_arg));
                 }
         }
     }
+    /*
     vector<string> v1(result.begin(), result.end());
     vector<string> v2(result2.begin(), result2.end());
     map<string,vector<string>> output; output[such_that_first_arg] = v1; output[such_that_second_arg] = v2;
+    */
 
     //pattern
     string pattern_first_arg = pattern_pay_load.getValue()[0];
     string pattern_second_arg = pattern_pay_load.getValue()[1];
     string pattern_third_arg = pattern_pay_load.getValue()[2]; //subexpression
     //retrieve lists from output
-    vector<string> pattern_first_lst = output[pattern_first_arg]; //assign
-    vector<string> pattern_second_lst = output[pattern_second_arg]; //variable
-    vector<pair<string,string>> combined_pattern_lst = SuchThatPatternEval::crossproduct(pattern_first_lst, pattern_second_lst);
+    //vector<string> pattern_first_lst = output[pattern_first_arg]; //assign
+    //vector<string> pattern_second_lst = output[pattern_second_arg]; //variable
+    //vector<pair<string,string>> combined_pattern_lst;// = SuchThatPatternEval::crossproduct(pattern_first_lst, pattern_second_lst);
+
     unordered_set<string> result3;
     unordered_set<string> result4;
     for(int i = 0;i<combined_pattern_lst.size();i++) {
