@@ -687,6 +687,26 @@ bool is_value_in_declarations(std::vector<PayLoad> payloads,
   return false;
 }
 
+// Returns true if the payload's value is of the specified type
+bool is_entity_type(PayLoad target, Single load_type, int index, std::vector<PayLoad> declarations) {
+  std::string value = target.getValue()[index];
+  for (auto it = declarations.begin(); it != declarations.end(); ++it) {
+    LoadType decl_type = (*it).getType();
+    std::string decl_value = (*it).getValue()[0];
+
+    if (decl_type.single == load_type && decl_value == value) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool is_variable(PayLoad clause, std::vector<PayLoad> declarations) {
+  return is_entity_type(clause, Single::VARIABLE, 1, declarations);
+}
+
+bool is_synonym(PayLoad clause, int index) { return clause.get_flag()[index]; }
+
 bool is_synonym_unique(std::vector<PayLoad> declarations) {
   std::vector<std::string> synonyms;
   for (auto it = declarations.begin(); it != declarations.end(); ++it) {
@@ -733,6 +753,22 @@ bool is_select_clause_valid(QueryMap table) {
   return is_synonym_declared(declarations, target_synonym);
 }
 
+bool is_parrent_valid(PayLoad target) {
+  return true;
+}
+
+bool is_parrentt_valid(PayLoad target) {
+  return true;
+}
+
+bool is_follows_valid(PayLoad target) {
+  return true;
+}
+
+bool is_followst_valid(PayLoad target) {
+  return true;
+}
+
 // Returns true is wildcard is not the first argument
 bool is_modifies_valid(PayLoad target) {
   if (target.getType().pair == MODIFIES && target.getValue()[0] == "_") {
@@ -766,6 +802,22 @@ bool is_suchthat_clause_valid(QueryMap table) {
       return false;
     }
 
+    if (!is_parrent_valid(target)) {
+      return false;
+    }
+
+    if (!is_parrentt_valid(target)) {
+      return false;
+    }
+
+    if (!is_follows_valid(target)) {
+      return false;
+    }
+
+    if (!is_followst_valid(target)) {
+      return false;
+    }
+
     if (!is_modifies_valid(target)) {
       return false;
     }
@@ -773,36 +825,9 @@ bool is_suchthat_clause_valid(QueryMap table) {
     if (!is_uses_valid(target)) {
       return false;
     }
+
   }
   return true;
-}
-
-bool is_value_variable(std::vector<PayLoad> declarations, PayLoad clause) {
-  std::string val_2 = clause.getValue()[1];
-  for (auto it = declarations.begin(); it != declarations.end(); ++it) {
-    LoadType decl_type = (*it).getType();
-    std::string decl_value = (*it).getValue()[0];
-
-    if (decl_type.single == Single::VARIABLE && decl_value == val_2) {
-      return true;
-    }
-  }
-  return false;
-}
-
-bool is_synonym(PayLoad clause, int index) { return clause.get_flag()[index]; }
-
-bool is_variable(PayLoad clause, std::vector<PayLoad> declarations) {
-  std::string val_2 = clause.getValue()[1];
-  for (auto it = declarations.begin(); it != declarations.end(); ++it) {
-    LoadType decl_type = (*it).getType();
-    std::string decl_value = (*it).getValue()[0];
-
-    if (decl_type.single == Single::VARIABLE && decl_value == val_2) {
-      return true;
-    }
-  }
-  return false;
 }
 
 // synonyms declared
