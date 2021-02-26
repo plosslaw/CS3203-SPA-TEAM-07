@@ -2,7 +2,7 @@
 #include "StringUtil.h"
 #include "ActionsExecutor.h"
 #include "ActionsGenerator.h"
-
+#include <iostream>
 //constructor
 PatternEval::PatternEval(unordered_map<string, Single> declaration_store, unordered_map<Single, 
             unordered_map<string, vector<string>>> map_storage, ActionsExecutor executor_) {
@@ -18,13 +18,11 @@ vector<string> PatternEval::zero_such_that_one_pattern(PayLoad pattern_pay_load,
     string third_arg = pattern_pay_load.getValue()[2]; //sub expression
     pair<bool, bool> bool_pairs_args = PatternEval::check_if_args_are_variable(first_arg, second_arg);
     //first arg has to be variable by convention.
-    if(!bool_pairs_args.second) {
-        if(PatternEval::is_pattern_variable_is_constant(second_arg)) {
-            second_arg.erase(second_arg.begin());
-            second_arg.pop_back();
+    if(PatternEval::is_pattern_variable_is_constant(second_arg)) {
+        second_arg.erase(second_arg.begin());
+        second_arg.pop_back();
+        bool_pairs_args.second =false;
     }
-    }
-    
     pattern p; p.rvalue = third_arg;
     if (bool_pairs_args.second) {
         // pattern a(v,_) where _ refers to any string term. first arg has to be variable by convention.
