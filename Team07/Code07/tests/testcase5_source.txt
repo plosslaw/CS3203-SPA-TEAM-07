@@ -1,0 +1,31 @@
+procedure nested_if {
+  if(x > 1) then {
+    if(x > 1) then {
+      if(x > 1) then {
+        print x;
+      } else {
+        print x;
+      }
+    } else {
+      if(x > 1) then {
+        print x;
+      } else {
+        print x;
+      }
+    }
+  } else {
+    if(x > 1) then {
+      if(x > 1) then {
+        print x;
+      } else {
+        print x;
+      }
+    } else {
+      if(x > 1) then {
+        print x;
+      } else {
+        print x;
+      }
+    }
+  }
+}
