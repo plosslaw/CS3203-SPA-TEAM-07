@@ -9,8 +9,8 @@
 //constructor
 SuchThatPatternEval::SuchThatPatternEval(unordered_map<string, Single> declaration_store, unordered_map<Single, 
             unordered_map<string, vector<string>>> map_storage, ActionsExecutor executor_) {
-                storeDeclaration = declaration_store;
-                mapStorage = map_storage;
+                store_declaration = declaration_store;
+                this->map_storage = map_storage;
                 executor = executor_; 
 }
 
@@ -52,8 +52,8 @@ vector<string> SuchThatPatternEval::zero_common_synonym(PayLoad such_that_pay_lo
     string pattern_first_arg = pattern_pay_load.getValue()[0];
     string pattern_second_arg = pattern_pay_load.getValue()[1];
     
-    SuchThatEval such_that_eval(storeDeclaration, mapStorage,executor);
-    PatternEval pattern_eval(storeDeclaration, mapStorage,executor);
+    SuchThatEval such_that_eval(store_declaration, map_storage,executor);
+    PatternEval pattern_eval(store_declaration, map_storage,executor);
     pair<bool, bool> is_select_val_in_suchthat(false, false);  
         if (such_that_first_arg == select_value) {
             is_select_val_in_suchthat.first = true;
@@ -79,7 +79,7 @@ vector<string> SuchThatPatternEval::zero_common_synonym(PayLoad such_that_pay_lo
     } else if (is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
         return pattern_lst;
     } else {
-        return (mapStorage[select_type])[select_value];
+        return (map_storage[select_type])[select_value];
     }
 }
 
@@ -88,16 +88,16 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
     string such_that_first_arg = such_that_pay_load.getValue()[0];
     Single such_that_first_type;
     unordered_map<string, Single>::iterator it;
-    it = storeDeclaration.find(such_that_first_arg);
-    if( (it!=storeDeclaration.end())) {
-        such_that_first_type = storeDeclaration[such_that_first_arg];
+    it = store_declaration.find(such_that_first_arg);
+    if( (it!=store_declaration.end())) {
+        such_that_first_type = store_declaration[such_that_first_arg];
     } 
     string such_that_second_arg = such_that_pay_load.getValue()[1];
     Single such_that_second_type;
     unordered_map<string, Single>::iterator it2;
-    it2 = storeDeclaration.find(such_that_second_arg);
-    if( (it2!=storeDeclaration.end())) {
-        such_that_second_type = storeDeclaration[such_that_second_arg];
+    it2 = store_declaration.find(such_that_second_arg);
+    if( (it2!=store_declaration.end())) {
+        such_that_second_type = store_declaration[such_that_second_arg];
     }
 
     string pattern_first_arg = pattern_pay_load.getValue()[0];
@@ -107,8 +107,8 @@ vector<string> SuchThatPatternEval::one_common_synonym(PayLoad such_that_pay_loa
     Pair such_that_type = such_that_pay_load.getType().pair;
     Pair pattern_type = pattern_pay_load.getType().pair;
 
-    SuchThatEval such_that_eval(storeDeclaration, mapStorage,executor);
-    PatternEval pattern_eval(storeDeclaration, mapStorage,executor);
+    SuchThatEval such_that_eval(store_declaration, map_storage,executor);
+    PatternEval pattern_eval(store_declaration, map_storage,executor);
 
     bool is_first_arg_common_such_that = (such_that_first_arg != "_") && (such_that_first_arg == pattern_first_arg || such_that_first_arg == pattern_second_arg);
     bool is_first_arg_common_pattern = (pattern_first_arg != "_") && (pattern_first_arg == such_that_first_arg || pattern_first_arg == such_that_second_arg);
@@ -371,8 +371,8 @@ vector<string> SuchThatPatternEval::more_than_one_common_synonym(PayLoad such_th
     //brute force
     string such_that_first_arg = such_that_pay_load.getValue()[0];
     string such_that_second_arg = such_that_pay_load.getValue()[1];
-    vector<string> first_arg_lst = mapStorage[storeDeclaration[such_that_first_arg]][such_that_first_arg];
-    vector<string> second_arg_lst = mapStorage[storeDeclaration[such_that_second_arg]][such_that_second_arg];
+    vector<string> first_arg_lst = map_storage[store_declaration[such_that_first_arg]][such_that_first_arg];
+    vector<string> second_arg_lst = map_storage[store_declaration[such_that_second_arg]][such_that_second_arg];
     vector<pair<string,string>> arg_lst = SuchThatPatternEval::crossproduct(first_arg_lst, second_arg_lst);
     Pair such_that_type = such_that_pay_load.getType().pair;
     vector<pair<string,string>> combined_pattern_lst;
@@ -455,11 +455,11 @@ pair<bool,bool> SuchThatPatternEval::check_if_args_are_variable(std::string firs
     bool is_first_arg_variable = false;
     bool is_second_arg_variable = false;
 
-    //check if string is in the storedeclaration.
-    if(storeDeclaration.find(first_arg) != storeDeclaration.end()) {
+    //check if string is in the store_declaration.
+    if(store_declaration.find(first_arg) != store_declaration.end()) {
         is_first_arg_variable = true;
     }
-    if(storeDeclaration.find(second_arg) != storeDeclaration.end()) {
+    if(store_declaration.find(second_arg) != store_declaration.end()) {
         is_second_arg_variable = true;
     }
     std::pair<bool, bool> pairArgs;

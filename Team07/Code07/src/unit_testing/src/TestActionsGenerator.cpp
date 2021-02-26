@@ -162,19 +162,19 @@ TEST_CASE("TEST PREPROCESSING OF MAP QUERY") {
     QueryMap mapQuery = map_unit.mapquery;
     ActionsGenerator generator(mapQuery,executor);
     unordered_map<Single, 
-    unordered_map<string, vector<string>>>mapStorage = generator.preprocess();
-    //vector<string> mapStorage = generator.preprocess();
+    unordered_map<string, vector<string>>>map_storage = generator.preprocess();
+    //vector<string> map_storage = generator.preprocess();
     SECTION("TEST individual storages") {
-        REQUIRE(verify_stmts(mapStorage[Single::STATEMENT]["s1"], stmt_lst));
-        REQUIRE(verify_stmts(mapStorage[Single::READ]["re1"],read_lst));
-        REQUIRE(verify_stmts(mapStorage[Single::PRINT]["pn1"], print_lst));
-        REQUIRE(verify_stmts(mapStorage[Single::CALL]["ca1"], call_lst));
-        REQUIRE(verify_stmts(mapStorage[Single::WHILE]["w1"], while_lst));
-        REQUIRE(verify_stmts(mapStorage[Single::IF]["ifs1"], if_lst));
-        REQUIRE(verify_stmts(mapStorage[Single::ASSIGN]["a1"], assignment_lst));
-        REQUIRE(verify_stmts(mapStorage[Single::CONSTANT]["c1"], constant_lst));
-        REQUIRE(verify_stmts(mapStorage[Single::VARIABLE]["v1"], variable_lst));
-        REQUIRE(verify_stmts(mapStorage[Single::PROCEDURE]["p1"], procedure_lst));
+        REQUIRE(verify_stmts(map_storage[Single::STATEMENT]["s1"], stmt_lst));
+        REQUIRE(verify_stmts(map_storage[Single::READ]["re1"],read_lst));
+        REQUIRE(verify_stmts(map_storage[Single::PRINT]["pn1"], print_lst));
+        REQUIRE(verify_stmts(map_storage[Single::CALL]["ca1"], call_lst));
+        REQUIRE(verify_stmts(map_storage[Single::WHILE]["w1"], while_lst));
+        REQUIRE(verify_stmts(map_storage[Single::IF]["ifs1"], if_lst));
+        REQUIRE(verify_stmts(map_storage[Single::ASSIGN]["a1"], assignment_lst));
+        REQUIRE(verify_stmts(map_storage[Single::CONSTANT]["c1"], constant_lst));
+        REQUIRE(verify_stmts(map_storage[Single::VARIABLE]["v1"], variable_lst));
+        REQUIRE(verify_stmts(map_storage[Single::PROCEDURE]["p1"], procedure_lst));
     }
 }
 
