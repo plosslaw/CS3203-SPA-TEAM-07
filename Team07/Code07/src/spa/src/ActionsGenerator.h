@@ -12,7 +12,7 @@ class ActionsGenerator {
     private:
         //variables
         ActionsExecutor executor;
-        QueryMap queryMap;
+        QueryMap query_map;
 
         // List of payloads from respective clauses - SELECT, DECLARATION, SUCHTHAT, PATTERN
         std::vector<PayLoad> select_list;
@@ -57,12 +57,12 @@ class ActionsGenerator {
     public:
         std::vector<PayLoad> get_pattern_list();
         ActionsGenerator();
-        ActionsGenerator(QueryMap mapQuery, ActionsExecutor executorActions);
+        ActionsGenerator(QueryMap query_map, ActionsExecutor executorActions);
         std::unordered_map<Single, 
             std::unordered_map<std::string, std::vector<std::string>>> preprocess();
         void set_map_storage_store_declaration(std::unordered_map<Single, 
             std::unordered_map<std::string, std::vector<std::string>>> storage_map,
             std::unordered_map<std::string, Single> store_declaration);
-        void set_Query_Map(QueryMap mapQuery);
+        void set_Query_Map(QueryMap query_map);
         std::vector<std::string> TraverseQueryMap();
 };

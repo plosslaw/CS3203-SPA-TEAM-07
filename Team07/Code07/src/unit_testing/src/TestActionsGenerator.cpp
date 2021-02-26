@@ -30,7 +30,7 @@ bool verify_stmts(vector<string> test_vector, vector<string> ans_vector){
 
 class Map_Query_unit {
     public:
-        QueryMap mapquery;
+        QueryMap query_map;
 
         void initialise_mock_ast_querymap() {
             //vector<PayLoad> declaration_list{}
@@ -49,36 +49,36 @@ class Map_Query_unit {
             PayLoad var2(SINGLE, Single::VARIABLE, vector<string>{"v2"});
             PayLoad proc(SINGLE, Single::PROCEDURE, vector<string>{"p1"});
             vector<PayLoad> declaration_lst{stmt, re, pn, call,w,ifs,a,c,var,proc};
-            mapquery.addItem(ClauseType::DECLARATION, stmt);
-            mapquery.addItem(ClauseType::DECLARATION, stmt2);
-            mapquery.addItem(ClauseType::DECLARATION, stmt3);
-            mapquery.addItem(ClauseType::DECLARATION, re);
-            mapquery.addItem(ClauseType::DECLARATION, pn);
-            mapquery.addItem(ClauseType::DECLARATION, call);
-            mapquery.addItem(ClauseType::DECLARATION, ifs);
-            mapquery.addItem(ClauseType::DECLARATION, w);
-            mapquery.addItem(ClauseType::DECLARATION, a);
-            mapquery.addItem(ClauseType::DECLARATION, a2);
-            mapquery.addItem(ClauseType::DECLARATION, c);
-            mapquery.addItem(ClauseType::DECLARATION, var);
-            mapquery.addItem(ClauseType::DECLARATION, var2);
-            mapquery.addItem(ClauseType::DECLARATION, proc);
+            query_map.addItem(ClauseType::DECLARATION, stmt);
+            query_map.addItem(ClauseType::DECLARATION, stmt2);
+            query_map.addItem(ClauseType::DECLARATION, stmt3);
+            query_map.addItem(ClauseType::DECLARATION, re);
+            query_map.addItem(ClauseType::DECLARATION, pn);
+            query_map.addItem(ClauseType::DECLARATION, call);
+            query_map.addItem(ClauseType::DECLARATION, ifs);
+            query_map.addItem(ClauseType::DECLARATION, w);
+            query_map.addItem(ClauseType::DECLARATION, a);
+            query_map.addItem(ClauseType::DECLARATION, a2);
+            query_map.addItem(ClauseType::DECLARATION, c);
+            query_map.addItem(ClauseType::DECLARATION, var);
+            query_map.addItem(ClauseType::DECLARATION, var2);
+            query_map.addItem(ClauseType::DECLARATION, proc);
         }
 
         void add_Select_synonym(PayLoad syn) {
-            mapquery.addItem(ClauseType::SELECT, syn);
+            query_map.addItem(ClauseType::SELECT, syn);
         }
         void add_Such_that(PayLoad st) {
-            mapquery.addItem(ClauseType::SUCHTHAT, st);
+            query_map.addItem(ClauseType::SUCHTHAT, st);
         }
         
         void add_pattern(PayLoad pattern1) {
-            mapquery.addItem(ClauseType::PATTERN, pattern1);
+            query_map.addItem(ClauseType::PATTERN, pattern1);
         }
 
         Map_Query_unit() {
             QueryMap q;
-            mapquery = q;    
+            query_map = q;    
         }
 };
 
@@ -90,7 +90,7 @@ vector<string> test_select_only(PayLoad select_payload) {
     Map_Query_unit map_unit;
     map_unit.initialise_mock_ast_querymap();    
     map_unit.add_Select_synonym(select_payload);   
-    QueryMap mapQuery = map_unit.mapquery;
+    QueryMap mapQuery = map_unit.query_map;
     ActionsGenerator generator(mapQuery,executor);
     vector<string> output = generator.TraverseQueryMap();
     return output;
@@ -105,7 +105,7 @@ vector<string> test_select_such_that_only(PayLoad select_payload, PayLoad such_t
     map_unit.initialise_mock_ast_querymap();
     map_unit.add_Select_synonym(select_payload);    
     map_unit.add_Such_that(such_that_payload);   
-    QueryMap mapQuery = map_unit.mapquery;
+    QueryMap mapQuery = map_unit.query_map;
     ActionsGenerator generator(mapQuery,executor);
     vector<string> output = generator.TraverseQueryMap();
     return output;
@@ -119,7 +119,7 @@ vector<string> test_select_pattern_only(PayLoad select_payload, PayLoad pattern_
     map_unit.initialise_mock_ast_querymap();
     map_unit.add_Select_synonym(select_payload); 
     map_unit.add_pattern(pattern_payload);     
-    QueryMap mapQuery = map_unit.mapquery;
+    QueryMap mapQuery = map_unit.query_map;
     ActionsGenerator generator(mapQuery,executor);
     vector<string> output = generator.TraverseQueryMap();
     return output;
@@ -135,7 +135,7 @@ vector<string> test_select_such_that_pattern_only(PayLoad select_payload, PayLoa
     map_unit.add_Select_synonym(select_payload); 
     map_unit.add_Such_that(such_that_payload); 
     map_unit.add_pattern(pattern_payload);     
-    QueryMap mapQuery = map_unit.mapquery;
+    QueryMap mapQuery = map_unit.query_map;
     ActionsGenerator generator(mapQuery,executor);
     vector<string> output = generator.TraverseQueryMap();
     return output;
@@ -159,7 +159,7 @@ TEST_CASE("TEST PREPROCESSING OF MAP QUERY") {
     ActionsExecutor executor(pkb_query_controller);
     Map_Query_unit map_unit;
     map_unit.initialise_mock_ast_querymap();
-    QueryMap mapQuery = map_unit.mapquery;
+    QueryMap mapQuery = map_unit.query_map;
     ActionsGenerator generator(mapQuery,executor);
     unordered_map<Single, 
     unordered_map<string, vector<string>>>map_storage = generator.preprocess();

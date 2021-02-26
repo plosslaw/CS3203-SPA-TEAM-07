@@ -7,7 +7,7 @@
 PatternEval::PatternEval(unordered_map<string, Single> declaration_store, unordered_map<Single, 
             unordered_map<string, vector<string>>> map_storage, ActionsExecutor executor_) {
                 store_declaration = declaration_store;
-                map_storage = map_storage;
+                this->map_storage = map_storage;
                 executor = executor_; 
 }
 

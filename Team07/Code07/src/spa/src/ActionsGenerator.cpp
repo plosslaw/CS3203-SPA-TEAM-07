@@ -15,9 +15,9 @@ using namespace std;
 //constructor
 ActionsGenerator::ActionsGenerator() {}
 
-ActionsGenerator::ActionsGenerator(QueryMap mapQuery, ActionsExecutor executorActions) {
+ActionsGenerator::ActionsGenerator(QueryMap query_map, ActionsExecutor executorActions) {
     executor = executorActions;
-    queryMap = mapQuery;
+    this->query_map = query_map;
     preprocess();
 }
 
@@ -39,12 +39,12 @@ void ActionsGenerator::set_map_storage_store_declaration(unordered_map<Single,
             this->store_declaration = store_declaration;
 }
 
-void ActionsGenerator::set_Query_Map(QueryMap mapQuery) {
-    this->queryMap = mapQuery;
-    declaration_list = mapQuery.getList(ClauseType::DECLARATION);
-    select_list = mapQuery.getList(ClauseType::SELECT);
-    such_that_list = mapQuery.getList(ClauseType::SUCHTHAT);
-    pattern_list = mapQuery.getList(ClauseType::PATTERN);
+void ActionsGenerator::set_Query_Map(QueryMap query_map) {
+    this->query_map = query_map;
+    declaration_list = query_map.getList(ClauseType::DECLARATION);
+    select_list = query_map.getList(ClauseType::SELECT);
+    such_that_list = query_map.getList(ClauseType::SUCHTHAT);
+    pattern_list = query_map.getList(ClauseType::PATTERN);
     
 }
 
@@ -54,10 +54,10 @@ std::vector<PayLoad> ActionsGenerator::get_pattern_list() {
 std::unordered_map<Single, 
         std::unordered_map<std::string, std::vector<std::string>>> ActionsGenerator::preprocess() {
     // preprocessing - retrieval of queryMap clauses
-    declaration_list = queryMap.getList(ClauseType::DECLARATION);
-    select_list = queryMap.getList(ClauseType::SELECT);
-    such_that_list = queryMap.getList(ClauseType::SUCHTHAT);
-    pattern_list = queryMap.getList(ClauseType::PATTERN);
+    declaration_list = query_map.getList(ClauseType::DECLARATION);
+    select_list = query_map.getList(ClauseType::SELECT);
+    such_that_list = query_map.getList(ClauseType::SUCHTHAT);
+    pattern_list = query_map.getList(ClauseType::PATTERN);
     
 
     //DECLARATION
