@@ -42,7 +42,7 @@ TODO Zong Sien
 ![architecture diagram](architecture.png)
 This components in this diagram corresponds to the grouping of functions and stateful objects together rather than components in an OOP sense.
 
-We have three core coreponents
+We have three core components
 - Parser
 - PKB
 - Query Evaluator
