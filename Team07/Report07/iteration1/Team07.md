@@ -39,7 +39,7 @@ TODO Zong Sien
 TODO Zong Sien
 # SPA Design
 ## Overview
-![architecture diagram](architecture.png)
+![architecture diagram](images/architecture.png)
 This components in this diagram corresponds to the grouping of functions and stateful objects together rather than components in an OOP sense.
 
 We have three core components
