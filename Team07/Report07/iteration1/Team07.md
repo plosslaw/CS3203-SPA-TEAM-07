@@ -55,7 +55,7 @@ The `PKBBuilder` builds a `PKBInstance` which is made up of entity tables and a 
 
 The `QueryEvaluator` generates actions (objects describing interaction with PKB Query Controller and composing data returned from it) via the actions generator. These actions are then passed to the actions executor which makes calls to PKB Query Controller. The PKB Query Controller looks up the `PKBInstance` to collect the data requested by the action.
 
-The data recieved is then composed and formatted in the response renderer subcomponent which then returns it back to the query evaluator.
+The data received is then composed and formatted in the response renderer sub component which then returns it back to the query evaluator.
 ## Design Patterns
 We used the facade pattern extensively. To keep the interaction between query evaluation and PKB localized PKB Query Controller serves as a facade rather than interacting with the `PKBInstance` directly.
 
@@ -86,9 +86,9 @@ The simplest combinator is the `charPredicate` that tests the character at the i
 
 Then there is the `stringPredicate` combinator that repeatedly applies the `charPredicate` until a failure occurs, and then resets the state back to just before the failure.
 
-This method of capturing failure and reseting the state, is used heavily. It can be used for repetition checking as in `stringPredicate` or it can be used to use an alternative parser if one fails.
+This method of capturing failure and reset the state, is used heavily. It can be used for repetition checking as in `stringPredicate` or it can be used to use an alternative parser if one fails.
 
-Another parser combinator used alot is the `stringMatch` which matches the character in the source at index position to the characters in sequence in the string argument. E.g. `stringMatch(s, "hello")` matches the source code `hellothere` up until before the character `t`.
+Another parser combinator used a lot is the `stringMatch` which matches the character in the source at index position to the characters in sequence in the string argument. E.g. `stringMatch(s, "hello")` matches the source code `hellothere` up until before the character `t`.
 
 With these primitive combinators, we can build a parser for PQL and SIMPLE.
 
