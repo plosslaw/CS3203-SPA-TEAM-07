@@ -216,8 +216,69 @@ There are also convenient functions that generate the string and caret string po
 
 ### PKB
 TODO
-### Query Processor
-TODO
+### Query Pre-Processor
+The query pre-processor parses and validates queries to ensure they are syntactically and semantically correct. This is done by first parsing a query string into a query object. Thereafter validation is carried out on the parsed query object. 
+
+The query pre-processor `parse_pql()` function is facilitated by 2 operations: 
+- `pql_query()` - Parses the input query into a query object 
+- `pql_validate()` - Validates the query object semantically 
+
+#### Query Object Data Representation
+The query object contains a table of lists where the key describes the `ClauseType` and the value contains the list of parsed clauses from the query. Each item is a `PayLoad` containing information about a single parsed clause (declaration, select, such that, etc). 
+
+![query object class diagram](images/query_object.png)
+
+Figure 1: Query object class diagram
+
+#### Query Pre-processor Parsing 
+The query pre-processor shares the same parsing library as the Source processor which uses the same recursive combinator logic. However, instead of returning an AST, the Query parser returns a table in the form of a `QueryMap`.  
+
+The parsing mechanism is facilitated mainly by the `parse_pql()` which executes the `pql_query()` function. 
+
+Given below is an example usage scenario and how the parsing mechanism behaves. 
+
+Step 1. An input string query is entered from the AutoTester. A `State` object is initialised and passed into `pql_query() ` to be parsed. 
+
+Step 2. When `pql_query()` executes, the query attempts to parse the clauses using the following operations: 
+- `declaration_cl()` - Parses the declaration clause 
+- `select_cl()` - Parses the select clause that starts with the keyword `Select` 
+- `suchthat_cl()` - Parses the such that clause that starts with the keyword `such that` 
+- `pattern_cl()` - Parses the pattern clause that starts with the keyword `pattern` 
+
+Step 3. Once parsed with no syntactical errors in the query’s grammar, the query is parsed to form a table of list stored in `QueryMap`. If a syntactic error occurs, a `prettyPrintException()` is thrown to indicate parsing failure.
+
+#### Query Pre-processor Validation
+The validation mechanism semantically validates the parsed query. It is facilitated mainly by the `parse_pql()` which executes the `pql_validate()`operation after the `pql_query()` operation as described above. 
+
+Given below is an example usage scenario and how the validation mechanism behaves. 
+
+Step 1. The parsed `QueryMap` from `pql_query()` is passed into the `pql_validate()` operation to validate the query semantically. 
+
+Step 2. When `pql_validate()` executes, each parsed clause is validated against the their respective validation operations. The rules are described in table 4. 
+- `is_declaration_clause_valid()` 
+- `is_select_clause_valid()` 
+- `is_suchthat_clause_valid()` 
+- `is_pattern_clause_valid()` 
+
+Step 3. Once validated, the original query object is returned. If a semantic error occurs, a `prettyPrintException()` is thrown to indicate validation failure.
+
+| Clause       | Validation Rules                                                                                                                                                                       | Remarks  |
+|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
+| Declaration  | Synonyms are unique.                                                                                                                                                                   |          |
+| Select       | Synonym declared.                                                                                                                                                                      |          |
+| Such That    | Synonyms declared.  Synonym in StmtRef is of statement type {‘stmt’, ‘read’, ‘print’, ‘call’, ‘while’, ‘if’, ‘assign’}.  Synonym/ IDENT in EntRef is of variable type {‘variable’}.    |          |
+| Pattern      | Synonyms declared.  Synonym of syn-assign is of type assign type {‘assign’}.  Synonym/ IDENT in EntRef is of variable type {‘variable’}.  in EntRef is of variable type {‘variable’}.  |          |
+
+Table 4: PQL validation rules
+
+Examples of valid queries 
+- `stmt s; Select s` 
+- `stmt s1, s2; Select s1 such that Parent (s1, s2)` 
+
+Examples of invalid queries 
+- `stmt s; Select s1` (synonym not declared)
+- `stmt a; Select a pattern a(_, _)` (syn-assign not of type entity type assign) 
+
 # Testing
 ## Unit Testing
 ### SIMPLE
