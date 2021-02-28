@@ -8,9 +8,9 @@
 Matriculation No. | Email
 -|-
 A0125431U | a0125431@u.nus.edu
-E0313668 | e0313668@u.nus.edu
+A0184679H | e0313668@u.nus.edu
 E0308994 | e0308994@u.nus.edu
-E0200944 | e0200944@u.nus.edu
+A0171374E | e0200944@u.nus.edu
 E0196816 | e0196816@u.nus.edu
 E0174832 | e0174832@u.nus.edu
 
