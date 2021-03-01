@@ -25,9 +25,9 @@ TNode Parse (std::string file) {
 		int valPhase = 0;
 		try {
 			std::unordered_set<std::string> procs;
-			validateUniqueProcedureNames(ast, procs);
+			validate_unique_procedure_names(ast, procs);
 			valPhase = 1;
-			validateCallProcedureExists(ast, procs);
+			validate_call_procedure_exists(ast, procs);
 			return ast;
 		} catch (int &valRes) {
 			throw pretty_print_validation(map, valRes, valPhase == 0 ? "repeated procedure definition" : "call on undefined procedure");

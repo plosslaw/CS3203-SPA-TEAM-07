@@ -140,7 +140,7 @@ TNode stmt(State &s) {
 }
 
 /** X :- <X> name ';' */
-TNode unaryOp(State &s, std::string op, stmt_type typ, bool nest_variable = false) {
+TNode unary_op(State &s, std::string op, stmt_type typ, bool nest_variable = false) {
   int init = s.i;
   bool partial = false;
   try {
@@ -172,13 +172,13 @@ TNode unaryOp(State &s, std::string op, stmt_type typ, bool nest_variable = fals
 }
 
 /** read :- 'read' name ';' */
-TNode read(State &s) { return unaryOp(s, "read", READ, true); }
+TNode read(State &s) { return unary_op(s, "read", READ, true); }
 
 /** print :- 'print' name ';' */
-TNode print(State &s) { return unaryOp(s, "print", PRINT, true); }
+TNode print(State &s) { return unary_op(s, "print", PRINT, true); }
 
 /** call :- 'call' name ';' */
-TNode call(State &s) { return unaryOp(s, "call", CALL); }
+TNode call(State &s) { return unary_op(s, "call", CALL); }
 
 /** while_stmt :- 'while' '(' cond_expr ')' '{' stmtLst '}' */
 TNode while_stmt(State &s) {
@@ -549,11 +549,11 @@ TNode constant(State &s) {
 }
 
 
-void validateUniqueProcedureNames(TNode &root, std::unordered_set<std::string> &procs) {
+void validate_unique_procedure_names(TNode &root, std::unordered_set<std::string> &procs) {
   switch(root.getType()) {
     case PROGRAM:
       for(int i = 0; i < root.getChildren().size(); i++) {
-        validateUniqueProcedureNames(root.getChildren()[i], procs);
+        validate_unique_procedure_names(root.getChildren()[i], procs);
       }
       break;
     case PROCEDURE:
@@ -567,21 +567,21 @@ void validateUniqueProcedureNames(TNode &root, std::unordered_set<std::string> &
   }
 }
 
-void validateCallProcedureExists(TNode &root, std::unordered_set<std::string> &procs) {
+void validate_call_procedure_exists(TNode &root, std::unordered_set<std::string> &procs) {
   if(root.getType() == PROGRAM || root.getType() == STATEMENTLIST) {
     for(int i = 0; i < root.getChildren().size(); i++) {
-      validateCallProcedureExists(root.getChildren()[i], procs);
+      validate_call_procedure_exists(root.getChildren()[i], procs);
     }
   } else if(root.getType() == PROCEDURE) {
-    validateCallProcedureExists(root.getChildren()[0], procs);
+    validate_call_procedure_exists(root.getChildren()[0], procs);
   } else if(root.getType() == CALL) {
     if(procs.find(root.getValue()) == procs.end()) {
       throw root.getPos();
     }
   } else if(root.getType() == WHILE) {
-    validateCallProcedureExists(root.getChildren()[1], procs);
+    validate_call_procedure_exists(root.getChildren()[1], procs);
   } else if(root.getType() == IF) {
-    validateCallProcedureExists(root.getChildren()[1], procs);
-    validateCallProcedureExists(root.getChildren()[2], procs);
+    validate_call_procedure_exists(root.getChildren()[1], procs);
+    validate_call_procedure_exists(root.getChildren()[2], procs);
   }
 }
