@@ -8,6 +8,10 @@
 
 **Team07**
 
+**Consultation Hours: Tuesday 12pm - 1pm**
+
+**Tutor: Liu Liyang**
+
 Team Members | Matriculation No. | Email
 -|-|-
 Abdul Haliq S/O Abdul Latiff | A0125431U | a0125431@u.nus.edu
