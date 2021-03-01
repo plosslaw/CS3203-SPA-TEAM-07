@@ -44,7 +44,7 @@ TEST_CASE("predicates") {
   }
 }
 
-int checkStringPred(std::string str, bool (*pred)(char)) {
+int check_string_pred(std::string str, bool (*pred)(char)) {
   std::string strv = str;
   State state(&str);
   string_predicate(state, pred, "");
@@ -53,51 +53,51 @@ int checkStringPred(std::string str, bool (*pred)(char)) {
 
 TEST_CASE("parsers") {
   SECTION("alphanum") {
-    REQUIRE(checkStringPred("a", &alpha_num_pred) == 1);
-    REQUIRE(checkStringPred("A", &alpha_num_pred) == 1);
-    REQUIRE(checkStringPred("1", &alpha_num_pred) == 1);
-    REQUIRE(checkStringPred(".", &alpha_num_pred) == 0);
-    REQUIRE(checkStringPred(" ", &alpha_num_pred) == 0);
+    REQUIRE(check_string_pred("a", &alpha_num_pred) == 1);
+    REQUIRE(check_string_pred("A", &alpha_num_pred) == 1);
+    REQUIRE(check_string_pred("1", &alpha_num_pred) == 1);
+    REQUIRE(check_string_pred(".", &alpha_num_pred) == 0);
+    REQUIRE(check_string_pred(" ", &alpha_num_pred) == 0);
   }
 
   SECTION("digit") {
-    REQUIRE(checkStringPred("a", &digit_pred) == 0);
-    REQUIRE(checkStringPred("A", &digit_pred) == 0);
-    REQUIRE(checkStringPred("1", &digit_pred) == 1);
-    REQUIRE(checkStringPred(".", &digit_pred) == 0);
-    REQUIRE(checkStringPred(" ", &digit_pred) == 0);
+    REQUIRE(check_string_pred("a", &digit_pred) == 0);
+    REQUIRE(check_string_pred("A", &digit_pred) == 0);
+    REQUIRE(check_string_pred("1", &digit_pred) == 1);
+    REQUIRE(check_string_pred(".", &digit_pred) == 0);
+    REQUIRE(check_string_pred(" ", &digit_pred) == 0);
   }
 
   SECTION("alpha") {
-    REQUIRE(checkStringPred("a", &alpha_pred) == 1);
-    REQUIRE(checkStringPred("A", &alpha_pred) == 1);
-    REQUIRE(checkStringPred("1", &alpha_pred) == 0);
-    REQUIRE(checkStringPred(".", &alpha_pred) == 0);
-    REQUIRE(checkStringPred(" ", &alpha_pred) == 0);
+    REQUIRE(check_string_pred("a", &alpha_pred) == 1);
+    REQUIRE(check_string_pred("A", &alpha_pred) == 1);
+    REQUIRE(check_string_pred("1", &alpha_pred) == 0);
+    REQUIRE(check_string_pred(".", &alpha_pred) == 0);
+    REQUIRE(check_string_pred(" ", &alpha_pred) == 0);
   }
 
   SECTION("lower") {
-    REQUIRE(checkStringPred("a", &lower_pred) == 1);
-    REQUIRE(checkStringPred("A", &lower_pred) == 0);
-    REQUIRE(checkStringPred("1", &lower_pred) == 0);
-    REQUIRE(checkStringPred(".", &lower_pred) == 0);
-    REQUIRE(checkStringPred(" ", &lower_pred) == 0);
+    REQUIRE(check_string_pred("a", &lower_pred) == 1);
+    REQUIRE(check_string_pred("A", &lower_pred) == 0);
+    REQUIRE(check_string_pred("1", &lower_pred) == 0);
+    REQUIRE(check_string_pred(".", &lower_pred) == 0);
+    REQUIRE(check_string_pred(" ", &lower_pred) == 0);
   }
 
   SECTION("upper") {
-    REQUIRE(checkStringPred("a", &upper_pred) == 0);
-    REQUIRE(checkStringPred("A", &upper_pred) == 1);
-    REQUIRE(checkStringPred("1", &upper_pred) == 0);
-    REQUIRE(checkStringPred(".", &upper_pred) == 0);
-    REQUIRE(checkStringPred(" ", &upper_pred) == 0);
+    REQUIRE(check_string_pred("a", &upper_pred) == 0);
+    REQUIRE(check_string_pred("A", &upper_pred) == 1);
+    REQUIRE(check_string_pred("1", &upper_pred) == 0);
+    REQUIRE(check_string_pred(".", &upper_pred) == 0);
+    REQUIRE(check_string_pred(" ", &upper_pred) == 0);
   }
   
   SECTION("whitespace") {
-    REQUIRE(checkStringPred("a", &whitespace_pred) == 0);
-    REQUIRE(checkStringPred("A", &whitespace_pred) == 0);
-    REQUIRE(checkStringPred(".", &whitespace_pred) == 0);
-    REQUIRE(checkStringPred("\n", &whitespace_pred) == 1);
-    REQUIRE(checkStringPred(" ", &whitespace_pred) == 1);
+    REQUIRE(check_string_pred("a", &whitespace_pred) == 0);
+    REQUIRE(check_string_pred("A", &whitespace_pred) == 0);
+    REQUIRE(check_string_pred(".", &whitespace_pred) == 0);
+    REQUIRE(check_string_pred("\n", &whitespace_pred) == 1);
+    REQUIRE(check_string_pred(" ", &whitespace_pred) == 1);
   }
 }
 
