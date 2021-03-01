@@ -40,12 +40,14 @@ std::string pretty_print_validation(std::string msg);
 std::string pretty_print_validation(ParserMapper &map, int pos, std::string msg);
 std::string pretty_print_exception(ParserMapper &map, State &s, bool show_stack = true);
 
+char char_match(State &s, char c);
 std::string string_match(State &s, std::string str);
 char char_predicate(State &s, bool (*pred)(char), std::string error_name);
 std::string string_predicate(State &s, bool (*pred)(char),
                             std::string error_name);
 bool whitespace_pred(char c);
 std::string whitespace(State &s);
+char whitespace_char(State &s);
 bool upper_pred(char c);
 std::string upper(State &s);
 bool lower_pred(char c);
@@ -56,9 +58,7 @@ bool digit_pred(char c);
 std::string digit(State &s);
 bool alpha_num_pred(char c);
 std::string alpha_num(State &s);
-bool double_quotes_pred(char c);
 std::string double_quotes(State &s);
-bool wildcard_pred(char c);
 std::string wildcard(State &s);
 
 std::string name(State &s);

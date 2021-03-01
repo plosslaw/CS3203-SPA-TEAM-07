@@ -41,7 +41,7 @@ TNode procedure(State &s) {
     whitespace(s);
     proc_name = name(s);
     whitespace(s);
-    string_match(s, "{");
+    char_match(s, '{');
     whitespace(s);
     stmtLstFail = true;
     TNode t1 = stmtLst(s);
@@ -74,7 +74,7 @@ TNode stmtLst(State &s) {
     State so1(s);
     s.assign(so);
     try {
-      string_match(s, "}");
+      char_match(s, '}');
       whitespace(s);
       return t;
     } catch (ParseException &eUnused) {
@@ -147,14 +147,14 @@ TNode unary_op(State &s, std::string op, stmt_type typ, bool nest_variable = fal
     string_match(s, op);
     partial = true;
     // :- '<op>'
-    string_match(s, " ");
+    whitespace_char(s);
     // compulsory whitespace
     whitespace(s);
     int var_i = s.i;
     std::string n = name(s);
     // :- name
     whitespace(s);
-    string_match(s, ";");
+    char_match(s, ';');
     // :- ';'
     whitespace(s);
     if (nest_variable) {
@@ -189,12 +189,12 @@ TNode while_stmt(State &s) {
   try {
     string_match(s, "while");
     whitespace(s);
-    string_match(s, "(");
+    char_match(s, '(');
     whitespace(s);
     TNode t1 = cond_expr(s);
-    string_match(s, ")");
+    char_match(s, ')');
     whitespace(s);
-    string_match(s, "{");
+    char_match(s, '{');
     whitespace(s);
     stmtLstFail = true;
     TNode t2 = stmtLst(s);
@@ -219,21 +219,21 @@ TNode if_stmt(State &s) {
   try {
     string_match(s, "if");
     whitespace(s);
-    string_match(s, "(");
+    char_match(s, '(');
     whitespace(s);
     TNode t1 = cond_expr(s);
-    string_match(s, ")");
+    char_match(s, ')');
     whitespace(s);
     string_match(s, "then");
     whitespace(s);
-    string_match(s, "{");
+    char_match(s, '{');
     whitespace(s);
     stmtLstFail = true;
     TNode t2 = stmtLst(s);
     stmtLstFail = false;
     string_match(s, "else");
     whitespace(s);
-    string_match(s, "{");
+    char_match(s, '{');
     whitespace(s);
     stmtLstFail = true;
     TNode t3 = stmtLst(s);
@@ -255,10 +255,10 @@ TNode assign(State &s) {
   try {
     TNode t1 = variable(s);
     whitespace(s);
-    string_match(s, "=");
+    char_match(s, '=');
     whitespace(s);
     TNode t2 = expr(s);
-    string_match(s, ";");
+    char_match(s, ';');
     TNode t(s.adv_cur_stmt_num(), "", ASSIGN, init);
     t.addChild(t1);
     t.addChild(t2);
@@ -279,12 +279,12 @@ TNode cond_expr(State &s) {
   } catch (ParseException &e) {
     s.assign(so);
     try {
-      string_match(s, "!");
+      char_match(s, '!');
       whitespace(s);
-      string_match(s, "(");
+      char_match(s, '(');
       whitespace(s);
       TNode t1 = cond_expr(s);
-      string_match(s, ")");
+      char_match(s, ')');
       whitespace(s);
       TNode t("!", EXPR, so.i);
       t.addChild(t1);
@@ -293,10 +293,10 @@ TNode cond_expr(State &s) {
       s.assign(so);
       try {
         s.assign(so);
-        string_match(s, "(");
+        char_match(s, '(');
         whitespace(s);
         TNode t1 = cond_expr(s);
-        string_match(s, ")");
+        char_match(s, ')');
         whitespace(s);
         State so1(s);
         std::string op;
@@ -311,10 +311,10 @@ TNode cond_expr(State &s) {
           }
         }
         whitespace(s);
-        string_match(s, "(");
+        char_match(s, '(');
         whitespace(s);
         TNode t2 = cond_expr(s);
-        string_match(s, ")");
+        char_match(s, ')');
         whitespace(s);
         TNode t(op, EXPR, so.i);
         t.addChild(t1);
@@ -347,7 +347,7 @@ TNode rel_expr(State &s) {
   } catch (ParseException &e) {
     s.assign(so);
     try {
-      op = string_match(s, ">");
+      op = char_match(s, '>');
     } catch (ParseException &e) {
       s.assign(so);
       try {
@@ -355,7 +355,7 @@ TNode rel_expr(State &s) {
       } catch (ParseException &e) {
         s.assign(so);
         try {
-          op = string_match(s, "<");
+          op = char_match(s, '<');
         } catch (ParseException &e) {
           s.assign(so);
           try {
@@ -419,11 +419,11 @@ TNode expr_1(State &s, TNode &lchild) {
   State so(s);
   std::string op;
   try {
-    op = string_match(s, "+");
+    op = char_match(s, '+');
   } catch (ParseException &e) {
     s.assign(so);
     try {
-      op = string_match(s, "-");
+      op = char_match(s, '-');
     } catch (ParseException &e) {
       s.assign(so);
       return lchild;
@@ -466,15 +466,15 @@ TNode term_1(State &s, TNode &lchild) {
   State so(s);
   std::string op;
   try {
-    op = string_match(s, "*");
+    op = char_match(s, '*');
   } catch (ParseException &e) {
     s.assign(so);
     try {
-      op = string_match(s, "/");
+      op = char_match(s, '/');
     } catch (ParseException &e) {
       s.assign(so);
       try {
-        op = string_match(s, "%");
+        op = char_match(s, '%');
       } catch (ParseException &e) {
         s.assign(so);
         return lchild;
@@ -511,11 +511,11 @@ TNode factor(State &s) {
     } catch (ParseException &e) {
       s.assign(so);
       try {
-        string_match(s, "(");
+        char_match(s, '(');
         whitespace(s);
         TNode t = expr(s);
         whitespace(s);
-        string_match(s, ")");
+        char_match(s, ')');
         return t;
       } catch (ParseException &e) {
         throw ParseException(so.i, s.i, "factor", "");

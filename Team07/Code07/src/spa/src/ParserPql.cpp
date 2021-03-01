@@ -145,13 +145,13 @@ std::vector<PayLoad> stmt_and_stmt_ref(State &state) {
   std::vector<PayLoad> refs;
   State so(state);
   try {
-    string_match(state, "(");
+    char_match(state, '(');
     whitespace(state);
 
     refs.push_back(stmt_ref(state));
     whitespace(state);
 
-    string_match(state, ",");
+    char_match(state, ',');
     whitespace(state);
 
     refs.push_back(stmt_ref(state));
@@ -159,7 +159,7 @@ std::vector<PayLoad> stmt_and_stmt_ref(State &state) {
 
     whitespace(state);
 
-    string_match(state, ")");
+    char_match(state, ')');
     whitespace(state);
 
     return refs;
@@ -175,19 +175,19 @@ std::vector<PayLoad> stmt_and_ent_ref(State &state) {
   std::vector<PayLoad> refs;
   State so(state);
   try {
-    string_match(state, "(");
+    char_match(state, '(');
     whitespace(state);
 
     refs.push_back(stmt_ref(state));
     whitespace(state);
 
-    string_match(state, ",");
+    char_match(state, ',');
     whitespace(state);
 
     refs.push_back(ent_ref(state));
     whitespace(state);
 
-    string_match(state, ")");
+    char_match(state, ')');
     whitespace(state);
 
     return refs;
@@ -203,19 +203,19 @@ std::vector<PayLoad> ent_and_expr_spec(State &state) {
   std::vector<PayLoad> refs;
   State so(state);
   try {
-    string_match(state, "(");
+    char_match(state, '(');
     whitespace(state);
 
     refs.push_back(ent_ref(state));
     whitespace(state);
 
-    string_match(state, ",");
+    char_match(state, ',');
     whitespace(state);
 
     refs.push_back(expr_spec(state));
     whitespace(state);
 
-    string_match(state, ")");
+    char_match(state, ')');
     whitespace(state);
 
     return refs;
@@ -244,7 +244,7 @@ std::vector<PayLoad> declaration(State &state, std::string design_entity,
     so.assign(state);
 
     while (true) {
-      string_match(state, ",");
+      char_match(state, ',');
       whitespace(state);
 
       std::vector<std::string> values;
@@ -257,7 +257,7 @@ std::vector<PayLoad> declaration(State &state, std::string design_entity,
   } catch (ParseException &e) {
     state.assign(so);
     try {
-      string_match(state, ";");
+      char_match(state, ';');
       whitespace(state);
       return declarations;
     } catch (ParseException &e) {
@@ -544,7 +544,11 @@ PayLoad suchthat_cl(State &state) {
   std::vector<PayLoad> suchthats;
   State so(state);
   try {
-    string_match(state, "such that");
+    string_match(state, "such");
+    whitespace_char(state);
+    whitespace(state);
+    string_match(state, "that");
+    whitespace_char(state);
     whitespace(state);
 
     PayLoad clause = suchthat(state);

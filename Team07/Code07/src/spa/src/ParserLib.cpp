@@ -77,6 +77,20 @@ std::string pretty_print_exception(ParserMapper &map, State &s, bool show_stack)
 
 // combinators ----------------------------------------------------------------
 
+char char_match(State &s, char c) {
+  int init = s.i;
+  try {
+    if ((*s.source).at(s.i) != c) {
+      throw ParseException(init, s.i, "char_match", std::to_string(c));
+    }
+    s.i++;
+    return c;
+  } catch (std::out_of_range &e) {
+    s.i = (*s.source).size();
+    throw ParseException(init, s.i, "char_match", std::to_string(c));
+  }
+}
+
 std::string string_match(State &s, std::string str) {
   int init = s.i;
   try {
@@ -126,6 +140,10 @@ std::string string_predicate(State &s, bool (*pred)(char),
   return str;
 }
 
+char whitespace_char(State &s) {
+  return char_predicate(s, &whitespace_pred, "whitespace");
+}
+
 std::string whitespace(State &s) {
   return string_predicate(s, &whitespace_pred, "whitespace");
 }
@@ -143,11 +161,13 @@ std::string alpha_num(State &s) {
 }
 
 std::string double_quotes(State &s) {
-  return string_predicate(s, &double_quotes_pred, "double_quotes");
+  char_match(s, '"');
+  return "\"";
 }
 
 std::string wildcard(State &s) {
-  return string_predicate(s, &wildcard_pred, "wildcard");
+  char_match(s, '_');
+  return "_";
 }
 
 // predicates -----------------------------------------------------------------
@@ -163,10 +183,6 @@ bool alpha_pred(char c) { return std::isalpha(c); }
 bool digit_pred(char c) { return std::isdigit(c); }
 
 bool alpha_num_pred(char c) { return std::isalnum(c); }
-
-bool double_quotes_pred(char c) { return c == '\"'; }
-
-bool wildcard_pred(char c) { return c == '_'; }
 
 // Low level abstractions
 // -----------------------------------------------------------------
