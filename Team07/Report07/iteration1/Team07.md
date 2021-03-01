@@ -1,18 +1,23 @@
-# CS3203 Software Engineering Project
+![logo](./images/NUS_SoC_Logo_sq.jpg)
+
+**CS3203 Software Engineering Project**
+
 **AY20/21 Semester 2**
 
 **Iteration 1 Project Report**
 
 **Team07**
 
-Matriculation No. | Email
--|-
-A0125431U | a0125431@u.nus.edu
-A0184679H | e0313668@u.nus.edu
-E0308994 | e0308994@u.nus.edu
-A0171374E | e0200944@u.nus.edu
-E0196816 | e0196816@u.nus.edu
-E0174832 | e0174832@u.nus.edu
+Team Members | Matriculation No. | Email
+-|-|-
+Abdul Haliq S/O Abdul Latiff | A0125431U | a0125431@u.nus.edu
+Yap Dian Hao | A0184679H | e0313668@u.nus.edu
+Wong Chuan Kai | - | e0308994@u.nus.edu
+Ho Zong Sien | A0171374E | e0200944@u.nus.edu
+Pakorn Ueareeworakul | A0170861E | e0196816@u.nus.edu
+Guo Bohao | A0117428E | e0174832@u.nus.edu
+
+<div style="page-break-after: always;"></div>
 
 # Scope
 ## Features Implemented
