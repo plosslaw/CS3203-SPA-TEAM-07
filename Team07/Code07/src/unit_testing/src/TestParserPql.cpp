@@ -1632,6 +1632,6 @@ TEST_CASE("Validate empty clause") {
     QueryMap expected_query_map;
 
     REQUIRE_THROWS(pql_validate(input_query_map),
-                   throw prettyPrintValidation("Empty query."));
+                   throw pretty_print_validation("Empty query."));
   }
 }

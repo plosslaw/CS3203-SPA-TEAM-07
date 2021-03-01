@@ -6,98 +6,98 @@
 
 TEST_CASE("predicates") {
   SECTION("alphanum") {
-    REQUIRE(alphanumPred('a'));
-    REQUIRE(alphanumPred('A'));
-    REQUIRE(alphanumPred('1'));
-    REQUIRE_FALSE(alphanumPred('.'));
+    REQUIRE(alpha_num_pred('a'));
+    REQUIRE(alpha_num_pred('A'));
+    REQUIRE(alpha_num_pred('1'));
+    REQUIRE_FALSE(alpha_num_pred('.'));
   }
 
   SECTION("digit") {
-    REQUIRE(digitPred('1'));
-    REQUIRE_FALSE(digitPred('a'));
-    REQUIRE_FALSE(digitPred('.'));
+    REQUIRE(digit_pred('1'));
+    REQUIRE_FALSE(digit_pred('a'));
+    REQUIRE_FALSE(digit_pred('.'));
   }
 
   SECTION("alpha") {
-    REQUIRE(alphaPred('a'));
-    REQUIRE(alphaPred('A'));
-    REQUIRE_FALSE(alphaPred('1'));
-    REQUIRE_FALSE(alphaPred('.'));
+    REQUIRE(alpha_pred('a'));
+    REQUIRE(alpha_pred('A'));
+    REQUIRE_FALSE(alpha_pred('1'));
+    REQUIRE_FALSE(alpha_pred('.'));
   }
 
   SECTION("lower") {
-    REQUIRE(lowerPred('a'));
-    REQUIRE_FALSE(lowerPred('A'));
-    REQUIRE_FALSE(lowerPred('.'));
+    REQUIRE(lower_pred('a'));
+    REQUIRE_FALSE(lower_pred('A'));
+    REQUIRE_FALSE(lower_pred('.'));
   }
 
   SECTION("upper") {
-    REQUIRE_FALSE(upperPred('a'));
-    REQUIRE(upperPred('A'));
-    REQUIRE_FALSE(upperPred('.'));
+    REQUIRE_FALSE(upper_pred('a'));
+    REQUIRE(upper_pred('A'));
+    REQUIRE_FALSE(upper_pred('.'));
   }
   
   SECTION("whitespace") {
-    REQUIRE(whitespacePred(' '));
-    REQUIRE(whitespacePred('\n'));
-    REQUIRE_FALSE(whitespacePred('.'));
+    REQUIRE(whitespace_pred(' '));
+    REQUIRE(whitespace_pred('\n'));
+    REQUIRE_FALSE(whitespace_pred('.'));
   }
 }
 
 int checkStringPred(std::string str, bool (*pred)(char)) {
   std::string strv = str;
   State state(&str);
-  stringPredicate(state, pred, "");
+  string_predicate(state, pred, "");
   return state.i;
 }
 
 TEST_CASE("parsers") {
   SECTION("alphanum") {
-    REQUIRE(checkStringPred("a", &alphanumPred) == 1);
-    REQUIRE(checkStringPred("A", &alphanumPred) == 1);
-    REQUIRE(checkStringPred("1", &alphanumPred) == 1);
-    REQUIRE(checkStringPred(".", &alphanumPred) == 0);
-    REQUIRE(checkStringPred(" ", &alphanumPred) == 0);
+    REQUIRE(checkStringPred("a", &alpha_num_pred) == 1);
+    REQUIRE(checkStringPred("A", &alpha_num_pred) == 1);
+    REQUIRE(checkStringPred("1", &alpha_num_pred) == 1);
+    REQUIRE(checkStringPred(".", &alpha_num_pred) == 0);
+    REQUIRE(checkStringPred(" ", &alpha_num_pred) == 0);
   }
 
   SECTION("digit") {
-    REQUIRE(checkStringPred("a", &digitPred) == 0);
-    REQUIRE(checkStringPred("A", &digitPred) == 0);
-    REQUIRE(checkStringPred("1", &digitPred) == 1);
-    REQUIRE(checkStringPred(".", &digitPred) == 0);
-    REQUIRE(checkStringPred(" ", &digitPred) == 0);
+    REQUIRE(checkStringPred("a", &digit_pred) == 0);
+    REQUIRE(checkStringPred("A", &digit_pred) == 0);
+    REQUIRE(checkStringPred("1", &digit_pred) == 1);
+    REQUIRE(checkStringPred(".", &digit_pred) == 0);
+    REQUIRE(checkStringPred(" ", &digit_pred) == 0);
   }
 
   SECTION("alpha") {
-    REQUIRE(checkStringPred("a", &alphaPred) == 1);
-    REQUIRE(checkStringPred("A", &alphaPred) == 1);
-    REQUIRE(checkStringPred("1", &alphaPred) == 0);
-    REQUIRE(checkStringPred(".", &alphaPred) == 0);
-    REQUIRE(checkStringPred(" ", &alphaPred) == 0);
+    REQUIRE(checkStringPred("a", &alpha_pred) == 1);
+    REQUIRE(checkStringPred("A", &alpha_pred) == 1);
+    REQUIRE(checkStringPred("1", &alpha_pred) == 0);
+    REQUIRE(checkStringPred(".", &alpha_pred) == 0);
+    REQUIRE(checkStringPred(" ", &alpha_pred) == 0);
   }
 
   SECTION("lower") {
-    REQUIRE(checkStringPred("a", &lowerPred) == 1);
-    REQUIRE(checkStringPred("A", &lowerPred) == 0);
-    REQUIRE(checkStringPred("1", &lowerPred) == 0);
-    REQUIRE(checkStringPred(".", &lowerPred) == 0);
-    REQUIRE(checkStringPred(" ", &lowerPred) == 0);
+    REQUIRE(checkStringPred("a", &lower_pred) == 1);
+    REQUIRE(checkStringPred("A", &lower_pred) == 0);
+    REQUIRE(checkStringPred("1", &lower_pred) == 0);
+    REQUIRE(checkStringPred(".", &lower_pred) == 0);
+    REQUIRE(checkStringPred(" ", &lower_pred) == 0);
   }
 
   SECTION("upper") {
-    REQUIRE(checkStringPred("a", &upperPred) == 0);
-    REQUIRE(checkStringPred("A", &upperPred) == 1);
-    REQUIRE(checkStringPred("1", &upperPred) == 0);
-    REQUIRE(checkStringPred(".", &upperPred) == 0);
-    REQUIRE(checkStringPred(" ", &upperPred) == 0);
+    REQUIRE(checkStringPred("a", &upper_pred) == 0);
+    REQUIRE(checkStringPred("A", &upper_pred) == 1);
+    REQUIRE(checkStringPred("1", &upper_pred) == 0);
+    REQUIRE(checkStringPred(".", &upper_pred) == 0);
+    REQUIRE(checkStringPred(" ", &upper_pred) == 0);
   }
   
   SECTION("whitespace") {
-    REQUIRE(checkStringPred("a", &whitespacePred) == 0);
-    REQUIRE(checkStringPred("A", &whitespacePred) == 0);
-    REQUIRE(checkStringPred(".", &whitespacePred) == 0);
-    REQUIRE(checkStringPred("\n", &whitespacePred) == 1);
-    REQUIRE(checkStringPred(" ", &whitespacePred) == 1);
+    REQUIRE(checkStringPred("a", &whitespace_pred) == 0);
+    REQUIRE(checkStringPred("A", &whitespace_pred) == 0);
+    REQUIRE(checkStringPred(".", &whitespace_pred) == 0);
+    REQUIRE(checkStringPred("\n", &whitespace_pred) == 1);
+    REQUIRE(checkStringPred(" ", &whitespace_pred) == 1);
   }
 }
 

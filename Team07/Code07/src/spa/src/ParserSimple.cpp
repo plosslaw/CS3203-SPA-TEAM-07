@@ -37,11 +37,11 @@ TNode procedure(State &s) {
   bool stmtLstFail = false;
   std::string proc_name;
   try {
-    stringMatch(s, "procedure");
+    string_match(s, "procedure");
     whitespace(s);
     proc_name = name(s);
     whitespace(s);
-    stringMatch(s, "{");
+    string_match(s, "{");
     whitespace(s);
     stmtLstFail = true;
     TNode t1 = stmtLst(s);
@@ -74,7 +74,7 @@ TNode stmtLst(State &s) {
     State so1(s);
     s.assign(so);
     try {
-      stringMatch(s, "}");
+      string_match(s, "}");
       whitespace(s);
       return t;
     } catch (ParseException &eUnused) {
@@ -144,26 +144,26 @@ TNode unaryOp(State &s, std::string op, stmt_type typ, bool nest_variable = fals
   int init = s.i;
   bool partial = false;
   try {
-    stringMatch(s, op);
+    string_match(s, op);
     partial = true;
     // :- '<op>'
-    stringMatch(s, " ");
+    string_match(s, " ");
     // compulsory whitespace
     whitespace(s);
     int var_i = s.i;
     std::string n = name(s);
     // :- name
     whitespace(s);
-    stringMatch(s, ";");
+    string_match(s, ";");
     // :- ';'
     whitespace(s);
     if (nest_variable) {
-      TNode stmtNode = TNode(s.advCurStmtNum(), "", typ, init);
+      TNode stmtNode = TNode(s.adv_cur_stmt_num(), "", typ, init);
       TNode varNode = TNode(n, VARIABLE, var_i);
       stmtNode.addChild(varNode);
       return stmtNode;
     } else {
-      return TNode(s.advCurStmtNum(), n, typ, init);
+      return TNode(s.adv_cur_stmt_num(), n, typ, init);
     }
   } catch (ParseException &e) {
     s.excps.push_back(e);
@@ -183,18 +183,18 @@ TNode call(State &s) { return unaryOp(s, "call", CALL); }
 /** while_stmt :- 'while' '(' cond_expr ')' '{' stmtLst '}' */
 TNode while_stmt(State &s) {
   int init = s.i;
-  int initNum = s.curStmtNum;
-  TNode t(s.advCurStmtNum(), "", WHILE, init);
+  int initNum = s.cur_stmt_num;
+  TNode t(s.adv_cur_stmt_num(), "", WHILE, init);
   bool stmtLstFail = false;
   try {
-    stringMatch(s, "while");
+    string_match(s, "while");
     whitespace(s);
-    stringMatch(s, "(");
+    string_match(s, "(");
     whitespace(s);
     TNode t1 = cond_expr(s);
-    stringMatch(s, ")");
+    string_match(s, ")");
     whitespace(s);
-    stringMatch(s, "{");
+    string_match(s, "{");
     whitespace(s);
     stmtLstFail = true;
     TNode t2 = stmtLst(s);
@@ -204,7 +204,7 @@ TNode while_stmt(State &s) {
     return t;
   } catch (ParseException &e) {
     s.excps.push_back(e);
-    s.curStmtNum = initNum;
+    s.cur_stmt_num = initNum;
     throw ParseException(init, s.i, "while_stmt", stmtLstFail ? "body" : "");
   }
 }
@@ -213,27 +213,27 @@ TNode while_stmt(State &s) {
  * '}' */
 TNode if_stmt(State &s) {
   int init = s.i;
-  int initNum = s.curStmtNum;
-  TNode t(s.advCurStmtNum(), "", IF, init);
+  int initNum = s.cur_stmt_num;
+  TNode t(s.adv_cur_stmt_num(), "", IF, init);
   bool stmtLstFail = false;
   try {
-    stringMatch(s, "if");
+    string_match(s, "if");
     whitespace(s);
-    stringMatch(s, "(");
+    string_match(s, "(");
     whitespace(s);
     TNode t1 = cond_expr(s);
-    stringMatch(s, ")");
+    string_match(s, ")");
     whitespace(s);
-    stringMatch(s, "then");
+    string_match(s, "then");
     whitespace(s);
-    stringMatch(s, "{");
+    string_match(s, "{");
     whitespace(s);
     stmtLstFail = true;
     TNode t2 = stmtLst(s);
     stmtLstFail = false;
-    stringMatch(s, "else");
+    string_match(s, "else");
     whitespace(s);
-    stringMatch(s, "{");
+    string_match(s, "{");
     whitespace(s);
     stmtLstFail = true;
     TNode t3 = stmtLst(s);
@@ -244,28 +244,28 @@ TNode if_stmt(State &s) {
     return t;
   } catch (ParseException &e) {
     s.excps.push_back(e);
-    s.curStmtNum = initNum;
+    s.cur_stmt_num = initNum;
     throw ParseException(init, s.i, "if_stmt", stmtLstFail ? "body" : "");
   }
 }
 
 TNode assign(State &s) {
   int init = s.i;
-  int initNum = s.curStmtNum;
+  int initNum = s.cur_stmt_num;
   try {
     TNode t1 = variable(s);
     whitespace(s);
-    stringMatch(s, "=");
+    string_match(s, "=");
     whitespace(s);
     TNode t2 = expr(s);
-    stringMatch(s, ";");
-    TNode t(s.advCurStmtNum(), "", ASSIGN, init);
+    string_match(s, ";");
+    TNode t(s.adv_cur_stmt_num(), "", ASSIGN, init);
     t.addChild(t1);
     t.addChild(t2);
     return t;
   } catch (ParseException &e) {
     s.excps.push_back(e);
-    s.curStmtNum = initNum;
+    s.cur_stmt_num = initNum;
     throw ParseException(init, s.i, "assign", "");
   }
 }
@@ -279,12 +279,12 @@ TNode cond_expr(State &s) {
   } catch (ParseException &e) {
     s.assign(so);
     try {
-      stringMatch(s, "!");
+      string_match(s, "!");
       whitespace(s);
-      stringMatch(s, "(");
+      string_match(s, "(");
       whitespace(s);
       TNode t1 = cond_expr(s);
-      stringMatch(s, ")");
+      string_match(s, ")");
       whitespace(s);
       TNode t("!", EXPR, so.i);
       t.addChild(t1);
@@ -293,28 +293,28 @@ TNode cond_expr(State &s) {
       s.assign(so);
       try {
         s.assign(so);
-        stringMatch(s, "(");
+        string_match(s, "(");
         whitespace(s);
         TNode t1 = cond_expr(s);
-        stringMatch(s, ")");
+        string_match(s, ")");
         whitespace(s);
         State so1(s);
         std::string op;
         try {
-          op = stringMatch(s, "&&");
+          op = string_match(s, "&&");
         } catch (ParseException &e) {
           try {
-            op = stringMatch(s, "||");
+            op = string_match(s, "||");
           } catch (ParseException &e) {
             s.excps.push_back(e);
             throw ParseException(so1.i, s.i, "cond_expr", "bin_op");
           }
         }
         whitespace(s);
-        stringMatch(s, "(");
+        string_match(s, "(");
         whitespace(s);
         TNode t2 = cond_expr(s);
-        stringMatch(s, ")");
+        string_match(s, ")");
         whitespace(s);
         TNode t(op, EXPR, so.i);
         t.addChild(t1);
@@ -343,27 +343,27 @@ TNode rel_expr(State &s) {
   std::string op;
   so.assign(s);
   try {
-    op = stringMatch(s, ">=");
+    op = string_match(s, ">=");
   } catch (ParseException &e) {
     s.assign(so);
     try {
-      op = stringMatch(s, ">");
+      op = string_match(s, ">");
     } catch (ParseException &e) {
       s.assign(so);
       try {
-        op = stringMatch(s, "<=");
+        op = string_match(s, "<=");
       } catch (ParseException &e) {
         s.assign(so);
         try {
-          op = stringMatch(s, "<");
+          op = string_match(s, "<");
         } catch (ParseException &e) {
           s.assign(so);
           try {
-            op = stringMatch(s, "==");
+            op = string_match(s, "==");
           } catch (ParseException &e) {
             s.assign(so);
             try {
-              op = stringMatch(s, "!=");
+              op = string_match(s, "!=");
             } catch (ParseException &e) {
               s.excps.push_back(e);
               throw ParseException(so.i, s.i, "rel_expr", "operator");
@@ -419,11 +419,11 @@ TNode expr_1(State &s, TNode &lchild) {
   State so(s);
   std::string op;
   try {
-    op = stringMatch(s, "+");
+    op = string_match(s, "+");
   } catch (ParseException &e) {
     s.assign(so);
     try {
-      op = stringMatch(s, "-");
+      op = string_match(s, "-");
     } catch (ParseException &e) {
       s.assign(so);
       return lchild;
@@ -466,15 +466,15 @@ TNode term_1(State &s, TNode &lchild) {
   State so(s);
   std::string op;
   try {
-    op = stringMatch(s, "*");
+    op = string_match(s, "*");
   } catch (ParseException &e) {
     s.assign(so);
     try {
-      op = stringMatch(s, "/");
+      op = string_match(s, "/");
     } catch (ParseException &e) {
       s.assign(so);
       try {
-        op = stringMatch(s, "%");
+        op = string_match(s, "%");
       } catch (ParseException &e) {
         s.assign(so);
         return lchild;
@@ -511,11 +511,11 @@ TNode factor(State &s) {
     } catch (ParseException &e) {
       s.assign(so);
       try {
-        stringMatch(s, "(");
+        string_match(s, "(");
         whitespace(s);
         TNode t = expr(s);
         whitespace(s);
-        stringMatch(s, ")");
+        string_match(s, ")");
         return t;
       } catch (ParseException &e) {
         throw ParseException(so.i, s.i, "factor", "");
