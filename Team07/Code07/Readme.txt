@@ -12,5 +12,5 @@
 
 e.g
 ```
-. ./run_autotester.sh ./tests/Sample_source.txt ./tests/Sample_queries.txt ./tests/out.xml
+. ./run_autotester.sh ../Tests07/Sample_source.txt ../Tests07/Sample_queries.txt ../Tests07/out.xml
 ```
