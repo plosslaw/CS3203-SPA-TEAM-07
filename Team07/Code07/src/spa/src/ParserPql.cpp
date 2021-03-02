@@ -544,10 +544,7 @@ PayLoad suchthat_cl(State &state) {
   std::vector<PayLoad> suchthats;
   State so(state);
   try {
-    string_match(state, "such");
-    whitespace_char(state);
-    whitespace(state);
-    string_match(state, "that");
+    string_match(state, "such that");
     whitespace_char(state);
     whitespace(state);
 
