@@ -21,11 +21,17 @@ enum stmt_type {
   PROGRAM,
 };
 
+//Argument Position for relation/pattern functions e.g. Follows(s1, 9) -> arg_pos = FIRST_ARG
+enum arg_pos {
+    FIRST_ARG,
+    SECOND_ARG
+};
+
 // Statement number of the referenced assign statement
 typedef int assign_ref;
 
 // Integer value of the constant
-typedef int const_value;
+typedef std::string const_value;
 
 // Statement number, note that we use NULL_STMT_REF to represent a null statement reference
 typedef int stmt_ref;

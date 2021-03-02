@@ -20,12 +20,13 @@ public:
   TNode(std::string val, stmt_type typ, int p);
   TNode(int num, std::string val, stmt_type typ, int p);
 
-  void addChild(TNode child);
+  TNode& addChild(TNode child);
   int getStatementNum();
   int getPos();
   std::string getValue();
   stmt_type getType();
   std::vector<TNode> getChildren();
   std::string toSexp(int sep = 0);
-  bool eq(TNode &t);
+  std::string toStub(int sep = 0);
+  bool eq(TNode rhs);
 };

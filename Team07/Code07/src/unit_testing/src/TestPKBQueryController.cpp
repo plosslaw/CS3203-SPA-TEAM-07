@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "PKB.H"
+#include "PKB.h"
 #include "PKBQueryController.cpp"
 #include "PKBEntities.hpp"
 #include "Types.hpp"
@@ -28,7 +28,8 @@ TEST_CASE("One") {
     std::unordered_set<var_ref> uses1;
     std::unordered_set<var_ref> modifies1;
     proc_ref reference1 = "gcd";
-    procedure one = {reference1, children1, uses1, modifies1};
+    TNode ast1;
+    procedure one = {reference1, ast1, children1, uses1, modifies1};
     procedures.insert(std::make_pair(reference1, one));
 
     //line 2
@@ -79,6 +80,9 @@ TEST_CASE("One") {
     indirect_follows4.insert(8);
     statement four = {reference4, type4, ast4, uses4, modifies4, parent4, follows4, indirect_parent4, indirect_follows4};
     statements.insert(std::make_pair(reference4, four));
+    assignment assignment1 = {"a % b"};
+    assign_ref assign4 = 4;
+    assignments.insert(std::make_pair(assign4, assignment1));
 
     //line 5
     stmt_ref reference5 = 4;
@@ -155,7 +159,7 @@ TEST_CASE("One") {
     variables.insert(std::make_pair("temp", temp));
 
     // store constants
-    constants.insert(0);
+    constants.insert("0");
 
     //initialise pkb
     TNode root;
@@ -163,7 +167,7 @@ TEST_CASE("One") {
 
     PKBQueryController pkbQueryController = PKBQueryController(pkb);
 
-    SECTION("Check isFollows") {
+    SECTION("check_is_follows") {
         REQUIRE(pkbQueryController.isFollows(1, 2) == true);
         REQUIRE(pkbQueryController.isFollows(2, 3) == true);
         REQUIRE(pkbQueryController.isFollows(4, 5) == true);
@@ -172,7 +176,7 @@ TEST_CASE("One") {
         REQUIRE(pkbQueryController.isFollows(2, 1) == false);
     }
 
-    SECTION("Check isFollows*") {
+    SECTION("check_is_follows*") {
         REQUIRE(pkbQueryController.isFollowsStar(1, 3) == true);
         REQUIRE(pkbQueryController.isFollowsStar(1, 8) == true);
         REQUIRE(pkbQueryController.isFollowsStar(2, 8) == true);
@@ -181,7 +185,7 @@ TEST_CASE("One") {
         REQUIRE(pkbQueryController.isFollowsStar(6, 8) == false);
     }
 
-    SECTION("Check isParent") {
+    SECTION("Ccheck_is_parent") {
         REQUIRE(pkbQueryController.isParent(1, 2) == false);
         REQUIRE(pkbQueryController.isParent(1, 3) == false);
         REQUIRE(pkbQueryController.isParent(2, 1) == false);
@@ -190,7 +194,7 @@ TEST_CASE("One") {
         REQUIRE(pkbQueryController.isParent(3, 6) == true);
     }
 
-    SECTION("Check statementUses") {
+    SECTION("check_statement_uses") {
         REQUIRE(pkbQueryController.statementUses(3, "b") == true);
         REQUIRE(pkbQueryController.statementUses(4, "b") == true);
         REQUIRE(pkbQueryController.statementUses(4, "a") == true);
@@ -199,5 +203,64 @@ TEST_CASE("One") {
         REQUIRE(pkbQueryController.statementUses(4, "temp") == false);
     }
 
+    SECTION("check_satisfies_pattern") {
+        assign_ref a = 4;
+        pattern p1 = {"temp", "a % b"};
+        pattern p2 = {"temp", "_a % b"};
+        pattern p3 = {"temp", "a % b_"};
+        pattern p4 = {"temp", "_a % b_"};
+        pattern p5 = {"temp", "b"};
+        pattern p6 = {"temp", "a"};
+        pattern p7 = {"temp", "_a + c_"};
+        pattern p8 = {"temp", "_temp_"};
+        pattern p9 = {"temp", "_"};
+        pattern p10 = {"not_modified_var", "a % b"};
+        pattern p11 = {"v", "_a % b"};
+        pattern p12 = {"v", "a % b_"};
+        pattern p13 = {"v", "_a % b_"};
+        pattern p14 = {"v", "a"};
+        pattern p15 = {"v", "_a + c_"};
+        pattern p16 = {"_", "_"};
+        pattern p17 = {"_", "a % b"};
+        pattern p18 = {"_", "_a + c_"};
+        /*
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p1) == true);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p2) == true);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p3) == true);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p4) == true);
+        */
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p5) == false);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p6) == false);
+        /*
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p7) == false);
+        */
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p8) == false);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p9) == true);
+        /*
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p10) == false);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p11) == false);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p12) == false);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p13) == false);
+        */
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p14) == false);
+        /*
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p15) == false);
+        */
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p16) == true);
+        /*
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p17) == true);
+        REQUIRE(pkbQueryController.satisfiesPattern(a, p18) == false);
+        */
+    }
     // implement the rest in iteration/v1.3
+
+    SECTION("check get_statements_of_type") {
+        stmt_type p = PRINT;
+        stmt_type r = READ;
+        stmt_type w = WHILE;
+        REQUIRE(pkbQueryController.getStatementsOfType(p).size() == 1);
+        REQUIRE(pkbQueryController.getStatementsOfType(w).size() == 1);
+        REQUIRE(pkbQueryController.getStatementsOfType(r).size() == 2);  
+    }
+
 }

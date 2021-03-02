@@ -1,8 +1,10 @@
 #include <string>
 #include <algorithm>
 
+using namespace std;
 
 class StringUtil {
     public:
-        std::string removeWhiteSpaces(std::string str);
+        static string remove_white_spaces(string str);
+        static bool is_number(string s);
 };

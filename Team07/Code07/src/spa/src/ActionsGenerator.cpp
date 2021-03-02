@@ -1,362 +1,339 @@
 #include "ActionsGenerator.h"
 #include "StringUtil.h"
+#include "SuchThatEval.h"
+#include "PatternEval.h"
+#include "SuchThatPatternEval.h"
+#include "Types.hpp"
 #include <sstream>
-//#include "QueryEvaluator.h"
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <unordered_set>
 
+using namespace std;
+
+//constructor
 ActionsGenerator::ActionsGenerator() {}
 
-ActionsGenerator::ActionsGenerator(QueryMap mapQuery, ActionsExecutor executerActions) {
-    executer = executerActions;
-    queryMap = mapQuery;
+ActionsGenerator::ActionsGenerator(QueryMap query_map, ActionsExecutor executorActions) {
+    executor = executorActions;
+    this->query_map = query_map;
+    preprocess();
 }
 
-std::vector<std::string> ActionsGenerator::TraverseQueryMap() {
-    selectList= queryMap.getList(ClauseType::SELECT);
-    declarationList = queryMap.getList(ClauseType::DECLARATION);
-    suchThatList = queryMap.getList(ClauseType::SUCHTHAT);
-    patternList = queryMap.getList(ClauseType::PATTERN);
+// //methods
+void ActionsGenerator::set_map_storage_store_declaration(unordered_map<Single, 
+        unordered_map<string, vector<string>>> storage_map, 
+        unordered_map<string, Single> store_declaration) {
+            map_storage = storage_map;
+            procedure_storage = storage_map[Single::PROCEDURE];
+            stmt_storage = storage_map[Single::STATEMENT];
+            read_storage = storage_map[Single::READ];
+            print_storage = storage_map[Single::PRINT];
+            assign_storage = storage_map[Single::ASSIGN];
+            while_storage = storage_map[Single::WHILE];
+            if_storage = storage_map[Single::IF];
+            constant_storage = storage_map[Single::CONSTANT];
+            variable_storage = storage_map[Single::VARIABLE];
+            call_storage = storage_map[Single::CALL];
+            this->store_declaration = store_declaration;
+}
+
+void ActionsGenerator::set_Query_Map(QueryMap query_map) {
+    this->query_map = query_map;
+    declaration_list = query_map.getList(ClauseType::DECLARATION);
+    select_list = query_map.getList(ClauseType::SELECT);
+    such_that_list = query_map.getList(ClauseType::SUCHTHAT);
+    pattern_list = query_map.getList(ClauseType::PATTERN);
     
-    // //here
-    // std::string dummyS = "s";
-    // std::vector<std::string> dummyVS;
-    // dummyVS.push_back("1");dummyVS.push_back("2"); dummyVS.push_back("3");
-    // std::string dummyA = "a";
-    // std::vector<std::string> dummyAS;
-    // dummyAS.push_back("1");dummyAS.push_back("2"); dummyAS.push_back("3");
-    // stmtStorage[dummyS] = dummyVS; 
-    // assignStorage[dummyA] = dummyAS;
-    // std::string dummyV = "v";
-    // std::vector<std::string> dummyVar;
-    // dummyVar.push_back("a");dummyVar.push_back("b"); dummyVar.push_back("c");
-    // variableStorage[dummyV] = dummyVar;
+}
+
+std::vector<PayLoad> ActionsGenerator::get_pattern_list() {
+    return pattern_list;
+}
+std::unordered_map<Single, 
+        std::unordered_map<std::string, std::vector<std::string>>> ActionsGenerator::preprocess() {
+    // preprocessing - retrieval of queryMap clauses
+    declaration_list = query_map.getList(ClauseType::DECLARATION);
+    select_list = query_map.getList(ClauseType::SELECT);
+    such_that_list = query_map.getList(ClauseType::SUCHTHAT);
+    pattern_list = query_map.getList(ClauseType::PATTERN);
     
+
     //DECLARATION
-    for(auto i: declarationList) {
+    for(auto i: declaration_list) {
         if (i.getType().single != Single::SYNONYM) {
-            std::vector<std::string> payloadValues = i.getValue();
-            storeDeclaration[payloadValues[0]] = i.getType().single;            
+            vector<string> payloadValues = i.getValue();
+            store_declaration[payloadValues[0]] = i.getType().single;            
         }
     }
-    for(auto i: storeDeclaration) {
+    
+    for(auto i: this->store_declaration) {
+        string declaration_name = i.first;
         Single s = i.second;
         if (s == Single::STATEMENT) {
-            // put inside statementstorage
+            vector<stmt_ref> statement_lst = executor.get_all_statements_of_type(stmt_type::STATEMENT);
+            vector<string> statement_lst_string;
+            for(auto stmt : statement_lst) {
+                statement_lst_string.push_back(to_string(stmt));
+            }
+            stmt_storage[declaration_name] = statement_lst_string;
         } else if (s == Single::READ) {    
-            
+            vector<stmt_ref> read_lst = executor.get_all_statements_of_type(stmt_type::READ);
+            vector<string> read_lst_string;
+            for(auto rd : read_lst) {
+                read_lst_string.push_back(to_string(rd));
+            }
+            read_storage[declaration_name] = read_lst_string;           
         } else if (s == Single::PRINT) {
-        
-        } else if (s == Single::CALL) {
-        
+            vector<stmt_ref> print_lst = executor.get_all_statements_of_type(stmt_type::PRINT);
+            vector<string> print_lst_string;
+            for(auto pr : print_lst) {
+                print_lst_string.push_back(to_string(pr));
+            }
+            print_storage[declaration_name] = print_lst_string;
         } else if (s == Single::WHILE) {
-        
+            vector<stmt_ref> while_lst = executor.get_all_statements_of_type(stmt_type::WHILE);
+            vector<string> while_lst_string;
+            for(auto while_ : while_lst) {
+                while_lst_string.push_back(to_string(while_));
+            }
+            while_storage[declaration_name] = while_lst_string;
         } else if (s == Single::IF) {
-        
+            vector<stmt_ref> if_lst = executor.get_all_statements_of_type(stmt_type::IF);
+            vector<string> if_lst_string;
+            for(auto ifs : if_lst) {
+                if_lst_string.push_back(to_string(ifs));
+            }
+            if_storage[declaration_name] = if_lst_string;
         } else if (s == Single::ASSIGN) {
-        
+            vector<stmt_ref> assign_lst = executor.get_all_statements_of_type(stmt_type::ASSIGN);
+            vector<string> assign_lst_string;
+            for(auto ass : assign_lst) {
+                assign_lst_string.push_back(to_string(ass));
+            }
+            assign_storage[declaration_name] = assign_lst_string;  
+        } else if (s == Single::CONSTANT) {
+            vector<constant> constant_lst = executor.get_all_constants();
+            vector<string> constant_lst_string;
+            for(auto cnst : constant_lst) {
+                constant_lst_string.push_back(cnst);
+            }
+            constant_storage[declaration_name] = constant_lst_string;   
+        } else if (s == Single::VARIABLE) {
+            vector<var_ref> variable_lst= executor.get_all_variables();
+            variable_storage[declaration_name] = variable_lst;
+        } else if (s == Single::PROCEDURE) {
+            vector<proc_ref> procedure_lst = executor.get_all_procedures();
+            procedure_storage[declaration_name] = procedure_lst;  
+        } else if (s == Single::CALL) {
+            vector<stmt_ref> call_lst = executor.get_all_statements_of_type(stmt_type::CALL);
+            vector<string> call_lst_string;
+            for(auto cll : call_lst) {
+                call_lst_string.push_back(to_string(cll));
+            }
+            call_storage[declaration_name] = call_lst_string;  
         } else {
             throw "Payload Single is not STATEMENT/READ/PRINT/CALL/WHILE/IF/ASSIGN.";
         }
-    }
-        /*
-            case Single::PROCEDURE:
-                break;
-            
-            case Single::CONSTANT:
-          
-                 break;
-            case Single::VARIABLE:
-          
-                //variableStorage[i.first] = generate action => retrieve all variables from PKB
-                break;
-        */
-    
-    mapStorage[Single::PROCEDURE] = procedureStorage;
-    mapStorage[Single::STATEMENT] = stmtStorage;
-    mapStorage[Single::READ] = readStorage;
-    mapStorage[Single::PRINT] = printStorage;
-    mapStorage[Single::ASSIGN] = assignStorage;
-    mapStorage[Single::WHILE] = whileStorage;
-    mapStorage[Single::IF] = ifStorage;
-    mapStorage[Single::CONSTANT] = constantStorage;
-    mapStorage[Single::VARIABLE] = variableStorage;
-    
+    } 
+
+    //map all types of storage such as stmt, read etc into map_storage
+    map_storage[Single::PROCEDURE] = procedure_storage;
+    map_storage[Single::STATEMENT] = stmt_storage;
+    map_storage[Single::READ] = read_storage;
+    map_storage[Single::PRINT] = print_storage;
+    map_storage[Single::ASSIGN] = assign_storage;
+    map_storage[Single::WHILE] = while_storage;
+    map_storage[Single::IF] = if_storage;
+    map_storage[Single::CONSTANT] = constant_storage;
+    map_storage[Single::VARIABLE] = variable_storage;
+    return map_storage; 
+}
+vector<string> ActionsGenerator::TraverseQueryMap() {
+
     //SELECT
-    PayLoad selectPayLoad = selectList[0];
-        //retrieve from pkb select synonym. example stmts s, Select s..., retrieve all stmts from pkb
-    if (selectPayLoad.getType().single != Single::SYNONYM) {
-        throw "SELECT payload is not a synonym. Synonym is required.";
+    if(select_list.empty()) {
+        // return vector<string>{"Invalid"};
+        throw "Missing SELECT payload.";
     }
-    std::string selectValue = (selectPayLoad.getValue())[0];
-    Single selectSynonym = selectPayLoad.getType().single;
+    PayLoad select_payload = select_list.at(0);
     
-    //Default solution is the solution to SELECT without considering SUCH THAT and PATTERN.
-    std::vector<std::string> defaultSolution = std::vector<string>{"1","2","3"};//here mapStorage[selectSynonym][selectValue];
-
-    //Evaluated solution
-    std::unordered_map<std::string, std::vector<std::string>> solutionSuchThat;
-    std::unordered_map<std::string, std::vector<std::string>> solutionPattern;
-
-    bool isSuchThatEmpty = suchThatList.empty();
-    bool isPatternEmpty = patternList.empty();
+    if (select_payload.getType().single != Single::SYNONYM) {
+        throw "SELECT payload is not a synonym. Synonym type is required.";
+    }
+    string select_value = (select_payload.getValue())[0];
+    Single select_type = store_declaration[select_value];
     
-    if (isSuchThatEmpty && isPatternEmpty) {
-        //there is no such that and pattern clause
-        //here return defaultSolution;
-        return std::vector<string>{"1","2","3"};
-    } else if (!isSuchThatEmpty && isPatternEmpty) {
-        // there is only suchthat clause but no pattern clause
-        PayLoad suchThatPayLoad = suchThatList[0];
+    vector<string> default_solution = (map_storage[select_type])[select_value];
+    vector<string> solution_such_that;
+    vector<string> solution_pattern;
 
-        bool isSelectInSuchThat = false;
-        std::string suchThatFirstArg = (suchThatPayLoad.getValue())[0];
-        std::string suchThatSecondArg = (suchThatPayLoad.getValue())[1];
+    bool is_such_that_empty = such_that_list.empty();
+    bool is_pattern_empty = pattern_list.empty();
+    if(is_such_that_empty && is_pattern_empty) {
+        // There is no such that and pattern clause.
+        return default_solution;
+    }
+    if (!is_such_that_empty && is_pattern_empty) {
+        // there is only such that clause and no pattern clause.
+        PayLoad such_that_pay_load = such_that_list.at(0);
 
-        if(!suchThatFirstArg.compare(selectValue) || !suchThatSecondArg.compare(selectValue)) {
-            isSelectInSuchThat = true;
+        // check if select value is in such that clauses(first and second)
+        string such_that_first_arg = such_that_pay_load.getValue()[0];
+        string such_that_second_arg = such_that_pay_load.getValue()[1];
+        pair<bool, bool> is_select_val_in_suchthat(false, false);  
+        if (such_that_first_arg == select_value) {
+            is_select_val_in_suchthat.first = true;
         }
-        if (isSelectInSuchThat) {
-            std::unordered_map<std::string, std::vector<std::string>> evaluatedSuchThat = evalSuchThatPre(suchThatFirstArg, suchThatSecondArg, selectValue, suchThatPayLoad);
-            return evaluatedSuchThat[selectValue];
-            //return std::vector<string>{"1","2","3"};
+        if (such_that_second_arg == select_value) {
+            is_select_val_in_suchthat.second = true;
+        }
+        SuchThatEval such_that_eval(store_declaration, map_storage, executor);
+
+        vector<string> return_result = such_that_eval.one_such_that_zero_pattern(such_that_pay_load, select_value, select_type, is_select_val_in_suchthat);
+        if (return_result.empty()) {
+                return vector<string> {};
         } else {
-            // return std::vector<string>{"1","2","3"};
-            return defaultSolution;
+            if (is_select_val_in_suchthat.first || is_select_val_in_suchthat.second) {
+                return return_result;    
+            } else {
+                return default_solution;
+            }
         }
-    } else if (isSuchThatEmpty && !isPatternEmpty) {  
-        // there is pattern clause but no such that clause.
-        PayLoad patternPayLoad = patternList[0];
-        std::string patternFirstArg = (patternPayLoad.getValue())[0];
-        std::string patternSecondArg = (patternPayLoad.getValue())[1];
-        bool isSelectInPattern = false;
-        if(!patternFirstArg.compare(selectValue) || !patternSecondArg.compare(selectValue)) {
-        isSelectInPattern = true;
+    } else if (is_such_that_empty && !is_pattern_empty) {
+        // there is only pattern clause and no such that
+        PayLoad pattern_pay_load = pattern_list.at(0);
+        string pattern_first_arg = pattern_pay_load.getValue()[0];
+        string pattern_second_arg = pattern_pay_load.getValue()[1];
+        string pattern_third_arg = pattern_pay_load.getValue()[2]; //sub expression
+        pair<bool, bool> is_select_val_in_pattern(false, false);  
+        if (pattern_first_arg == select_value) {
+            is_select_val_in_pattern.first = true;
         }
-        if (isSelectInPattern) {
-            // call patternEval
-            //return
-        } else {
-            return defaultSolution;
+        if (pattern_second_arg == select_value) {
+            is_select_val_in_pattern.second = true;
         }
+        PatternEval pattern_eval(store_declaration, map_storage, executor);
 
+        vector<string> return_result = pattern_eval.zero_such_that_one_pattern(pattern_pay_load, select_value, select_type, is_select_val_in_pattern);
+        
+        if (return_result.empty()) {
+                return vector<string> {};
+        } else {
+            if (is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
+                return return_result;    
+            } else {
+                return default_solution;
+            }
+        }
     } else {
-        // there is both pattern and empty clause
-        PayLoad suchThatPayLoad = suchThatList[0];
-        PayLoad patternPayLoad = patternList[0];
-
-        std::string suchThatFirstArg = (suchThatPayLoad.getValue())[0];
-        std::string suchThatSecondArg = (suchThatPayLoad.getValue())[1];
-
-        std::string patternFirstArg = (patternPayLoad.getValue())[0];
-        std::string patternSecondArg = (patternPayLoad.getValue())[1];
-
-        bool isSelectInSuchThat = false;
-        bool isSelectInPattern = false;
-
-        if(!suchThatFirstArg.compare(selectValue) || !suchThatSecondArg.compare(selectValue)) {
-            isSelectInSuchThat = true;
+        // there is both such that and pattern.
+        PayLoad such_that_pay_load = such_that_list.at(0);
+        PayLoad pattern_pay_load = pattern_list.at(0);
+        SuchThatPatternEval such_that_pattern(store_declaration, map_storage, executor);
+        
+        vector<string> return_result = such_that_pattern.such_that_pattern_eval(such_that_pay_load, pattern_pay_load,select_value,select_type);
+        
+        string such_that_first_arg = such_that_pay_load.getValue()[0];
+        string such_that_second_arg = such_that_pay_load.getValue()[1];
+        string pattern_first_arg = pattern_pay_load.getValue()[0];
+        string pattern_second_arg = pattern_pay_load.getValue()[1];
+        pair<bool, bool> is_select_val_in_suchthat(false, false);  
+        if (such_that_first_arg == select_value) {
+            is_select_val_in_suchthat.first = true;
         }
-        if(!patternFirstArg.compare(selectValue) || !patternSecondArg.compare(selectValue)) {
-            isSelectInPattern = true;
+        if (such_that_second_arg == select_value) {
+            is_select_val_in_suchthat.second = true;
         }
-        if (!isSelectInSuchThat && !isSelectInPattern) {
-            return defaultSolution;
-        } 
-        // to do...
+        pair<bool, bool> is_select_val_in_pattern(false, false);  
+        if (pattern_first_arg == select_value) {
+            is_select_val_in_pattern.first = true;
+        }
+        if (pattern_second_arg == select_value) {
+            is_select_val_in_pattern.second = true;
+        }
+
+        if (return_result.empty()) {
+                return vector<string> {};
+        } else {
+            if (is_select_val_in_suchthat.first || is_select_val_in_suchthat.second || is_select_val_in_pattern.first || is_select_val_in_pattern.second) {
+                return return_result;    
+            } else {
+                return default_solution;
+            }
+        }    
     }
-};
+    return default_solution;
+}
 
 
-std::pair<bool,bool> ActionsGenerator::checkIfArgsAreVariable(std::string firstArg, std::string secondArg) {
-    bool isFirstArgVariable = false;
-    bool isSecondArgVariable = false;
+// utilities
 
-    //check if string is in the storedeclaration.
-    if(storeDeclaration.find(firstArg) != storeDeclaration.end()) {
-        isFirstArgVariable = true;
+pair<bool,bool> ActionsGenerator::check_if_args_are_variable(std::string first_arg, std::string second_arg) {
+    bool is_first_arg_variable = false;
+    bool is_second_arg_variable = false;
+
+    //check if string is in the store_declaration.
+    if(store_declaration.find(first_arg) != store_declaration.end()) {
+        is_first_arg_variable = true;
     }
-    if(storeDeclaration.find(secondArg) != storeDeclaration.end()) {
-        isSecondArgVariable = true;
+    if(store_declaration.find(second_arg) != store_declaration.end()) {
+        is_second_arg_variable = true;
     }
     std::pair<bool, bool> pairArgs;
-    pairArgs.first = isFirstArgVariable;
-    pairArgs.second = isSecondArgVariable;
+    pairArgs.first = is_first_arg_variable;
+    pairArgs.second = is_second_arg_variable;
     return pairArgs;
 } 
 
-std::vector<std::pair <std::string, std::string>> ActionsGenerator::bothAreVariables(std::string firstArg, std::string secondArg) {
-    Single firstArgSynonym = storeDeclaration[firstArg];
-    Single secondArgSynonym = storeDeclaration[secondArg];
-    std::vector<std::string> firstArgLst = mapStorage[firstArgSynonym][firstArg];
-    std::vector<std::string> secondArgLst = mapStorage[secondArgSynonym][secondArg];
-    std::vector<std::pair <std::string, std::string>> permutated = ActionsGenerator::permutateValues(firstArgLst, secondArgLst);
-    return permutated;
-}
-
-//return list
-std::unordered_map<std::string, std::vector<std::string>> ActionsGenerator::evalSuchThatPre(std::string firstArg, std::string secondArg, 
-std::string selectValue, PayLoad loadpay) {
-    std::pair<bool,bool> pairArgs = checkIfArgsAreVariable(firstArg, secondArg);
-    
-    int findSelectVal;
-    if(!selectValue.compare(firstArg)) {
-        findSelectVal = 0;
-    } else if (!selectValue.compare(secondArg)) {
-        findSelectVal = 1;
-    }
-
-    std::unordered_map<std::string, std::vector<std::string>> evaluatedSuchThat;
-    
-    if(pairArgs.first && pairArgs.second) {
-        std::vector<std::pair <std::string, std::string>> permutated = ActionsGenerator::bothAreVariables(firstArg, secondArg);
-        for(auto j : permutated) {
-            std::string actionFirstArg = j.first;
-            std::string actionSecondArg = j.second;
-            bool isInPKB = evalSuchThat(loadpay.getType().pair, actionFirstArg, actionSecondArg);
-            if(isInPKB) {
-                //if element is not in evaluatedSuchThat, add it.
-                if(std::find(evaluatedSuchThat[firstArg].begin(), evaluatedSuchThat[firstArg].end(),actionFirstArg) == evaluatedSuchThat[firstArg].end()) {
-                    evaluatedSuchThat[firstArg].push_back(actionFirstArg);
-                }
-                if(std::find(evaluatedSuchThat[secondArg].begin(), evaluatedSuchThat[secondArg].end(),actionSecondArg) == evaluatedSuchThat[secondArg].end()) {
-                    evaluatedSuchThat[secondArg].push_back(actionSecondArg);
-                }
-            }
-        }
-    } else if(pairArgs.first && !pairArgs.second) {
-        Single firstArgSynonym = storeDeclaration[firstArg];
-        std::vector<std::string> firstArgLst = mapStorage[firstArgSynonym][firstArg];
-        for(auto i : firstArgLst) {      
-            bool isInPKB = evalSuchThat(loadpay.getType().pair, i, secondArg);
-            
-            if(isInPKB) {
-                if(std::find(evaluatedSuchThat[firstArg].begin(), evaluatedSuchThat[firstArg].end(),i) == evaluatedSuchThat[firstArg].end()) {
-                    evaluatedSuchThat[firstArg].push_back(i);
-                }
-            }
-        }
-    } else if (!pairArgs.first && pairArgs.second) {
-        Single secondArgSynonym = storeDeclaration[secondArg];
-        std::vector<std::string> secondArgLst = mapStorage[secondArgSynonym][secondArg];
-        for(auto i : secondArgLst) {
-            bool isInPKB = evalSuchThat(loadpay.getType().pair, firstArg, i);
-            if(isInPKB) {
-                if(std::find(evaluatedSuchThat[secondArg].begin(), evaluatedSuchThat[secondArg].end(),i) == evaluatedSuchThat[secondArg].end()) {
-                    evaluatedSuchThat[secondArg].push_back(i);
-                }
-            }
-        }
-    } else {
-        bool isInPKB = evalSuchThat(loadpay.getType().pair, firstArg, secondArg);
-        if(isInPKB) {
-                //evaluated.push_back(suchThatArgs[findSelectVal]);
-            }
-    }
-    //testing evaluatedSuchThat["s"]= std::vector<std::string>{"1","2","3",firstArg,secondArg,to_string(pairArgs.first),to_string(pairArgs.second)};
-    return evaluatedSuchThat;
-}
-
-bool ActionsGenerator::evalSuchThat(Pair suchThatType, std::string actionFirstArg, std::string actionSecondArg) {
-    std::vector<std::string> argLst;
-    argLst.push_back(actionFirstArg);
-    argLst.push_back(actionSecondArg);
-    switch (suchThatType)
-    {
-        {
-            case Pair::FOLLOWS:
-            
-            return true;
-            break;
-        } {
-        case Pair::FOLLOWST:
-            
-            return true;
-            break;
-        } {
-        case Pair::PARENT:
-            
-            return true;
-            break;
-        } {
-        case Pair::PARENTT:
-            
-            return true;
-            break;
-        } {
-        case Pair::USES:
-            
-            return true;
-            break;
-        } {
-        case Pair::MODIFIES:
-            
-            return true;
-            break;
-        }    
-        default:
-            throw "such that type is not FOLLOWS/FOLLOWST/PARENT/PARENTT/USES/MODIFIES.";
-            break;
-    }
-}
-/*
-std::unordered_map<std::string, std::vector<std::string>> ActionsGenerator::evalPattern(PayLoad loadPay, 
-std::unordered_map<std::string, std::vector<std::string>> solutionStorage) {
-    std::vector<std::string> suchThatArgs = ActionsGenerator::extract(loadPay.getValue());
-    std::string firstArg = suchThatArgs[0];
-    std::string secondArg = suchThatArgs[1];
-    std::unordered_map<std::string, std::vector<std::string>> evaluatedSolution;
-    //if solutionStorage is empty, this implies there is no such-that clause 
-    if(!solutionStorage.empty()) {
-        if(solutionStorage.find(firstArg) == solutionStorage.end()) { // assign a is not found 
-            std::vector<std::string> assignFromStorage = mapStorage[ASSIGN].begin()->second;
-            for(auto i : assignFromStorage) {
-                // generate action -pattern(i,secondArg);
-                if (true) {
-                    //add to evaluatedSolution[]
-                }
-            }
-        } else {// found
-            std::vector<std::string> solutionFromSuchThat = solutionStorage[firstArg];
-            for(auto i : solutionFromSuchThat) {
-                //generate action - pattern(i, secondArg)
-                if(true) {
-                    //add to evaluatedSolution[]
-                }
-            }
-        }
-    } else {
-        std::vector<std::string> assignFromStorage = mapStorage[ASSIGN].begin()->second;
-            for(auto i : assignFromStorage) {
-                // generate action -pattern(i,secondArg);
-                if (true) {
-                    //add to evaluatedSolution[]
-                }
-            }
-    }
-    //generate action- Pattern (firstArg, SecondArg)
-    //return list 
-    return evaluatedSolution;   
-}
-*/
-std::vector<std::pair <std::string, std::string>> ActionsGenerator::permutateValues(std::vector<std::string> firstArg, 
-    std::vector<std::string> secondArg){
-    std::vector<std::pair <std::string, std::string>> permutated;
-    for(auto i : firstArg) {
-        for(auto j : secondArg) {
-            permutated.push_back(std::make_pair(i,j));
+vector<pair<string,string>> ActionsGenerator::crossproduct(vector<string> first_arg_lst, vector<string> second_arg_lst){
+    vector<pair <string, string>> products;
+    for(auto i : first_arg_lst) {
+        for(auto j : second_arg_lst) {
+            products.push_back(make_pair(i,j));
         }
     }
-    return permutated;
+    return products;
 };
 
-/*
-std::vector<std::string> ActionsGenerator::extract(std::string payloadVal) {
-    std::vector<std::string> output;
-    std::stringstream splitter(payloadVal);
-    std::string intermediate;
-
-    while(getline(splitter, intermediate, ',')) {
-        output.push_back(StringUtil::removeWhiteSpaces(intermediate));
+vector<string> ActionsGenerator::inner_join_A(vector<string> lstA, vector<string> lstB) {
+    // add all elements of lst A that is present in lstB.
+    vector<string> result;
+    for(auto item : lstA) {
+        if(std::find(lstB.begin(), lstB.end(), item) != lstB.end()) {
+            result.push_back(item);
+        }
     }
-    return output;
+    return result;
 }
-*/
+
+
+bool ActionsGenerator::is_element_inside_vectorA(string element, vector<string> vectorA) {
+    return std::find(vectorA.begin(), vectorA.end(), element) != vectorA.end();
+}
+stmt_type ActionsGenerator::convert_single_to_stmt_type(Single s) {
+    if (s == Single::STATEMENT) {
+        return stmt_type::STATEMENT;
+    } else if (s == Single::READ) {
+        return stmt_type::READ;
+    } else if (s == Single::PRINT) {
+        return stmt_type::PRINT;
+    } else if (s == Single::CALL) {
+        return stmt_type::CALL;
+    } else if (s == Single::WHILE) {
+        return stmt_type::WHILE;
+    } else if (s == Single::IF) {
+        return stmt_type::IF;
+    } else if (s == Single::ASSIGN) {
+        return stmt_type::ASSIGN;
+    } else if (s == Single::CONSTANT) {
+        return stmt_type::CONSTANT;
+    } else if (s == Single::VARIABLE) {
+        return stmt_type::VARIABLE;
+    } else if (s == Single::PROCEDURE) {
+        return stmt_type::PROCEDURE;
+    } else {
+        return stmt_type::STATEMENT;
+    }
+}
