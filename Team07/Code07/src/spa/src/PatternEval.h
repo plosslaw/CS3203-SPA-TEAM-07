@@ -11,9 +11,9 @@ using namespace std;
 class PatternEval {
     private:
         //variables
-        unordered_map<string, Single> storeDeclaration;
+        unordered_map<string, Single> store_declaration;
         unordered_map<Single, 
-            unordered_map<string, vector<string>>> mapStorage;
+            unordered_map<string, vector<string>>> map_storage;
         ActionsExecutor executor;
         //utilities
         pair<bool,bool> check_if_args_are_variable(std::string first_arg, std::string second_arg);

@@ -6,8 +6,8 @@
 //constructor
 PatternEval::PatternEval(unordered_map<string, Single> declaration_store, unordered_map<Single, 
             unordered_map<string, vector<string>>> map_storage, ActionsExecutor executor_) {
-                storeDeclaration = declaration_store;
-                mapStorage = map_storage;
+                store_declaration = declaration_store;
+                this->map_storage = map_storage;
                 executor = executor_; 
 }
 
@@ -55,11 +55,11 @@ pair<bool,bool> PatternEval::check_if_args_are_variable(std::string first_arg, s
     bool is_first_arg_variable = false;
     bool is_second_arg_variable = false;
     
-    //check if string is in the storedeclaration.
-    if(storeDeclaration.find(first_arg) != storeDeclaration.end()) {
+    //check if string is in the store_declaration.
+    if(store_declaration.find(first_arg) != store_declaration.end()) {
         is_first_arg_variable = true;
     }
-    if(storeDeclaration.find(second_arg) != storeDeclaration.end()) {
+    if(store_declaration.find(second_arg) != store_declaration.end()) {
         is_second_arg_variable = true;
     }
     std::pair<bool, bool> pairArgs;

@@ -11,9 +11,9 @@ using namespace std;
 class SuchThatPatternEval {
     private:
         //variables
-        unordered_map<string, Single> storeDeclaration;
+        unordered_map<string, Single> store_declaration;
         unordered_map<Single, 
-            unordered_map<string, vector<string>>> mapStorage;
+            unordered_map<string, vector<string>>> map_storage;
         ActionsExecutor executor;
         
         //methods
