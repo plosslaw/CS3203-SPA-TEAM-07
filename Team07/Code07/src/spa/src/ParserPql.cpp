@@ -62,7 +62,7 @@ PayLoad stmt_ref(State &state) {
       state.assign(so);
       try {
         return PayLoad(SINGLE, Single::WILDCARD,
-                       std::vector<std::string>{wildcard(state)});
+                       std::vector<std::string>{std::string(1, char_match(state, '_'))});
       } catch (ParseException &e) {
         state.excps.push_back(e);
         throw ParseException(so.i, state.i, "stmt_ref", "");
@@ -81,13 +81,13 @@ PayLoad ent_ref(State &state) {
   } catch (ParseException &e) {
     state.assign(so);
     try {
-      std::string dbl_quotes_1 = double_quotes(state);
+      std::string dbl_quotes_1 = std::string(1, char_match(state, '"'));
       whitespace(state);
 
       std::string val = ident(state);
       whitespace(state);
 
-      std::string dbl_quotes_2 = double_quotes(state);
+      std::string dbl_quotes_2 = std::string(1, char_match(state, '"'));
       whitespace(state);
 
       return PayLoad(
@@ -97,7 +97,7 @@ PayLoad ent_ref(State &state) {
       state.assign(so);
       try {
         return PayLoad(SINGLE, Single::WILDCARD,
-                       std::vector<std::string>{wildcard(state)});
+                       std::vector<std::string>{std::string(1, char_match(state, '_'))});
       } catch (ParseException &e) {
         state.excps.push_back(e);
         throw ParseException(so.i, state.i, "ent_ref", "");
@@ -110,19 +110,19 @@ PayLoad ent_ref(State &state) {
 PayLoad expr_spec(State &state) {
   State so(state);
   try {
-    std::string any_val_1 = wildcard(state);
+    std::string any_val_1 = std::string(1, char_match(state, '_'));
     whitespace(state);
 
-    std::string dbl_quotes_1 = double_quotes(state);
+    std::string dbl_quotes_1 = std::string(1, char_match(state, '"'));
     whitespace(state);
 
     std::string value = factor(state);
     whitespace(state);
 
-    std::string dbl_quotes_2 = double_quotes(state);
+    std::string dbl_quotes_2 = std::string(1, char_match(state, '"'));
     whitespace(state);
 
-    std::string any_val_2 = wildcard(state);
+    std::string any_val_2 = std::string(1, char_match(state, '_'));
     whitespace(state);
 
     return PayLoad(SINGLE, Single::U_DQ_FACTOR,
@@ -131,7 +131,7 @@ PayLoad expr_spec(State &state) {
     state.assign(so);
     try {
       return PayLoad(SINGLE, Single::WILDCARD,
-                     std::vector<std::string>{wildcard(state)});
+                     std::vector<std::string>{std::string(1, char_match(state, '_'))});
     } catch (ParseException &e) {
       state.excps.push_back(e);
       throw ParseException(so.i, state.i, "expr_spec", "");

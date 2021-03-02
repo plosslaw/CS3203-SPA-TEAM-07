@@ -40,6 +40,7 @@ TEST_CASE("predicates") {
   SECTION("whitespace") {
     REQUIRE(whitespace_pred(' '));
     REQUIRE(whitespace_pred('\n'));
+    REQUIRE(whitespace_pred('\t'));
     REQUIRE_FALSE(whitespace_pred('.'));
   }
 }

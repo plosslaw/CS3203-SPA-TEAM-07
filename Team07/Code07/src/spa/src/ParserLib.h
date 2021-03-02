@@ -58,8 +58,6 @@ bool digit_pred(char c);
 std::string digit(State &s);
 bool alpha_num_pred(char c);
 std::string alpha_num(State &s);
-std::string double_quotes(State &s);
-std::string wildcard(State &s);
 
 std::string name(State &s);
 std::string ident(State &s);

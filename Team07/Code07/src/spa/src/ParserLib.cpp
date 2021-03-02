@@ -160,16 +160,6 @@ std::string alpha_num(State &s) {
   return string_predicate(s, &alpha_num_pred, "alpha_num");
 }
 
-std::string double_quotes(State &s) {
-  char_match(s, '"');
-  return "\"";
-}
-
-std::string wildcard(State &s) {
-  char_match(s, '_');
-  return "_";
-}
-
 // predicates -----------------------------------------------------------------
 
 bool whitespace_pred(char c) { return std::isspace(c); }
