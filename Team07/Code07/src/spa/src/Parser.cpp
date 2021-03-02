@@ -25,17 +25,17 @@ TNode Parse (std::string file) {
 		int valPhase = 0;
 		try {
 			std::unordered_set<std::string> procs;
-			validateUniqueProcedureNames(ast, procs);
+			validate_unique_procedure_names(ast, procs);
 			valPhase = 1;
-			validateCallProcedureExists(ast, procs);
+			validate_call_procedure_exists(ast, procs);
 			return ast;
 		} catch (int &valRes) {
-			throw prettyPrintValidation(map, valRes, valPhase == 0 ? "repeated procedure definition" : "call on undefined procedure");
+			throw pretty_print_validation(map, valRes, valPhase == 0 ? "repeated procedure definition" : "call on undefined procedure");
 		}
 		// validate
 	} catch (ParseException &e) {
 		s.excps.push_back(e);
-		throw prettyPrintException(map, s);
+		throw pretty_print_exception(map, s);
 	}
 }
 
@@ -47,6 +47,6 @@ QueryMap parse_pql(std::string query) {
     return pql_validate(parsed_query_map);
 	} catch (ParseException &e) {
 		state.excps.push_back(e);
-		throw prettyPrintException(map, state);
+		throw pretty_print_exception(map, state);
 	}
 }

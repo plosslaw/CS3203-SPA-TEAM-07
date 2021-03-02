@@ -62,7 +62,7 @@ PayLoad stmt_ref(State &state) {
       state.assign(so);
       try {
         return PayLoad(SINGLE, Single::WILDCARD,
-                       std::vector<std::string>{wildcard(state)});
+                       std::vector<std::string>{std::string(1, char_match(state, '_'))});
       } catch (ParseException &e) {
         state.excps.push_back(e);
         throw ParseException(so.i, state.i, "stmt_ref", "");
@@ -81,13 +81,13 @@ PayLoad ent_ref(State &state) {
   } catch (ParseException &e) {
     state.assign(so);
     try {
-      std::string dbl_quotes_1 = double_quotes(state);
+      std::string dbl_quotes_1 = std::string(1, char_match(state, '"'));
       whitespace(state);
 
       std::string val = ident(state);
       whitespace(state);
 
-      std::string dbl_quotes_2 = double_quotes(state);
+      std::string dbl_quotes_2 = std::string(1, char_match(state, '"'));
       whitespace(state);
 
       return PayLoad(
@@ -97,7 +97,7 @@ PayLoad ent_ref(State &state) {
       state.assign(so);
       try {
         return PayLoad(SINGLE, Single::WILDCARD,
-                       std::vector<std::string>{wildcard(state)});
+                       std::vector<std::string>{std::string(1, char_match(state, '_'))});
       } catch (ParseException &e) {
         state.excps.push_back(e);
         throw ParseException(so.i, state.i, "ent_ref", "");
@@ -110,19 +110,19 @@ PayLoad ent_ref(State &state) {
 PayLoad expr_spec(State &state) {
   State so(state);
   try {
-    std::string any_val_1 = wildcard(state);
+    std::string any_val_1 = std::string(1, char_match(state, '_'));
     whitespace(state);
 
-    std::string dbl_quotes_1 = double_quotes(state);
+    std::string dbl_quotes_1 = std::string(1, char_match(state, '"'));
     whitespace(state);
 
     std::string value = factor(state);
     whitespace(state);
 
-    std::string dbl_quotes_2 = double_quotes(state);
+    std::string dbl_quotes_2 = std::string(1, char_match(state, '"'));
     whitespace(state);
 
-    std::string any_val_2 = wildcard(state);
+    std::string any_val_2 = std::string(1, char_match(state, '_'));
     whitespace(state);
 
     return PayLoad(SINGLE, Single::U_DQ_FACTOR,
@@ -131,7 +131,7 @@ PayLoad expr_spec(State &state) {
     state.assign(so);
     try {
       return PayLoad(SINGLE, Single::WILDCARD,
-                     std::vector<std::string>{wildcard(state)});
+                     std::vector<std::string>{std::string(1, char_match(state, '_'))});
     } catch (ParseException &e) {
       state.excps.push_back(e);
       throw ParseException(so.i, state.i, "expr_spec", "");
@@ -145,13 +145,13 @@ std::vector<PayLoad> stmt_and_stmt_ref(State &state) {
   std::vector<PayLoad> refs;
   State so(state);
   try {
-    stringMatch(state, "(");
+    char_match(state, '(');
     whitespace(state);
 
     refs.push_back(stmt_ref(state));
     whitespace(state);
 
-    stringMatch(state, ",");
+    char_match(state, ',');
     whitespace(state);
 
     refs.push_back(stmt_ref(state));
@@ -159,7 +159,7 @@ std::vector<PayLoad> stmt_and_stmt_ref(State &state) {
 
     whitespace(state);
 
-    stringMatch(state, ")");
+    char_match(state, ')');
     whitespace(state);
 
     return refs;
@@ -175,19 +175,19 @@ std::vector<PayLoad> stmt_and_ent_ref(State &state) {
   std::vector<PayLoad> refs;
   State so(state);
   try {
-    stringMatch(state, "(");
+    char_match(state, '(');
     whitespace(state);
 
     refs.push_back(stmt_ref(state));
     whitespace(state);
 
-    stringMatch(state, ",");
+    char_match(state, ',');
     whitespace(state);
 
     refs.push_back(ent_ref(state));
     whitespace(state);
 
-    stringMatch(state, ")");
+    char_match(state, ')');
     whitespace(state);
 
     return refs;
@@ -203,19 +203,19 @@ std::vector<PayLoad> ent_and_expr_spec(State &state) {
   std::vector<PayLoad> refs;
   State so(state);
   try {
-    stringMatch(state, "(");
+    char_match(state, '(');
     whitespace(state);
 
     refs.push_back(ent_ref(state));
     whitespace(state);
 
-    stringMatch(state, ",");
+    char_match(state, ',');
     whitespace(state);
 
     refs.push_back(expr_spec(state));
     whitespace(state);
 
-    stringMatch(state, ")");
+    char_match(state, ')');
     whitespace(state);
 
     return refs;
@@ -233,7 +233,7 @@ std::vector<PayLoad> declaration(State &state, std::string design_entity,
   std::vector<PayLoad> declarations;
   State so(state);
   try {
-    stringMatch(state, design_entity);
+    string_match(state, design_entity);
     whitespace(state);
 
     std::vector<std::string> values;
@@ -244,7 +244,7 @@ std::vector<PayLoad> declaration(State &state, std::string design_entity,
     so.assign(state);
 
     while (true) {
-      stringMatch(state, ",");
+      char_match(state, ',');
       whitespace(state);
 
       std::vector<std::string> values;
@@ -257,7 +257,7 @@ std::vector<PayLoad> declaration(State &state, std::string design_entity,
   } catch (ParseException &e) {
     state.assign(so);
     try {
-      stringMatch(state, ";");
+      char_match(state, ';');
       whitespace(state);
       return declarations;
     } catch (ParseException &e) {
@@ -364,7 +364,7 @@ std::vector<PayLoad> declaration_cl(State &state) {
 PayLoad select(State &state, Single load_type) {
   State so(state);
   try {
-    stringMatch(state, "Select");
+    string_match(state, "Select");
     whitespace(state);
 
     std::vector<std::string> values;
@@ -422,7 +422,7 @@ PayLoad rel_ref(State &state, std::string design_relation, Pair load_type) {
 
   State so(state);
   try {
-    stringMatch(state, design_relation);
+    string_match(state, design_relation);
     whitespace(state);
 
     if (load_type == PARENT || load_type == PARENTT || load_type == FOLLOWS ||
@@ -544,7 +544,8 @@ PayLoad suchthat_cl(State &state) {
   std::vector<PayLoad> suchthats;
   State so(state);
   try {
-    stringMatch(state, "such that");
+    string_match(state, "such that");
+    whitespace_char(state);
     whitespace(state);
 
     PayLoad clause = suchthat(state);
@@ -597,7 +598,7 @@ PayLoad pattern_cl(State &state) {
   std::vector<PayLoad> patterns;
   State so(state);
   try {
-    stringMatch(state, "pattern");
+    string_match(state, "pattern");
     whitespace(state);
 
     PayLoad clause = pattern(state);
@@ -959,20 +960,20 @@ bool is_pattern_clause_valid(QueryMap table) {
 
 QueryMap pql_validate(QueryMap query) {
   if (query.is_empty()) {
-    throw prettyPrintValidation("Empty query.");
+    throw pretty_print_validation("Empty query.");
   }
 
   if (!is_declaration_clause_valid(query)) {
-    throw prettyPrintValidation("Invalid declaration clause.");
+    throw pretty_print_validation("Invalid declaration clause.");
   }
   if (!is_select_clause_valid(query)) {
-    throw prettyPrintValidation("Invalid select clause.");
+    throw pretty_print_validation("Invalid select clause.");
   }
   if (!is_suchthat_clause_valid(query)) {
-    throw prettyPrintValidation("Invalid such that clause.");
+    throw pretty_print_validation("Invalid such that clause.");
   }
   if (!is_pattern_clause_valid(query)) {
-    throw prettyPrintValidation("Invalid pattern clause.");
+    throw pretty_print_validation("Invalid pattern clause.");
   }
 
   return query;

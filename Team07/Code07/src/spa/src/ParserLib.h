@@ -15,7 +15,7 @@ public:
   /** arguments to parser configuration */
   std::string args;
   ParseException(int f, int a, std::string s, std::string ar);
-  std::string errorMessage();
+  std::string error_message();
   const char *what() const throw() override;
 };
 
@@ -26,40 +26,38 @@ public:
   /** source string to be parsed */
   std::string *source;
   /** current statement num index */
-  int curStmtNum;
+  int cur_stmt_num;
   /** exception stack */
   std::vector<ParseException> excps;
   State(std::string *str);
   State(State &s);
-  std::string toString();
-  int advCurStmtNum();
+  std::string to_string();
+  int adv_cur_stmt_num();
   void assign(State &s);
 };
 
-std::string prettyPrintValidation(std::string msg);
-std::string prettyPrintValidation(ParserMapper &map, int pos, std::string msg);
-std::string prettyPrintException(ParserMapper &map, State &s, bool show_stack = true);
+std::string pretty_print_validation(std::string msg);
+std::string pretty_print_validation(ParserMapper &map, int pos, std::string msg);
+std::string pretty_print_exception(ParserMapper &map, State &s, bool show_stack = true);
 
-std::string stringMatch(State &s, std::string str);
-char charPredicate(State &s, bool (*pred)(char), std::string errorName);
-std::string stringPredicate(State &s, bool (*pred)(char),
-                            std::string errorName);
-bool whitespacePred(char c);
+char char_match(State &s, char c);
+std::string string_match(State &s, std::string str);
+char char_predicate(State &s, bool (*pred)(char), std::string error_name);
+std::string string_predicate(State &s, bool (*pred)(char),
+                            std::string error_name);
+bool whitespace_pred(char c);
 std::string whitespace(State &s);
-bool upperPred(char c);
+char whitespace_char(State &s);
+bool upper_pred(char c);
 std::string upper(State &s);
-bool lowerPred(char c);
+bool lower_pred(char c);
 std::string lower(State &s);
-bool alphaPred(char c);
+bool alpha_pred(char c);
 std::string alpha(State &s);
-bool digitPred(char c);
+bool digit_pred(char c);
 std::string digit(State &s);
-bool alphanumPred(char c);
-std::string alphaNum(State &s);
-bool double_quotes_pred(char c);
-std::string double_quotes(State &s);
-bool wildcard_pred(char c);
-std::string wildcard(State &s);
+bool alpha_num_pred(char c);
+std::string alpha_num(State &s);
 
 std::string name(State &s);
 std::string ident(State &s);
