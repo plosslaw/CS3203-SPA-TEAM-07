@@ -1,132 +1,226 @@
+#include <cctype>
+#include <limits>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <cctype>
 #include "ParserLib.h"
+#include "ParserIndexMapper.h"
 
-using namespace std;
 // class definitions ----------------------------------------------------------
 
-State::State(string str) {
-	i = 0;
-	source = str;
+State::State(std::string *str) {
+  i = 0;
+  source = str;
+  cur_stmt_num = 1;
+  excps.clear();
 }
 State::State(State &s) {
-	i = s.i;
-	source = s.source;
+  i = s.i;
+  source = s.source;
+  cur_stmt_num = s.cur_stmt_num;
+  excps = s.excps;
 }
-string State::toString() {
-	return "{ i: " + to_string(i) + " }";
-}
-
-void ParseException::init(int f, int a, string s, string ar, ParseException *c) {
-	from = f;
-	at = a;
-	subparser = s;
-	args = ar;
-	childException = c;
-	errmsg = subparser + "(" + args + ") : from " + to_string(from) + " at " + to_string(at);
+int State::adv_cur_stmt_num() { return cur_stmt_num++; }
+std::string State::to_string() { return "{ i: " + std::to_string(i) + " }"; }
+void State::assign(State &s) {
+  i = s.i;
+  source = s.source;
+  cur_stmt_num = s.cur_stmt_num;
+  excps = s.excps;
 }
 
-ParseException::ParseException(int f, int a, string s, string ar) {
-	init(f,a,s,ar,nullptr);
+ParseException::ParseException(int f, int a, std::string s, std::string ar) {
+  from = f;
+  at = a;
+  subparser = s;
+  args = ar;
 }
 
-ParseException::ParseException(int f, int a, string s, string ar, ParseException *c) {
-	init(f,a,s,ar,c);
+std::string ParseException::error_message() {
+  return subparser + "(" + args + ") : ";
 }
-string ParseException::prettyPrint() {
-  // for each f and a
-  // identify line number
-  // identify column number
-  
-  // print whole lines of line from f and a
-  // underline from (line,column) f to a
+const char *ParseException::what() const throw() {
+  static std::string str("ParseException : " + subparser);
+  return str.c_str();
+}
 
-  // concat what(), recursively for each childException
-  return "";
+std::string pretty_print_validation(std::string msg) {
+	return "ValidationError " + msg + "\n";
+}
+
+std::string pretty_print_validation(ParserMapper &map, int pos, std::string msg) {
+	std::string outputstr("ValidationError ");
+	outputstr += map.get_pos_print(pos) + "\n";
+	outputstr += map.get_line_caret(pos, 2);
+	outputstr += "  " + msg + "\n";
+	return outputstr;
+}
+
+std::string pretty_print_exception(ParserMapper &map, State &s, bool show_stack) {
+	std::vector<ParseException> e = s.excps;
+	int pos = e[0].at;
+
+	std::string outputstr("ParseError ");
+	outputstr += map.get_pos_print(pos) + "\n";
+	outputstr += map.get_line_caret(pos, 2);
+	if(show_stack) {
+		std::vector<int> fs;
+		std::vector<std::string> es;
+		for(int i = 0; i < e.size(); i++) {
+			outputstr += "  " + e[i].error_message() + "\n";
+			outputstr += map.get_pos_print(e[i].from, 4);
+		}
+  }
+  return outputstr;
 }
 
 // combinators ----------------------------------------------------------------
 
-string stringMatch(State &s, string str) {
-	for (int j = 0; j < str.size(); j++) {
-		if (s.source.at(s.i + j) != str.at(j)) {
-			throw ParseException(s.i, s.i+j, "stringParse", str);
-		}
-	}
-	s.i += str.size();
-	return str;
+char char_match(State &s, char c) {
+  int init = s.i;
+  try {
+    if ((*s.source).at(s.i) != c) {
+      throw ParseException(init, s.i, "char_match", std::to_string(c));
+    }
+    s.i++;
+    return c;
+  } catch (std::out_of_range &e) {
+    s.i = (*s.source).size();
+    throw ParseException(init, s.i, "char_match", std::to_string(c));
+  }
 }
 
-char charPredicate(State &s, bool (*pred)(char), string errorName) {
-	char c = s.source.at(s.i);
-	if (pred(c)) {
-		s.i += 1;
-	} else {
-		throw ParseException(s.i, s.i, "charPredicate", errorName);
-	}
-	return c;
+std::string string_match(State &s, std::string str) {
+  int init = s.i;
+  try {
+    for (int j = 0; j < str.size(); j++) {
+      if ((*s.source).at(s.i + j) != str.at(j)) {
+        s.i += j;
+        throw ParseException(init, s.i, "string_match", str);
+      }
+    }
+    s.i += str.size();
+    return str;
+  } catch (std::out_of_range &e) {
+    s.i = (*s.source).size();
+    throw ParseException(init, s.i, "string_match", str);
+  }
 }
 
-string stringPredicate(State &s, bool (*pred)(char), string errorName) {
-	vector<char> cs;
-	while(true) {
-		try {
-			cs.push_back(charPredicate(s, pred, errorName));
-		} catch(ParseException e) {
-			break;
-		}
-	}
-	string str(cs.begin(), cs.end());
-	return str;
+char char_predicate(State &s, bool (*pred)(char), std::string error_name) {
+  try {
+    char c = (*s.source).at(s.i);
+    if (pred(c)) {
+      s.i += 1;
+    } else {
+      throw ParseException(s.i, s.i, "char_predicate", error_name);
+    }
+    return c;
+  } catch (std::out_of_range &e) {
+    s.i = (*s.source).size();
+    throw ParseException(s.i, s.i, "char_predicate", error_name);
+  }
 }
 
-string whitespace(State &s) {
-	return stringPredicate(s, &whitespacePred, "whitespace");
+std::string string_predicate(State &s, bool (*pred)(char),
+                            std::string error_name) {
+  std::vector<char> cs;
+  State so(s);
+  while (true) {
+    try {
+      cs.push_back(char_predicate(s, pred, error_name));
+      so.assign(s);
+    } catch (ParseException &e) {
+      s.assign(so);
+      break;
+    }
+  }
+  std::string str(cs.begin(), cs.end());
+  return str;
 }
 
-string upper(State &s) {
-	return stringPredicate(s, &upperPred, "whitespace");
+char whitespace_char(State &s) {
+  return char_predicate(s, &whitespace_pred, "whitespace");
 }
 
-string lower(State &s) {
-	return stringPredicate(s, &lowerPred, "whitespace");
+std::string whitespace(State &s) {
+  return string_predicate(s, &whitespace_pred, "whitespace");
 }
 
-string alpha(State &s) {
-	return stringPredicate(s, &alphaPred, "whitespace");
-}
+std::string upper(State &s) { return string_predicate(s, &upper_pred, "upper"); }
 
-string digit(State &s) {
-	return stringPredicate(s, &digitPred, "whitespace");
-}
+std::string lower(State &s) { return string_predicate(s, &lower_pred, "lower"); }
 
-string alphanum(State &s) {
-	return stringPredicate(s, &alphanumPred, "whitespace");
+std::string alpha(State &s) { return string_predicate(s, &alpha_pred, "alpha"); }
+
+std::string digit(State &s) { return string_predicate(s, &digit_pred, "digit"); }
+
+std::string alpha_num(State &s) {
+  return string_predicate(s, &alpha_num_pred, "alpha_num");
 }
 
 // predicates -----------------------------------------------------------------
 
-bool whitespacePred(char c) {
-	return std::isspace(c);	
+bool whitespace_pred(char c) { return std::isspace(c); }
+
+bool upper_pred(char c) { return std::isupper(c); }
+
+bool lower_pred(char c) { return std::islower(c); }
+
+bool alpha_pred(char c) { return std::isalpha(c); }
+
+bool digit_pred(char c) { return std::isdigit(c); }
+
+bool alpha_num_pred(char c) { return std::isalnum(c); }
+
+// Low level abstractions
+// -----------------------------------------------------------------
+// NAME: LETTER (LETTER | DIGIT)*
+std::string name(State &s) {
+  int init = s.i;
+  try {
+    char r1 = char_predicate(s, &alpha_pred, "letter");
+    // :- letter
+    std::string r2 = alpha_num(s);
+    // :- (letter | digit)*
+    r2.insert(r2.begin(), r1);
+    return r2;
+  } catch (ParseException &e) {
+    s.excps.push_back(e);
+    throw ParseException(init, s.i, "name", "");
+  }
 }
 
-bool upperPred(char c) {
-	return std::isupper(c);
+// IDENT: LETTER (LETTER | DIGIT)*
+std::string ident(State &state) {
+  int init = state.i;
+  try {
+    char r1 = char_predicate(state, &alpha_pred, "letter"); // letter
+    std::string r2 = alpha_num(state);                     // (letter | digit)*
+    r2.insert(r2.begin(), r1);
+    return r2;
+  } catch (ParseException &e) {
+    state.excps.push_back(e);
+    throw ParseException(init, state.i, "ident", "");
+  }
 }
 
-bool lowerPred(char c) {
-	return std::islower(c);
+/** integer :- digit digit* */
+std::string integer(State &s) {
+  int init = s.i;
+  try {
+    char r1 = char_predicate(s, &digit_pred, "digit");
+    // :- digit
+    std::string r2 = digit(s);
+    // :- digit*
+    r2.insert(r2.begin(), r1);
+    return r2;
+  } catch (ParseException &e) {
+    s.excps.push_back(e);
+    throw ParseException(init, s.i, "integer", "");
+  }
 }
 
-bool alphaPred(char c) {
-	return std::isalpha(c);
-}
-
-bool digitPred(char c) {
-	return std::isdigit(c);
-}
-
-bool alphanumPred(char c) {
-	return std::isalnum(c);
-}
+// synonym: IDENT
+std::string synonym(State &state) { return ident(state); }

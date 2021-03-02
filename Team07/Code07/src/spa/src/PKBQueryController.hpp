@@ -7,7 +7,9 @@ class PKBQueryController {
     private:
         PKB pkb;
     public:
-        PKBQueryController(PKB pkbToSet);
+        PKBQueryController();
+
+        explicit PKBQueryController(PKB pkbToSet);
 
         void setPKB(PKB pkbToSet);
         // Returns true if and only if Follows(s1,s2)
@@ -28,17 +30,23 @@ class PKBQueryController {
         // Returns true if and only if Modifies(s,v)
         bool statementModifies(stmt_ref s, var_ref v);
 
+        // Returns true if and only if Uses(p,v)
+        bool procedureUses(proc_ref p, var_ref v);
+
+        // Returns true if and only if Modifies(p,v)
+        bool procedureModifies(proc_ref p, var_ref v);
+
         // Returns true if and only if assignment statement a matches pattern p
         bool satisfiesPattern(assign_ref a, pattern p);
 
         // Returns list of all constants in the SIMPLE program
-        std::vector<constant> getAllConstants();
+        std::vector<const_value> getAllConstants();
 
         // Returns list of all procedures in the SIMPLE program
         std::vector<proc_ref> getAllProcedures();
 
         // Returns list of all statements in the SIMPLE program
-        std::vector<statement> getAllStatements();
+        std::vector<stmt_ref> getAllStatements();
 
         // Returns list of all variables in the SIMPLE program
         std::vector<var_ref> getAllVariables();
