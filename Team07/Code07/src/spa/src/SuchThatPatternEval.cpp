@@ -446,7 +446,24 @@ vector<string> SuchThatPatternEval::more_than_one_common_synonym(PayLoad such_th
     vector<string> v3(result3.begin(), result3.end());
     vector<string> v4(result4.begin(), result4.end());
     map<string,vector<string>> output2; output2[pattern_first_arg] = v3; output2[pattern_second_arg] = v4;
-    return output2[select_value];
+    bool check_if_query_in_output2_key = false;
+    for(std::map<string,vector<string>>::iterator it = output2.begin(); it != output2.end(); ++it) {
+        if(it->first == select_value) {
+            check_if_query_in_output2_key = true;
+        }
+    }
+    if (check_if_query_in_output2_key) {
+        return output2[select_value];
+    } else {
+        bool is_empty_output2 = true;
+        for(std::map<string,vector<string>>::iterator it = output2.begin(); it != output2.end(); ++it) {
+            if( !output2[it->first].empty() ) {
+                is_empty_output2 = false;
+                return output2[it->first];
+            }
+        }
+        return vector<string>{};
+    }
 }
 
 
